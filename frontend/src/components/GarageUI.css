@@ -1,0 +1,510 @@
+/* Garage UI Styles */
+.garage-ui {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    z-index: 900;
+    overflow: hidden;
+}
+
+.garage-ui.loading,
+.garage-ui.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.loading-spinner {
+    font-size: 24px;
+    color: #64b5f6;
+    animation: pulse 2s infinite;
+}
+
+.error-message {
+    font-size: 18px;
+    color: #e53e3e;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Header */
+.garage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: linear-gradient(90deg, #0f3460 0%, #16213e 100%);
+    border-bottom: 3px solid #0f3460;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.garage-header h2 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: #64b5f6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.garage-currency {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.currency-icon {
+    font-size: 28px;
+}
+
+.currency-amount {
+    color: #ffd700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.close-button {
+    background: #e53e3e;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: #c53030;
+    transform: scale(1.1);
+}
+
+/* Main Content */
+.garage-content {
+    display: flex;
+    height: calc(100% - 100px);
+    overflow: hidden;
+}
+
+.vehicle-grid {
+    flex: 2;
+    padding: 30px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-content: start;
+}
+
+.vehicle-details {
+    flex: 1;
+    padding: 30px;
+    border-left: 3px solid #0f3460;
+    background: rgba(15, 52, 96, 0.2);
+    overflow-y: auto;
+}
+
+/* Vehicle Cards */
+.vehicle-card {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #0f3460;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vehicle-card:hover {
+    border-color: #64b5f6;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(100, 181, 246, 0.2);
+}
+
+.vehicle-card.selected {
+    border-color: #64b5f6;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1a1a2e 100%);
+    box-shadow: 0 0 25px rgba(100, 181, 246, 0.4);
+}
+
+.vehicle-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.vehicle-placeholder {
+    font-size: 48px;
+    opacity: 0.7;
+}
+
+.vehicle-info {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.vehicle-name {
+    margin: 0 0 5px 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.vehicle-type {
+    margin: 0;
+    font-size: 14px;
+    color: #b0bec5;
+    text-transform: capitalize;
+}
+
+/* Vehicle Progress */
+.vehicle-progress {
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #64b5f6 0%, #48bb78 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 12px;
+    color: #b0bec5;
+    text-align: center;
+}
+
+/* Vehicle Actions */
+.vehicle-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.select-button,
+.upgrade-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.select-button {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.select-button:hover {
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    transform: translateY(-1px);
+}
+
+.upgrade-button {
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    color: white;
+}
+
+.upgrade-button:hover {
+    background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+    transform: translateY(-1px);
+}
+
+.upgrade-button.expensive {
+    background: linear-gradient(135deg, #757575 0%, #616161 100%);
+    cursor: not-allowed;
+}
+
+.upgrade-button.expensive:hover {
+    transform: none;
+}
+
+/* Fully Upgraded Badge */
+.fully-upgraded-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Vehicle Details Panel */
+.vehicle-details-panel {
+    height: 100%;
+}
+
+.vehicle-details-panel h3 {
+    margin: 0 0 25px 0;
+    font-size: 28px;
+    color: #64b5f6;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #0f3460;
+}
+
+.vehicle-details.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #64b5f6;
+}
+
+/* Stats Section */
+.stats-section,
+.upgrades-section {
+    margin-bottom: 30px;
+}
+
+.stats-section h4,
+.upgrades-section h4 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.stat-item {
+    background: rgba(15, 52, 96, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-name {
+    display: block;
+    font-size: 12px;
+    color: #b0bec5;
+    text-transform: capitalize;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* Upgrades Grid */
+.upgrades-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upgrade-item {
+    background: rgba(15, 52, 96, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.upgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.upgrade-icon {
+    font-size: 20px;
+}
+
+.upgrade-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.upgrade-level {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.level-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.level-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #64b5f6 0%, #42a5f5 100%);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.level-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #b0bec5;
+    min-width: 35px;
+    text-align: right;
+}
+
+/* Details Actions */
+.details-actions {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 2px solid #0f3460;
+}
+
+.upgrade-all-button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upgrade-all-button:hover {
+    background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(100, 181, 246, 0.3);
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .garage-content {
+        flex-direction: column;
+    }
+    
+    .vehicle-grid {
+        flex: none;
+        height: 60%;
+    }
+    
+    .vehicle-details {
+        flex: none;
+        height: 40%;
+        border-left: none;
+        border-top: 3px solid #0f3460;
+    }
+}
+
+@media (max-width: 768px) {
+    .garage-header {
+        padding: 15px 20px;
+    }
+    
+    .garage-header h2 {
+        font-size: 24px;
+    }
+    
+    .garage-currency {
+        font-size: 18px;
+    }
+    
+    .vehicle-grid {
+        padding: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .vehicle-details {
+        padding: 20px;
+    }
+    
+    .vehicle-card {
+        padding: 15px;
+    }
+    
+    .vehicle-image {
+        height: 80px;
+    }
+    
+    .vehicle-placeholder {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .vehicle-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .vehicle-actions {
+        flex-direction: column;
+    }
+}
+
+/* Scrollbar Styling */
+.vehicle-grid::-webkit-scrollbar,
+.vehicle-details::-webkit-scrollbar {
+    width: 8px;
+}
+
+.vehicle-grid::-webkit-scrollbar-track,
+.vehicle-details::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.vehicle-grid::-webkit-scrollbar-thumb,
+.vehicle-details::-webkit-scrollbar-thumb {
+    background: #64b5f6;
+    border-radius: 4px;
+}
+
+.vehicle-grid::-webkit-scrollbar-thumb:hover,
+.vehicle-details::-webkit-scrollbar-thumb:hover {
+    background: #42a5f5;
+}

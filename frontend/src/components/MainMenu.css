@@ -1,0 +1,247 @@
+/* Main Menu Styles */
+.main-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.main-menu.fade-out {
+  opacity: 0;
+}
+
+.main-menu-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 50%, #1a1a1a 100%);
+  overflow: hidden;
+}
+
+.main-menu-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(139, 69, 19, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 69, 19, 0.2) 0%, transparent 50%);
+  animation: backgroundPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundPulse {
+  0% { opacity: 0.5; }
+  100% { opacity: 0.8; }
+}
+
+.zombie-silhouettes {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200"><path d="M0,200 L50,180 L80,160 L120,170 L150,150 L200,160 L250,140 L300,150 L350,130 L400,140 L450,120 L500,130 L550,110 L600,120 L650,100 L700,110 L750,90 L800,100 L850,80 L900,90 L950,70 L1000,80 L1050,60 L1100,70 L1150,50 L1200,60 L1200,200 Z" fill="rgba(0,0,0,0.6)"/></svg>') repeat-x;
+  opacity: 0.7;
+}
+
+.car-silhouette {
+  position: absolute;
+  bottom: 50px;
+  right: 10%;
+  width: 150px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.8);
+  clip-path: polygon(10% 100%, 0% 70%, 15% 50%, 25% 40%, 40% 35%, 60% 35%, 75% 40%, 85% 50%, 100% 70%, 90% 100%);
+  animation: carIdle 3s ease-in-out infinite alternate;
+}
+
+@keyframes carIdle {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-5px); }
+}
+
+.main-menu-content {
+  position: relative;
+  text-align: center;
+  z-index: 10;
+  max-width: 500px;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(139, 69, 19, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.game-title h1 {
+  font-size: 3.5em;
+  margin: 0 0 10px 0;
+  color: #ff6b35;
+  text-shadow: 
+    0 0 10px rgba(255, 107, 53, 0.5),
+    0 0 20px rgba(255, 107, 53, 0.3),
+    2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-weight: bold;
+  letter-spacing: 2px;
+  animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  0% { text-shadow: 0 0 10px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.3), 2px 2px 4px rgba(0, 0, 0, 0.8); }
+  100% { text-shadow: 0 0 15px rgba(255, 107, 53, 0.8), 0 0 25px rgba(255, 107, 53, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.8); }
+}
+
+.game-subtitle {
+  font-size: 1.2em;
+  color: #ccc;
+  margin: 0 0 40px 0;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.main-menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 30px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #333 0%, #444 100%);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.menu-button:hover::before {
+  left: 100%;
+}
+
+.menu-button:hover {
+  background: linear-gradient(135deg, #444 0%, #555 100%);
+  border-color: #ff6b35;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+}
+
+.menu-button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+.menu-button.primary {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+  border-color: #ff6b35;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.menu-button.primary:hover {
+  background: linear-gradient(135deg, #ff8c42 0%, #ffa652 100%);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.menu-button.secondary {
+  background: linear-gradient(135deg, #666 0%, #777 100%);
+  color: #ccc;
+}
+
+.menu-button.secondary:hover {
+  background: linear-gradient(135deg, #777 0%, #888 100%);
+  border-color: #999;
+  color: #fff;
+}
+
+.button-icon {
+  font-size: 1.2em;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.menu-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.menu-footer p {
+  color: #888;
+  font-size: 0.9em;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-menu-content {
+    max-width: 90%;
+    padding: 30px 20px;
+  }
+  
+  .game-title h1 {
+    font-size: 2.5em;
+  }
+  
+  .game-subtitle {
+    font-size: 1em;
+    margin-bottom: 30px;
+  }
+  
+  .menu-button {
+    padding: 12px 25px;
+    font-size: 1em;
+  }
+  
+  .car-silhouette {
+    width: 100px;
+    height: 40px;
+    bottom: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-title h1 {
+    font-size: 2em;
+  }
+  
+  .menu-button {
+    padding: 10px 20px;
+    font-size: 0.9em;
+  }
+  
+  .main-menu-nav {
+    gap: 12px;
+  }
+}

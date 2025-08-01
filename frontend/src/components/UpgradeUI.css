@@ -1,0 +1,495 @@
+/* Upgrade UI Styles */
+.upgrade-ui {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 1200px;
+    height: 80%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #0f3460;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.upgrade-ui.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    font-size: 18px;
+    color: #64b5f6;
+}
+
+/* Header */
+.upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(90deg, #0f3460 0%, #16213e 100%);
+    border-bottom: 2px solid #0f3460;
+}
+
+.upgrade-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+    color: #64b5f6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.close-button {
+    background: #e53e3e;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: #c53030;
+    transform: scale(1.1);
+}
+
+/* Vehicle Info */
+.vehicle-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: rgba(15, 52, 96, 0.3);
+    border-bottom: 1px solid #0f3460;
+}
+
+.vehicle-info h3 {
+    margin: 0;
+    font-size: 22px;
+    color: #ffffff;
+}
+
+.currency-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.currency-icon {
+    font-size: 24px;
+}
+
+.currency-amount {
+    color: #ffd700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Error Message */
+.error-message {
+    background: #e53e3e;
+    color: white;
+    padding: 10px 30px;
+    margin: 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Main Content */
+.upgrade-content {
+    display: flex;
+    height: calc(100% - 200px);
+    overflow: hidden;
+}
+
+.upgrade-categories {
+    flex: 2;
+    padding: 20px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    align-content: start;
+}
+
+.upgrade-preview {
+    flex: 1;
+    padding: 20px;
+    border-left: 2px solid #0f3460;
+    background: rgba(15, 52, 96, 0.2);
+}
+
+/* Upgrade Category Cards */
+.upgrade-category {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #0f3460;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.upgrade-category:hover {
+    border-color: #64b5f6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(100, 181, 246, 0.2);
+}
+
+.upgrade-category.selected {
+    border-color: #64b5f6;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1a1a2e 100%);
+    box-shadow: 0 0 20px rgba(100, 181, 246, 0.3);
+}
+
+.upgrade-category.maxed {
+    border-color: #48bb78;
+    background: linear-gradient(135deg, #22543d 0%, #1a1a2e 100%);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.category-icon {
+    font-size: 28px;
+}
+
+.category-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* Level Progress */
+.category-level {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.level-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.level-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #64b5f6 0%, #42a5f5 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.upgrade-category.maxed .level-progress {
+    background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+}
+
+.level-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #b0bec5;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Category Description */
+.category-description {
+    font-size: 14px;
+    color: #b0bec5;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+/* Upgrade Action */
+.upgrade-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.upgrade-cost {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.upgrade-button {
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.upgrade-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(100, 181, 246, 0.3);
+}
+
+.upgrade-button.expensive {
+    background: linear-gradient(135deg, #757575 0%, #616161 100%);
+    cursor: not-allowed;
+}
+
+.upgrade-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.max-level-indicator {
+    text-align: center;
+    font-weight: bold;
+    color: #48bb78;
+    font-size: 16px;
+    padding: 8px;
+    background: rgba(72, 187, 120, 0.1);
+    border-radius: 8px;
+}
+
+/* Upgrade Preview Panel */
+.upgrade-preview-panel {
+    background: rgba(15, 52, 96, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.upgrade-preview-panel h4 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    color: #64b5f6;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.preview-cost {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+/* Stat Changes */
+.stat-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stat-change {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stat-name {
+    font-size: 14px;
+    color: #b0bec5;
+    text-transform: capitalize;
+    font-weight: bold;
+}
+
+.stat-values {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+}
+
+.current-value {
+    color: #ffffff;
+}
+
+.arrow {
+    color: #64b5f6;
+    font-weight: bold;
+}
+
+.new-value {
+    color: #48bb78;
+    font-weight: bold;
+}
+
+.change-amount {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(72, 187, 120, 0.2);
+}
+
+.change-amount.positive {
+    color: #48bb78;
+}
+
+/* Upgrade Stats Panel */
+.upgrade-stats {
+    padding: 20px 30px;
+    background: rgba(15, 52, 96, 0.3);
+    border-top: 2px solid #0f3460;
+}
+
+.upgrade-stats-panel h4 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: #64b5f6;
+}
+
+.overall-progress {
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #64b5f6 0%, #48bb78 100%);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 14px;
+    color: #b0bec5;
+}
+
+.category-breakdown {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.category-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.category-stat .category-name {
+    font-size: 12px;
+    color: #b0bec5;
+    text-transform: capitalize;
+}
+
+.category-stat .category-level {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.fully-upgraded {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #48bb78;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(72, 187, 120, 0.1);
+    border-radius: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .upgrade-content {
+        flex-direction: column;
+    }
+    
+    .upgrade-categories {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .upgrade-preview {
+        border-left: none;
+        border-top: 2px solid #0f3460;
+    }
+}
+
+@media (max-width: 768px) {
+    .upgrade-ui {
+        width: 95%;
+        height: 90%;
+    }
+    
+    .upgrade-header {
+        padding: 15px 20px;
+    }
+    
+    .upgrade-header h2 {
+        font-size: 24px;
+    }
+    
+    .vehicle-info {
+        padding: 10px 20px;
+    }
+    
+    .upgrade-categories {
+        padding: 15px;
+        grid-template-columns: 1fr;
+    }
+    
+    .upgrade-category {
+        padding: 15px;
+    }
+    
+    .category-breakdown {
+        justify-content: center;
+    }
+}
+
+/* Scrollbar Styling */
+.upgrade-categories::-webkit-scrollbar {
+    width: 8px;
+}
+
+.upgrade-categories::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.upgrade-categories::-webkit-scrollbar-thumb {
+    background: #64b5f6;
+    border-radius: 4px;
+}
+
+.upgrade-categories::-webkit-scrollbar-thumb:hover {
+    background: #42a5f5;
+}

@@ -1,0 +1,412 @@
+/* Zombie Car Game Main Styles */
+.zombie-car-game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Arial', sans-serif;
+  background: #000;
+}
+
+/* Game Canvas */
+.game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  text-align: center;
+  color: #fff;
+  max-width: 500px;
+  padding: 2rem;
+}
+
+.loading-content h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  color: #ff4444;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-weight: bold;
+}
+
+.loading-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4444 0%, #ff6666 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+.loading-content p {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+  color: #ccc;
+}
+
+.loading-tips {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #ff4444;
+}
+
+.loading-tips p {
+  font-size: 1rem;
+  color: #fff;
+  margin: 0;
+}
+
+/* Error Screen */
+.error-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d1b1b 0%, #4d2d2d 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+  z-index: 1000;
+}
+
+.error-screen h1 {
+  font-size: 2.5rem;
+  color: #ff4444;
+  margin-bottom: 1rem;
+}
+
+.error-screen p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #ccc;
+  max-width: 600px;
+}
+
+.error-screen button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  background: #ff4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-screen button:hover {
+  background: #ff6666;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+}
+
+/* Game Over Screen */
+.game-over-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  z-index: 100;
+}
+
+.game-over-screen h2 {
+  font-size: 3rem;
+  color: #ff4444;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.final-stats {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  min-width: 300px;
+}
+
+.final-stats p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  color: #ccc;
+}
+
+.final-stats p:first-child {
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+.game-over-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.game-over-actions button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.game-over-actions button:first-child {
+  background: #44ff44;
+  color: #000;
+}
+
+.game-over-actions button:first-child:hover {
+  background: #66ff66;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(68, 255, 68, 0.3);
+}
+
+.game-over-actions button:last-child {
+  background: #666;
+  color: #fff;
+}
+
+.game-over-actions button:last-child:hover {
+  background: #888;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(136, 136, 136, 0.3);
+}
+
+/* UI Overlays */
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.ui-overlay > * {
+  pointer-events: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .loading-content h1 {
+    font-size: 2rem;
+  }
+  
+  .loading-content {
+    padding: 1rem;
+  }
+  
+  .game-over-screen h2 {
+    font-size: 2rem;
+  }
+  
+  .final-stats {
+    min-width: 250px;
+    padding: 1.5rem;
+  }
+  
+  .game-over-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-content h1 {
+    font-size: 1.5rem;
+  }
+  
+  .loading-content p {
+    font-size: 1rem;
+  }
+  
+  .game-over-screen h2 {
+    font-size: 1.5rem;
+  }
+  
+  .final-stats p {
+    font-size: 1rem;
+  }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-in-out;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.slide-out-down {
+  animation: slideOutDown 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* Performance Indicators */
+.performance-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 50;
+}
+
+.performance-indicator.good {
+  border-left: 4px solid #44ff44;
+}
+
+.performance-indicator.medium {
+  border-left: 4px solid #ffff44;
+}
+
+.performance-indicator.poor {
+  border-left: 4px solid #ff4444;
+}
+
+/* Debug Information */
+.debug-info {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  z-index: 50;
+  max-width: 300px;
+}
+
+.debug-info.hidden {
+  display: none;
+}
+
+/* Accessibility */
+.zombie-car-game button:focus,
+.zombie-car-game input:focus,
+.zombie-car-game select:focus {
+  outline: 2px solid #ff4444;
+  outline-offset: 2px;
+}
+
+.zombie-car-game button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .loading-screen {
+    background: #000;
+  }
+  
+  .loading-content h1 {
+    color: #fff;
+  }
+  
+  .loading-progress {
+    background: #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .loading-progress {
+    transition: none;
+  }
+  
+  .fade-in,
+  .fade-out,
+  .slide-in-up,
+  .slide-out-down {
+    animation: none;
+  }
+  
+  .game-over-actions button:hover,
+  .error-screen button:hover {
+    transform: none;
+  }
+}

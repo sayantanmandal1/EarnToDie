@@ -1,0 +1,190 @@
+/* Game App Styles */
+.app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Arial', sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+.app.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #1a1a1a;
+  padding: 20px;
+}
+
+.app.error h1 {
+  color: #ff4444;
+  margin-bottom: 20px;
+}
+
+.app.error pre {
+  background: #333;
+  padding: 15px;
+  border-radius: 5px;
+  max-width: 80%;
+  overflow: auto;
+  margin-bottom: 20px;
+}
+
+.app.error button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.app.error button:hover {
+  background: #45a049;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  text-align: center;
+  color: #fff;
+}
+
+.loading-content h2 {
+  margin-bottom: 20px;
+  font-size: 2em;
+}
+
+.loading-content p {
+  margin-bottom: 30px;
+  font-size: 1.2em;
+  color: #ccc;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  border: 4px solid #333;
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Game Canvas */
+.game-canvas {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  cursor: crosshair;
+}
+
+/* Game UI Overlay */
+.game-ui {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.controls-info {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  backdrop-filter: blur(5px);
+}
+
+.controls-info h3 {
+  margin: 0 0 10px 0;
+  color: #4CAF50;
+  font-size: 1.1em;
+}
+
+.controls-info ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.controls-info li {
+  margin: 5px 0;
+  font-size: 0.9em;
+  color: #ccc;
+}
+
+.engine-info {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+.engine-info p {
+  margin: 5px 0;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-ui {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  
+  .controls-info,
+  .engine-info {
+    padding: 10px;
+    font-size: 0.8em;
+  }
+  
+  .controls-info h3 {
+    font-size: 1em;
+  }
+  
+  .loading-content h2 {
+    font-size: 1.5em;
+  }
+  
+  .loading-content p {
+    font-size: 1em;
+  }
+}
+
+/* Hide scrollbars */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}

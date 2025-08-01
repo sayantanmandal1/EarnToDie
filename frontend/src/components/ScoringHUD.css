@@ -1,0 +1,343 @@
+/* Scoring HUD Styles */
+.scoring-hud {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+/* Main Score Display */
+.score-main {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.9));
+    border: 2px solid #00ff00;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+}
+
+.score-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.score-label {
+    font-size: 0.9em;
+    color: #cccccc;
+    margin-top: 5px;
+}
+
+/* Stats Panel */
+.stats-panel {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.stat-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.stat-label {
+    font-size: 0.7em;
+    color: #aaaaaa;
+    margin-top: 2px;
+}
+
+/* Combo Display */
+.combo-display {
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 100, 0, 0.3));
+    border: 2px solid #ff4000;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    animation: comboGlow 2s ease-in-out infinite alternate;
+}
+
+.combo-text {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-shadow: 0 0 15px currentColor;
+}
+
+.combo-multiplier {
+    font-size: 1em;
+    color: #ffaa00;
+    margin-top: 5px;
+}
+
+.combo-pulse {
+    animation: comboPulse 0.5s ease-out;
+}
+
+@keyframes comboGlow {
+    0% { box-shadow: 0 0 10px rgba(255, 64, 0, 0.5); }
+    100% { box-shadow: 0 0 20px rgba(255, 64, 0, 0.8); }
+}
+
+@keyframes comboPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Floating Points */
+.floating-points-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 300px;
+    pointer-events: none;
+}
+
+.floating-points {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+    animation: floatUp 2s ease-out forwards;
+}
+
+.floating-points.combo-points {
+    color: #ff8000;
+    text-shadow: 0 0 10px rgba(255, 128, 0, 0.8);
+    font-size: 1.8em;
+}
+
+.floating-points.bonus-airTime {
+    color: #00aaff;
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.8);
+}
+
+.floating-points.bonus-nearMiss {
+    color: #ffff00;
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+}
+
+.floating-points.bonus-perfectLanding {
+    color: #ff00ff;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+}
+
+.bonus-type {
+    display: block;
+    font-size: 0.6em;
+    color: #cccccc;
+    margin-top: 2px;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.8);
+    }
+}
+
+/* Achievement Notifications */
+.achievement-notifications {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+}
+
+.achievement-notification {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95));
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 400px;
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    animation: achievementSlide 5s ease-out forwards;
+}
+
+.achievement-icon {
+    font-size: 3em;
+    animation: achievementBounce 1s ease-out infinite alternate;
+}
+
+.achievement-content {
+    flex: 1;
+    color: #000;
+}
+
+.achievement-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #8b4513;
+    margin-bottom: 5px;
+}
+
+.achievement-name {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 3px;
+}
+
+.achievement-description {
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.achievement-points {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #006400;
+}
+
+@keyframes achievementSlide {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    15% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    85% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+@keyframes achievementBounce {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
+/* Currency Preview */
+.currency-preview {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #ffd700;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.currency-icon {
+    font-size: 1.2em;
+}
+
+.currency-amount {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .scoring-hud {
+        top: 10px;
+        right: 10px;
+        transform: scale(0.8);
+        transform-origin: top right;
+    }
+    
+    .stats-panel {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .achievement-notification {
+        min-width: 300px;
+        padding: 15px;
+    }
+    
+    .achievement-icon {
+        font-size: 2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .scoring-hud {
+        transform: scale(0.7);
+    }
+    
+    .achievement-notification {
+        min-width: 250px;
+        padding: 10px;
+    }
+    
+    .achievement-content {
+        font-size: 0.9em;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .scoring-hud {
+        background: rgba(0, 0, 0, 0.95);
+        border: 2px solid white;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    
+    .score-main,
+    .stat-item,
+    .combo-display {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .combo-display,
+    .floating-points,
+    .achievement-notification,
+    .achievement-icon {
+        animation: none;
+    }
+    
+    .combo-pulse {
+        animation: none;
+        transform: scale(1.05);
+    }
+}

@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - zombie-game-dev-network
+
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres-dev
+      - DB_PORT=5432
+      - DB_USER=gameuser
+      - DB_PASSWORD=gamepass
+      - DB_NAME=zombie_game_dev
+      - DB_SSLMODE=disable
+      - REDIS_HOST=redis-dev
+      - REDIS_PORT=6379
+      - JWT_SECRET=development-jwt-secret-key
+      - GIN_MODE=debug
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres-dev
+      - redis-dev
+    networks:
+      - zombie-game-dev-network
+
+  postgres-dev:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=zombie_game_dev
+      - POSTGRES_USER=gameuser
+      - POSTGRES_PASSWORD=gamepass
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - zombie-game-dev-network
+
+  redis-dev:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - zombie-game-dev-network
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+
+networks:
+  zombie-game-dev-network:
+    driver: bridge
