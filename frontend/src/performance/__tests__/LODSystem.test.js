@@ -66,8 +66,17 @@ describe('LODSystem', () => {
     describe('LOD Level Creation', () => {
         test('should create LOD levels for mesh', () => {
             const mockMesh = {
-                geometry: { isBufferGeometry: true },
-                material: {}
+                geometry: { 
+                    isBufferGeometry: true,
+                    attributes: {
+                        position: { array: new Float32Array([0, 0, 0, 1, 1, 1, 2, 2, 2]) },
+                        normal: { array: new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]) },
+                        uv: { array: new Float32Array([0, 0, 1, 0, 0.5, 1]) }
+                    }
+                },
+                material: {
+                    clone: jest.fn(() => ({ map: null, transparent: false }))
+                }
             };
 
             const levels = lodSystem.createLODLevels(mockMesh);
@@ -107,8 +116,17 @@ describe('LODSystem', () => {
 
         test('should accept custom distances for LOD levels', () => {
             const mockMesh = {
-                geometry: { isBufferGeometry: true },
-                material: {}
+                geometry: { 
+                    isBufferGeometry: true,
+                    attributes: {
+                        position: { array: new Float32Array([0, 0, 0, 1, 1, 1, 2, 2, 2]) },
+                        normal: { array: new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]) },
+                        uv: { array: new Float32Array([0, 0, 1, 0, 0.5, 1]) }
+                    }
+                },
+                material: {
+                    clone: jest.fn(() => ({ map: null, transparent: false }))
+                }
             };
 
             const options = {
@@ -268,7 +286,10 @@ describe('LODSystem', () => {
                 position: { x: 0, y: 0, z: 0 }
             };
 
-            lodSystem.registerObject(mockObject, [{ maxDistance: 50 }]);
+            lodSystem.registerObject(mockObject, [
+                { maxDistance: 50, visible: true },
+                { maxDistance: 100, visible: false }
+            ]);
 
             const applySpy = jest.spyOn(lodSystem, '_applyLODLevel');
 
@@ -276,8 +297,13 @@ describe('LODSystem', () => {
             lodSystem.update(0.05);
             expect(applySpy).not.toHaveBeenCalled();
 
+            // Change camera distance to trigger LOD level change
+            mockCamera.position.distanceTo.mockReturnValue(75); // Beyond first LOD level
+            
             // Second update should trigger (interval exceeded)
             lodSystem.update(0.06);
+            
+            // Should have been called due to interval being exceeded and level change
             expect(applySpy).toHaveBeenCalled();
         });
 

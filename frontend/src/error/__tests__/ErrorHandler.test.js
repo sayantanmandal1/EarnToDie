@@ -28,6 +28,26 @@ describe('ErrorHandler', () => {
     let errorHandler;
 
     beforeEach(() => {
+        // Mock DOM elements
+        const mockElement = {
+            appendChild: jest.fn(),
+            removeChild: jest.fn(),
+            style: {},
+            innerHTML: '',
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+
+        // Mock document.createElement
+        document.createElement = jest.fn(() => mockElement);
+        
+        // Mock document.body
+        if (!document.body) {
+            document.body = mockElement;
+        } else {
+            document.body.appendChild = jest.fn();
+            document.body.removeChild = jest.fn();
+        }
         errorHandler = new ErrorHandler({
             enableReporting: false, // Disable for testing
             enableRecovery: true
