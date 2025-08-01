@@ -516,11 +516,13 @@ describe('End-to-End User Workflows', () => {
 
       const loadResult = await saveManager.loadFromLocalStorage();
       
-      // Should provide default state instead of crashing
-      expect(loadResult).toBeDefined();
-      expect(loadResult.playerLevel).toBe(1);
-      expect(loadResult.currency).toBe(0);
-      expect(loadResult.completedLevels).toEqual([]);
+      // Should handle corruption gracefully and return false for corrupted data
+      expect(loadResult).toBe(false);
+      
+      // SaveManager should still have default state
+      expect(saveManager.saveState.player.level).toBe(1);
+      expect(saveManager.saveState.player.currency).toBe(0);
+      expect(saveManager.saveState.levels.completed).toEqual([]);
     });
   });
 
@@ -572,8 +574,8 @@ describe('End-to-End User Workflows', () => {
       audioManager.setVolume('effects', 0.3);
       expect(audioManager.volumes.effects).toBe(0.3);
 
-      audioManager.setMusicVolume(0.7);
-      expect(audioManager.getMusicVolume()).toBe(0.7);
+      audioManager.setVolume('music', 0.7);
+      expect(audioManager.volumes.music).toBe(0.7);
 
       // Test mute functionality
       audioManager.muteAll();

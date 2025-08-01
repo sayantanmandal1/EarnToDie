@@ -63,7 +63,8 @@ const createWebGLMock = () => {
         cullFace: jest.fn(),
         frontFace: jest.fn(),
         clearColor: jest.fn(),
-        clearDepth: jest.fn(), // This was missing!
+        clearDepth: jest.fn(),
+        clearStencil: jest.fn(), // Add missing clearStencil method
         clear: jest.fn(),
         viewport: jest.fn(),
         drawElements: jest.fn(),

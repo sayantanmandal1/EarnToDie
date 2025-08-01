@@ -383,7 +383,7 @@ describe('Final Integration System', () => {
                 duration: 0.3
             });
             
-            expect(particleCreateSpy).toHaveBeenCalledTimes(expect.any(Number)); // Hit + death events may trigger multiple effects
+            expect(particleCreateSpy).toHaveBeenCalled(); // Hit + death events may trigger multiple effects
             expect(animationShakeSpy).toHaveBeenCalled();
         });
 
