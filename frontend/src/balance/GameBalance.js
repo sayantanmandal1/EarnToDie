@@ -188,7 +188,7 @@ export class GameBalance {
         let points = 0;
         
         switch (action) {
-            case 'zombie_kill':
+            case 'zombie_kill': {
                 const zombie = data.zombie || {};
                 const basePoints = zombie.points || scoring.baseZombieKillPoints;
                 const comboMultiplier = Math.min(
@@ -197,6 +197,7 @@ export class GameBalance {
                 );
                 points = basePoints * comboMultiplier;
                 break;
+            }
                 
             case 'distance':
                 points = data.distance * scoring.distancePointsPerMeter;

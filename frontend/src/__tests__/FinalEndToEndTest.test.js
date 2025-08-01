@@ -65,9 +65,27 @@ describe('Final End-to-End Integration Test', () => {
         });
 
         // Mock DOM container
+        // Clear any existing container
+        const existingContainer = document.getElementById('game-container');
+        if (existingContainer && existingContainer.parentNode) {
+            existingContainer.parentNode.removeChild(existingContainer);
+        }
+
         mockContainer = document.createElement('div');
         mockContainer.id = 'game-container';
-        document.body.appendChild(mockContainer);
+        
+        // Ensure document.body exists and safely append
+        if (document.body && typeof document.body.appendChild === 'function') {
+            try {
+                document.body.appendChild(mockContainer);
+            } catch (error) {
+                // If appendChild fails, create a mock container
+                mockContainer = { id: 'game-container', style: {} };
+            }
+        } else {
+            // Create a mock container if document.body is not available
+            mockContainer = { id: 'game-container', style: {} };
+        }
 
         // Mock fetch for API calls
         global.fetch = jest.fn(() =>
@@ -133,7 +151,16 @@ describe('Final End-to-End Integration Test', () => {
         if (game) {
             game.dispose();
         }
-        document.body.removeChild(mockContainer);
+        
+        // Safely remove container
+        if (mockContainer && mockContainer.parentNode && typeof mockContainer.parentNode.removeChild === 'function') {
+            try {
+                mockContainer.parentNode.removeChild(mockContainer);
+            } catch (error) {
+                // Ignore removal errors in test environment
+            }
+        }
+        
         jest.clearAllMocks();
     });
 

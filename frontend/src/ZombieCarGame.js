@@ -527,43 +527,43 @@ export class ZombieCarGame extends React.Component {
     /**
      * Menu action handlers
      */
-    handleStartGame = () => {
+    handleStartGame() {
         this.setState({ gameState: 'LEVEL_SELECT' });
-    };
+    }
 
-    handleVehicleSelection = () => {
+    handleVehicleSelection() {
         this.setState({ gameState: 'GARAGE' });
-    };
+    }
 
-    handleSettings = () => {
+    handleSettings() {
         this.setState({ gameState: 'SETTINGS' });
-    };
+    }
 
-    handleQuit = () => {
+    handleQuit() {
         if (window.confirm('Are you sure you want to quit?')) {
             window.close();
         }
-    };
+    }
 
-    handleLevelSelect = (levelId) => {
+    handleLevelSelect(levelId) {
         this.updateGameData({ currentLevel: levelId });
         this.setState({ gameState: 'PLAYING' });
-    };
+    }
 
-    handleVehicleSelect = (vehicleId) => {
+    handleVehicleSelect(vehicleId) {
         this.updateGameData({ currentVehicle: vehicleId });
         this.setState({ gameState: 'MAIN_MENU' });
-    };
+    }
 
-    handlePause = () => {
+    handlePause() {
         this.setState({ gameState: 'PAUSED' });
-    };
+    }
 
-    handleResume = () => {
+    handleResume() {
         this.setState({ gameState: 'PLAYING' });
-    };
+    }
 
-    handleRestart = () => {
+    handleRestart() {
         // Reset game data
         this.updateGameData({
             score: 0,
@@ -575,11 +575,11 @@ export class ZombieCarGame extends React.Component {
         });
         
         this.setState({ gameState: 'PLAYING' });
-    };
+    }
 
-    handleBackToMenu = () => {
+    handleBackToMenu() {
         this.setState({ gameState: 'MAIN_MENU' });
-    };
+    }
 
     /**
      * Cleanup resources

@@ -11,12 +11,12 @@ export class FinalIntegration {
         this.particleSystem = null;
         this.animationSystem = null;
         this.gameBalance = null;
-        
+
         // Integration state
         this.isInitialized = false;
         this.systemConnections = new Map();
         this.eventHandlers = new Map();
-        
+
         // Performance monitoring
         this.performanceMetrics = {
             frameRate: 60,
@@ -24,23 +24,23 @@ export class FinalIntegration {
             animationCount: 0,
             memoryUsage: 0
         };
-        
+
         this.initialize();
     }
 
     async initialize() {
         try {
             console.log('Initializing Final Integration System...');
-            
+
             // Initialize core systems
             await this.initializeCoreEffects();
             await this.initializeGameBalance();
             await this.connectAllSystems();
             await this.setupEventHandlers();
-            
+
             this.isInitialized = true;
             console.log('Final Integration System initialized successfully');
-            
+
         } catch (error) {
             console.error('Failed to initialize Final Integration System:', error);
             throw error;
@@ -53,13 +53,13 @@ export class FinalIntegration {
     async initializeCoreEffects() {
         // Initialize particle system
         this.particleSystem = new ParticleSystem(this.gameEngine);
-        
+
         // Initialize animation system
         this.animationSystem = new AnimationSystem(this.gameEngine);
-        
+
         // Initialize game balance
         this.gameBalance = new GameBalance();
-        
+
         console.log('Core effects systems initialized');
     }
 
@@ -78,7 +78,7 @@ export class FinalIntegration {
         } catch (error) {
             console.warn('Could not load saved balance data:', error);
         }
-        
+
         console.log('Game balance system initialized');
     }
 
@@ -88,16 +88,16 @@ export class FinalIntegration {
     async connectAllSystems() {
         // Connect particle system to combat events
         this.connectParticleEffects();
-        
+
         // Connect animation system to UI and game events
         this.connectAnimationEffects();
-        
+
         // Connect balance system to gameplay
         this.connectBalanceSystem();
-        
+
         // Connect performance monitoring
         this.connectPerformanceMonitoring();
-        
+
         console.log('All systems connected');
     }
 
@@ -108,8 +108,8 @@ export class FinalIntegration {
         // Vehicle-related particles
         this.addEventHandler('vehicle_explosion', (data) => {
             this.particleSystem.createExplosion(
-                data.position, 
-                data.intensity || 2.0, 
+                data.position,
+                data.intensity || 2.0,
                 0xff4444
             );
         });
@@ -199,7 +199,7 @@ export class FinalIntegration {
                     { x: 1.5, y: 1.5, z: 1.5 },
                     0.3
                 );
-                
+
                 setTimeout(() => {
                     this.animationSystem.animateOpacity(
                         data.element.material,
@@ -269,7 +269,7 @@ export class FinalIntegration {
                 accuracy: data.accuracy || 0.5,
                 levelCompleted: true
             });
-            
+
             // Save balance data
             this.saveBalanceData();
         });
@@ -282,7 +282,7 @@ export class FinalIntegration {
                 accuracy: data.accuracy || 0.5,
                 levelCompleted: false
             });
-            
+
             // Save balance data
             this.saveBalanceData();
         });
@@ -302,16 +302,16 @@ export class FinalIntegration {
         // Monitor frame rate
         let frameCount = 0;
         let lastTime = performance.now();
-        
+
         const updateFrameRate = () => {
             frameCount++;
             const currentTime = performance.now();
-            
+
             if (currentTime - lastTime >= 1000) {
                 this.performanceMetrics.frameRate = frameCount;
                 frameCount = 0;
                 lastTime = currentTime;
-                
+
                 // Trigger performance adjustment if needed
                 this.handlePerformanceAdjustment();
             }
@@ -328,12 +328,12 @@ export class FinalIntegration {
         setInterval(() => {
             this.performanceMetrics.particleCount = this.particleSystem.getActiveParticleCount();
             this.performanceMetrics.animationCount = this.animationSystem.getActiveAnimationCount();
-            
+
             // Estimate memory usage (rough approximation)
-            this.performanceMetrics.memoryUsage = 
-                this.performanceMetrics.particleCount * 0.1 + 
+            this.performanceMetrics.memoryUsage =
+                this.performanceMetrics.particleCount * 0.1 +
                 this.performanceMetrics.animationCount * 0.05;
-                
+
         }, 1000);
     }
 
@@ -342,7 +342,7 @@ export class FinalIntegration {
      */
     handlePerformanceAdjustment() {
         const fps = this.performanceMetrics.frameRate;
-        
+
         if (fps < 30) {
             // Poor performance - reduce effects
             this.triggerEvent('performance_degradation', {
@@ -350,12 +350,12 @@ export class FinalIntegration {
                 fps: fps,
                 particleCount: this.performanceMetrics.particleCount
             });
-            
+
             // Reduce particle limits
             if (this.performanceMetrics.particleCount > 200) {
                 this.particleSystem.maxParticles = Math.max(100, this.particleSystem.maxParticles * 0.8);
             }
-            
+
         } else if (fps < 45) {
             // Moderate performance issues
             this.triggerEvent('performance_degradation', {
@@ -363,7 +363,7 @@ export class FinalIntegration {
                 fps: fps,
                 particleCount: this.performanceMetrics.particleCount
             });
-            
+
         } else if (fps > 55 && this.particleSystem.maxParticles < 500) {
             // Good performance - can increase effects
             this.particleSystem.maxParticles = Math.min(500, this.particleSystem.maxParticles * 1.1);
@@ -500,7 +500,7 @@ export class FinalIntegration {
             // Pause particle updates by clearing active particles
             this.particleSystem.clear();
         }
-        
+
         if (this.animationSystem) {
             // Pause animations
             this.animationSystem.stopAll();

@@ -144,7 +144,7 @@ export class AudioManager {
      * Set volume for a specific audio category
      */
     setVolume(category, volume) {
-        if (this.volumes.hasOwnProperty(category)) {
+        if (Object.prototype.hasOwnProperty.call(this.volumes, category)) {
             this.volumes[category] = Math.max(0, Math.min(1, volume));
             this._updateCategoryVolumes(category);
         }

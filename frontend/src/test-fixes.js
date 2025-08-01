@@ -71,11 +71,22 @@ const createWebGLMock = () => {
         getParameter: jest.fn((param) => {
             switch (param) {
                 case gl.MAX_TEXTURE_SIZE: return 2048;
-                case gl.MAX_VIEWPORT_DIMS: return [1920, 1080];
+                case gl.MAX_VIEWPORT_DIMS: return new Int32Array([1920, 1080]);
                 case gl.VENDOR: return 'Mock WebGL';
                 case gl.RENDERER: return 'Mock Renderer';
                 case gl.VERSION: return 'WebGL 1.0';
-                default: return null;
+                case 34921: return 16; // MAX_VERTEX_ATTRIBS
+                case 36347: return 256; // MAX_VERTEX_UNIFORM_VECTORS
+                case 36349: return 256; // MAX_FRAGMENT_UNIFORM_VECTORS
+                case 36348: return 8; // MAX_VARYING_VECTORS
+                case 34076: return 4096; // MAX_CUBE_MAP_TEXTURE_SIZE
+                case 34930: return 16; // MAX_TEXTURE_IMAGE_UNITS
+                case 35660: return 16; // MAX_VERTEX_TEXTURE_IMAGE_UNITS
+                case 35661: return 32; // MAX_COMBINED_TEXTURE_IMAGE_UNITS
+                case 3408: return new Float32Array([0, 1]); // ALIASED_LINE_WIDTH_RANGE
+                case 33901: return new Float32Array([0, 1]); // ALIASED_POINT_SIZE_RANGE
+                case 2978: return new Int32Array([0, 0, 800, 600]); // VIEWPORT
+                default: return param === 2978 ? new Int32Array([0, 0, 800, 600]) : 0;
             }
         }),
         getSupportedExtensions: jest.fn(() => ['WEBGL_depth_texture', 'OES_texture_float']),

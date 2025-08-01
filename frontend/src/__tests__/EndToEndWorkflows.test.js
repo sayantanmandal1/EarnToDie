@@ -3,6 +3,9 @@
  * Tests complete user journeys from start to finish
  */
 
+// Import test fixes first
+import '../test-fixes';
+
 import { GameEngine } from '../engine/GameEngine';
 import { VehicleManager } from '../vehicles/VehicleManager';
 import { ZombieManager } from '../zombies/ZombieManager';
@@ -488,7 +491,7 @@ describe('End-to-End User Workflows', () => {
       upgradeManager.reset();
 
       // Load game
-      const loadedData = await saveManager.loadGame();
+      const loadedData = await saveManager.loadFromLocalStorage();
       
       // Restore state
       scoringSystem.setScore(loadedData.totalScore);
@@ -511,7 +514,7 @@ describe('End-to-End User Workflows', () => {
       // Mock corrupted save data
       localStorage.setItem('zombie_car_game_save', 'corrupted_data');
 
-      const loadResult = await saveManager.loadGame();
+      const loadResult = await saveManager.loadFromLocalStorage();
       
       // Should provide default state instead of crashing
       expect(loadResult).toBeDefined();
@@ -563,11 +566,11 @@ describe('End-to-End User Workflows', () => {
       audioManager.initialize();
 
       // Test volume controls
-      audioManager.setMasterVolume(0.5);
-      expect(audioManager.getMasterVolume()).toBe(0.5);
+      audioManager.setVolume('master', 0.5);
+      expect(audioManager.volumes.master).toBe(0.5);
 
-      audioManager.setEffectsVolume(0.3);
-      expect(audioManager.getEffectsVolume()).toBe(0.3);
+      audioManager.setVolume('effects', 0.3);
+      expect(audioManager.volumes.effects).toBe(0.3);
 
       audioManager.setMusicVolume(0.7);
       expect(audioManager.getMusicVolume()).toBe(0.7);
