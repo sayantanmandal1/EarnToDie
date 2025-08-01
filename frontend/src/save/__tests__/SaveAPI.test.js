@@ -338,16 +338,28 @@ describe('RobustSaveAPI', () => {
 
             // Trigger online event
             window.dispatchEvent(new Event('online'));
+            
+            // Add small delay to allow async processing
+            await new Promise(resolve => setTimeout(resolve, 10));
 
             const result = await promise;
             expect(result.success).toBe(true);
             expect(robustAPI.offlineQueue).toHaveLength(0);
-        });
+        }, 5000);
 
         test('should not queue GET requests when offline', async () => {
             navigator.onLine = false;
+            
+            // Mock fetch to reject for offline scenario
+            fetch.mockRejectedValueOnce(new Error('Network error'));
 
-            await expect(robustAPI.request('/test')).rejects.toThrow();
+            try {
+                await robustAPI.request('/test');
+                expect(false).toBe(true); // Should not reach here
+            } catch (error) {
+                expect(error.message).toContain('Network error');
+            }
+            
             expect(robustAPI.offlineQueue).toHaveLength(0);
         });
     });

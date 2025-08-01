@@ -453,9 +453,12 @@ describe('RobustScoringAPI', () => {
             // Trigger online event
             window.dispatchEvent(new Event('online'));
             
+            // Add small delay to allow async processing
+            await new Promise(resolve => setTimeout(resolve, 10));
+            
             const result = await promise;
             expect(result).toEqual({ success: true });
-        });
+        }, 5000);
 
         test('should not queue GET requests when offline', async () => {
             navigator.onLine = false;
@@ -463,7 +466,14 @@ describe('RobustScoringAPI', () => {
             // Mock fetch to reject for offline scenario
             fetch.mockRejectedValueOnce(new Error('Network error'));
             
-            await expect(robustApi.request('/test', { method: 'GET' })).rejects.toThrow();
+            try {
+                await robustApi.request('/test', { method: 'GET' });
+                // If it doesn't throw, check if it returned an error response
+                expect(false).toBe(true); // Should not reach here
+            } catch (error) {
+                expect(error.message).toContain('Network error');
+            }
+            
             expect(robustApi.offlineQueue).toHaveLength(0);
         });
     });

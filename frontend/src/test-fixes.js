@@ -153,6 +153,19 @@ const createAudioContextMock = () => {
             connect: jest.fn(),
             disconnect: jest.fn()
         },
+        listener: {
+            positionX: { setValueAtTime: jest.fn() },
+            positionY: { setValueAtTime: jest.fn() },
+            positionZ: { setValueAtTime: jest.fn() },
+            forwardX: { setValueAtTime: jest.fn() },
+            forwardY: { setValueAtTime: jest.fn() },
+            forwardZ: { setValueAtTime: jest.fn() },
+            upX: { setValueAtTime: jest.fn() },
+            upY: { setValueAtTime: jest.fn() },
+            upZ: { setValueAtTime: jest.fn() },
+            setPosition: jest.fn(),
+            setOrientation: jest.fn()
+        },
         createGain: jest.fn(() => mockGainNode),
         createBufferSource: jest.fn(() => mockBufferSource),
         createPanner: jest.fn(() => mockPannerNode),
@@ -262,6 +275,40 @@ const applyTestMocks = () => {
     global.HTMLCanvasElement.prototype.getContext = jest.fn((type) => {
         if (type === 'webgl' || type === 'experimental-webgl') {
             return createWebGLMock();
+        }
+        if (type === '2d') {
+            return {
+                fillStyle: '',
+                strokeStyle: '',
+                lineWidth: 1,
+                font: '10px sans-serif',
+                textAlign: 'start',
+                textBaseline: 'alphabetic',
+                fillRect: jest.fn(),
+                strokeRect: jest.fn(),
+                clearRect: jest.fn(),
+                fillText: jest.fn(),
+                strokeText: jest.fn(),
+                measureText: jest.fn(() => ({ width: 100 })),
+                beginPath: jest.fn(),
+                closePath: jest.fn(),
+                moveTo: jest.fn(),
+                lineTo: jest.fn(),
+                arc: jest.fn(),
+                stroke: jest.fn(),
+                fill: jest.fn(),
+                save: jest.fn(),
+                restore: jest.fn(),
+                translate: jest.fn(),
+                rotate: jest.fn(),
+                scale: jest.fn(),
+                setTransform: jest.fn(),
+                transform: jest.fn(),
+                createImageData: jest.fn(() => ({ data: new Uint8ClampedArray(64 * 64 * 4) })),
+                getImageData: jest.fn(() => ({ data: new Uint8ClampedArray(64 * 64 * 4) })),
+                putImageData: jest.fn(),
+                drawImage: jest.fn()
+            };
         }
         return null;
     });

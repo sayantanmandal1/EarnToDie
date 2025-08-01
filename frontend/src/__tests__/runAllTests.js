@@ -5,7 +5,7 @@
  * Runs all test suites and generates detailed reports
  */
 
-const TestRunner = require('./TestRunner');
+const TestRunner = require('../utils/TestRunner');
 
 // Import test suites
 const GameSystemsIntegration = require('./GameSystemsIntegration.test');

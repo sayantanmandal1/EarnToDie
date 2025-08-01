@@ -353,6 +353,15 @@ export class AssetLoader {
     canvas.height = 64;
     const context = canvas.getContext('2d');
     
+    // Check if context is available (for testing environments)
+    if (!context) {
+      // Return a basic texture for testing
+      const texture = new THREE.Texture();
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      return texture;
+    }
+    
     // Create red checkerboard pattern
     context.fillStyle = '#ff0000';
     context.fillRect(0, 0, 64, 64);

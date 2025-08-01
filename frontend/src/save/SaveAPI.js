@@ -340,13 +340,13 @@ export class RobustSaveAPI extends SaveAPI {
         try {
             // First, try to get server data
             const serverResponse = await this.getSaveData();
-            const serverData = serverResponse.data.save_data;
+            const serverData = serverResponse?.data?.save_data;
             
             // Compare timestamps
             const localTimestamp = localSaveData.timestamp;
-            const serverTimestamp = serverData.timestamp;
+            const serverTimestamp = serverData?.timestamp;
             
-            if (serverTimestamp > localTimestamp) {
+            if (serverData && serverTimestamp > localTimestamp) {
                 // Server is newer, return server data
                 return {
                     action: 'download',

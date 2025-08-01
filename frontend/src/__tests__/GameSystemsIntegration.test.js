@@ -27,9 +27,24 @@ describe('Game Systems Integration', () => {
   beforeEach(() => {
     // Initialize all game systems
     gameEngine = new GameEngine();
+    
+    // Add physics mock to gameEngine
+    gameEngine.physics = {
+      world: {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        step: jest.fn(),
+        addBody: jest.fn(),
+        removeBody: jest.fn()
+      },
+      createBox: jest.fn(() => ({ body: {}, shape: {} })),
+      createSphere: jest.fn(() => ({ body: {}, shape: {} })),
+      createCylinder: jest.fn(() => ({ body: {}, shape: {} }))
+    };
+    
     vehicleManager = new VehicleManager();
     zombieManager = new ZombieManager();
-    combatSystem = new CombatSystem();
+    combatSystem = new CombatSystem(gameEngine);
     scoringSystem = new ScoringSystem();
     upgradeManager = new UpgradeManager();
     levelManager = new LevelManager();

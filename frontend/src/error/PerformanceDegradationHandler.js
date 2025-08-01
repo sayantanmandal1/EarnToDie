@@ -434,7 +434,7 @@ export class PerformanceDegradationHandler {
         if (capabilities.mobile) score -= 2;
         
         // GPU score (basic heuristic)
-        const gpu = capabilities.gpu.toLowerCase();
+        const gpu = (capabilities.gpu || 'unknown').toLowerCase();
         if (gpu.includes('nvidia') || gpu.includes('amd') || gpu.includes('radeon')) {
             score += 2;
         } else if (gpu.includes('intel')) {
