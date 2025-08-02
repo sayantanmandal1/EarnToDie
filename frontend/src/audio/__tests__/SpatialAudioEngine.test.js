@@ -628,4 +628,57 @@ describe('SpatialAudioSource', () => {
 
     test('should set 3D position correctly', () => {
         const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
-        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer,
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer, 'test-id', mockOptions);
+        
+        source.setPosition(10, 5, -3);
+        
+        expect(source.position).toEqual({ x: 10, y: 5, z: -3 });
+        expect(source.pannerNode.positionX.value).toBe(10);
+        expect(source.pannerNode.positionY.value).toBe(5);
+        expect(source.pannerNode.positionZ.value).toBe(-3);
+    });
+
+    test('should calculate distance to listener', () => {
+        const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer, 'test-id', mockOptions);
+        
+        source.setPosition(3, 4, 0);
+        const distance = source.calculateDistance({ x: 0, y: 0, z: 0 });
+        
+        expect(distance).toBe(5); // 3-4-5 triangle
+    });
+
+    test('should apply occlusion filtering', () => {
+        const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer, 'test-id', mockOptions);
+        
+        source.setOcclusionAmount(0.5);
+        
+        expect(source.occlusionAmount).toBe(0.5);
+        expect(source.filterNode.frequency.setValueAtTime).toHaveBeenCalled();
+    });
+
+    test('should handle volume changes', () => {
+        const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer, 'test-id', mockOptions);
+        
+        source.setVolume(0.7);
+        
+        expect(source.volume).toBe(0.7);
+        expect(source.gainNode.gain.setValueAtTime).toHaveBeenCalledWith(
+            0.7,
+            mockAudioContext.currentTime
+        );
+    });
+
+    test('should clamp volume to valid range', () => {
+        const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer, 'test-id', mockOptions);
+        
+        source.setVolume(-0.5);
+        expect(source.volume).toBe(0);
+        
+        source.setVolume(1.5);
+        expect(source.volume).toBe(1);
+    });
+});
