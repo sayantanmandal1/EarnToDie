@@ -85,7 +85,7 @@ describe('PerformanceDegradationHandler', () => {
             }
             performance.memory.usedJSHeapSize = 180000000; // 90% of limit
             
-            performanceHandler._checkMemoryPressure();
+            performanceHandler._monitorMemoryUsage();
             
             const metrics = performanceHandler.getPerformanceMetrics();
             expect(metrics.memory.pressure).toBe(true);
