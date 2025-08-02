@@ -353,7 +353,7 @@ export class RobustSaveAPI extends SaveAPI {
                     data: serverData,
                     message: 'Server data is newer, downloading'
                 };
-            } else if (localTimestamp > serverTimestamp) {
+            } else if (serverData && localTimestamp > serverTimestamp) {
                 // Local is newer, upload
                 await this.uploadSaveData(localSaveData);
                 return {
