@@ -82,16 +82,22 @@ const mockGameEngine = {
 
 // Mock Three.js
 jest.mock('three', () => ({
-    Vector3: jest.fn().mockImplementation((x = 0, y = 0, z = 0) => ({
-        x, y, z,
-        clone: jest.fn().mockReturnThis(),
-        copy: jest.fn().mockReturnThis(),
-        subVectors: jest.fn().mockReturnThis(),
-        normalize: jest.fn().mockReturnThis(),
-        dot: jest.fn(() => 0),
-        distanceTo: jest.fn(() => 10),
-        applyQuaternion: jest.fn().mockReturnThis()
-    })),
+    Vector3: jest.fn().mockImplementation((x = 0, y = 0, z = 0) => {
+        const createVector = (x, y, z) => ({
+            x, y, z,
+            clone: jest.fn().mockImplementation(() => createVector(x, y, z)),
+            copy: jest.fn().mockImplementation((other) => {
+                const vector = createVector(other.x, other.y, other.z);
+                return vector;
+            }),
+            subVectors: jest.fn().mockReturnThis(),
+            normalize: jest.fn().mockReturnThis(),
+            dot: jest.fn(() => 0),
+            distanceTo: jest.fn(() => 10),
+            applyQuaternion: jest.fn().mockReturnThis()
+        });
+        return createVector(x, y, z);
+    }),
     Quaternion: jest.fn().mockImplementation(() => ({})),
     Matrix4: jest.fn().mockImplementation(() => ({})),
     Raycaster: jest.fn().mockImplementation(() => ({
@@ -142,7 +148,9 @@ describe('SpatialAudio', () => {
             
             expect(spatialSource).toBeDefined();
             expect(spatialSource.id).toBeDefined();
-            expect(spatialSource.position).toEqual(position);
+            expect(spatialSource.position.x).toBe(position.x);
+            expect(spatialSource.position.y).toBe(position.y);
+            expect(spatialSource.position.z).toBe(position.z);
             expect(spatialSource.volume).toBe(0.8);
             expect(spatialSource.loop).toBe(true);
             expect(mockAudioManager.audioContext.createBufferSource).toHaveBeenCalled();
@@ -233,7 +241,9 @@ describe('SpatialAudio', () => {
             const newPosition = new THREE.Vector3(5, 2, -1);
             spatialAudio.updateSourcePosition(spatialSource, newPosition);
             
-            expect(spatialSource.position).toEqual(newPosition);
+            expect(spatialSource.position.x).toBe(newPosition.x);
+            expect(spatialSource.position.y).toBe(newPosition.y);
+            expect(spatialSource.position.z).toBe(newPosition.z);
             expect(spatialSource.panner.positionX.setValueAtTime).toHaveBeenCalledWith(5, 0);
             expect(spatialSource.panner.positionY.setValueAtTime).toHaveBeenCalledWith(2, 0);
             expect(spatialSource.panner.positionZ.setValueAtTime).toHaveBeenCalledWith(-1, 0);
@@ -257,7 +267,9 @@ describe('SpatialAudio', () => {
             
             spatialAudio.updateSourcePosition(spatialSource, newPosition, velocity);
             
-            expect(spatialSource.velocity).toEqual(velocity);
+            expect(spatialSource.velocity.x).toBe(velocity.x);
+            expect(spatialSource.velocity.y).toBe(velocity.y);
+            expect(spatialSource.velocity.z).toBe(velocity.z);
         });
     });
 
@@ -277,7 +289,9 @@ describe('SpatialAudio', () => {
             spatialAudio.addAudioZone(zone);
             
             expect(spatialAudio.audioZones).toHaveLength(1);
-            expect(spatialAudio.audioZones[0].position).toEqual(zone.position);
+            expect(spatialAudio.audioZones[0].position.x).toBe(zone.position.x);
+            expect(spatialAudio.audioZones[0].position.y).toBe(zone.position.y);
+            expect(spatialAudio.audioZones[0].position.z).toBe(zone.position.z);
             expect(spatialAudio.audioZones[0].effect).toBe('reverb');
         });
 
