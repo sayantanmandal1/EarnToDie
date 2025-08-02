@@ -1,5 +1,5 @@
 import { PerformanceManager } from './PerformanceManager';
-import { PoolManager } from './ObjectPool';
+import { ObjectPool } from './ObjectPool';
 import { LODSystem } from './LODSystem';
 import { TextureOptimizer } from './TextureOptimizer';
 import { PerformanceBenchmark } from './PerformanceBenchmark';
@@ -31,7 +31,7 @@ export class PerformanceIntegration {
             this.performanceManager = new PerformanceManager(this.gameEngine);
             
             // Initialize pool manager with common pools
-            this.poolManager = new PoolManager();
+            this.poolManager = new ObjectPool();
             this._setupObjectPools();
             
             // Initialize LOD system

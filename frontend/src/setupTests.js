@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { applyTestMocks } from './test-fixes.js';
+const { applyComprehensiveMocks } = require('./comprehensive-test-fixes.js');
 
 // Mock canvas getContext to return a proper WebGL mock
 const mockWebGLContext = {
@@ -274,17 +275,58 @@ global.CANNON = {
 
 // Mock Web Audio API
 global.AudioContext = jest.fn(() => ({
+  currentTime: 0,
+  sampleRate: 44100,
+  state: 'running',
+  destination: {
+    connect: jest.fn(),
+    disconnect: jest.fn()
+  },
   createGain: jest.fn(() => ({
     connect: jest.fn(),
-    gain: { value: 1 }
+    disconnect: jest.fn(),
+    gain: { 
+      value: 1,
+      setValueAtTime: jest.fn(),
+      setTargetAtTime: jest.fn()
+    }
   })),
   createBufferSource: jest.fn(() => ({
     connect: jest.fn(),
+    disconnect: jest.fn(),
     start: jest.fn(),
-    stop: jest.fn()
+    stop: jest.fn(),
+    buffer: null,
+    loop: false,
+    playbackRate: {
+      value: 1,
+      setValueAtTime: jest.fn(),
+      setTargetAtTime: jest.fn()
+    },
+    onended: null
   })),
-  decodeAudioData: jest.fn(() => Promise.resolve({})),
-  destination: {}
+  createPanner: jest.fn(() => ({
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    setPosition: jest.fn(),
+    setOrientation: jest.fn(),
+    panningModel: 'HRTF',
+    distanceModel: 'inverse'
+  })),
+  createBuffer: jest.fn(() => ({
+    duration: 1,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    getChannelData: jest.fn(() => new Float32Array(44100))
+  })),
+  decodeAudioData: jest.fn(() => Promise.resolve({
+    duration: 1,
+    sampleRate: 44100,
+    numberOfChannels: 2
+  })),
+  close: jest.fn(() => Promise.resolve()),
+  suspend: jest.fn(() => Promise.resolve()),
+  resume: jest.fn(() => Promise.resolve())
 }));
 
 // Mock localStorage
@@ -313,6 +355,7 @@ global.cancelAnimationFrame = jest.fn();
 
 // Apply comprehensive test mocks
 applyTestMocks();
+applyComprehensiveMocks();
 
 // Set test timeout
 jest.setTimeout(30000);

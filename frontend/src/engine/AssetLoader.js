@@ -356,9 +356,12 @@ export class AssetLoader {
     // Check if context is available (for testing environments)
     if (!context) {
       // Return a basic texture for testing
-      const texture = new THREE.Texture();
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
+      const texture = {
+        wrapS: 1001, // THREE.RepeatWrapping
+        wrapT: 1001,
+        needsUpdate: true,
+        dispose: jest.fn ? jest.fn() : () => {}
+      };
       return texture;
     }
     
