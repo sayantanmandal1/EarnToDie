@@ -1,0 +1,367 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-02T16:00:00Z",
+  "description": "Zombie Car Game Asset Manifest",
+  "assets": {
+    "audio": {
+      "effects": {
+        "engine_start": {
+          "path": "audio/effects/engine_start.mp3",
+          "size": 45000,
+          "hash": "sha256-a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+          "checksum": "sha256-a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+          "critical": true,
+          "description": "Engine startup sound effect",
+          "quality": "high",
+          "duration": 2.5,
+          "format": "mp3",
+          "bitrate": 128
+        },
+        "engine_idle": {
+          "path": "audio/effects/engine_idle.mp3",
+          "size": 120000,
+          "hash": "sha256-b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567",
+          "checksum": "sha256-b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567",
+          "critical": true,
+          "description": "Engine idle loop sound",
+          "quality": "high",
+          "duration": 5.0,
+          "format": "mp3",
+          "bitrate": 128
+        },
+        "engine_rev": {
+          "path": "audio/effects/engine_rev.mp3",
+          "size": 80000,
+          "hash": "sha256-c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678",
+          "checksum": "sha256-c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678",
+          "critical": true,
+          "description": "Engine revving sound",
+          "quality": "high",
+          "duration": 3.2,
+          "format": "mp3",
+          "bitrate": 128
+        },
+        "zombie_hit": {
+          "path": "audio/effects/zombie_hit.mp3",
+          "size": 25000,
+          "hash": "sha256-d4e5f6789012345678901234567890abcdef1234567890abcdef123456789",
+          "checksum": "sha256-d4e5f6789012345678901234567890abcdef1234567890abcdef123456789",
+          "critical": true,
+          "description": "Zombie impact sound",
+          "quality": "high",
+          "duration": 1.0,
+          "format": "mp3",
+          "bitrate": 128
+        },
+        "zombie_splat": {
+          "path": "audio/effects/zombie_splat.mp3",
+          "size": 30000,
+          "hash": "sha256-e5f6789012345678901234567890abcdef1234567890abcdef1234567890",
+          "checksum": "sha256-e5f6789012345678901234567890abcdef1234567890abcdef1234567890",
+          "critical": true,
+          "description": "Zombie splat sound effect",
+          "quality": "high",
+          "duration": 1.5,
+          "format": "mp3",
+          "bitrate": 128
+        }
+      },
+      "music": {
+        "menu_theme": {
+          "path": "audio/music/menu_theme.mp3",
+          "size": 2500000,
+          "hash": "sha256-f6789012345678901234567890abcdef1234567890abcdef12345678901",
+          "checksum": "sha256-f6789012345678901234567890abcdef1234567890abcdef12345678901",
+          "critical": false,
+          "description": "Main menu background music",
+          "quality": "high",
+          "duration": 120.0,
+          "format": "mp3",
+          "bitrate": 192
+        },
+        "gameplay_theme": {
+          "path": "audio/music/gameplay_theme.mp3",
+          "size": 3000000,
+          "hash": "sha256-6789012345678901234567890abcdef1234567890abcdef123456789012",
+          "checksum": "sha256-6789012345678901234567890abcdef1234567890abcdef123456789012",
+          "critical": false,
+          "description": "Gameplay background music",
+          "quality": "high",
+          "duration": 180.0,
+          "format": "mp3",
+          "bitrate": 192
+        }
+      }
+    },
+    "textures": {
+      "ui": {
+        "logo": {
+          "path": "images/ui/logo.png",
+          "size": 150000,
+          "hash": "sha256-789012345678901234567890abcdef1234567890abcdef1234567890123",
+          "checksum": "sha256-789012345678901234567890abcdef1234567890abcdef1234567890123",
+          "critical": true,
+          "description": "Game logo",
+          "width": 512,
+          "height": 256,
+          "format": "png",
+          "quality": "lossless"
+        },
+        "background_menu": {
+          "path": "images/ui/background_menu.jpg",
+          "size": 800000,
+          "hash": "sha256-89012345678901234567890abcdef1234567890abcdef12345678901234",
+          "checksum": "sha256-89012345678901234567890abcdef1234567890abcdef12345678901234",
+          "critical": true,
+          "description": "Main menu background",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpg",
+          "quality": "high"
+        }
+      },
+      "vehicles": {
+        "sedan": {
+          "path": "images/vehicles/sedan.png",
+          "size": 200000,
+          "hash": "sha256-9012345678901234567890abcdef1234567890abcdef123456789012345",
+          "checksum": "sha256-9012345678901234567890abcdef1234567890abcdef123456789012345",
+          "critical": true,
+          "description": "Sedan vehicle texture",
+          "width": 1024,
+          "height": 1024,
+          "format": "png",
+          "quality": "high"
+        }
+      },
+      "environment": {
+        "road": {
+          "path": "images/environment/road.jpg",
+          "size": 400000,
+          "hash": "sha256-012345678901234567890abcdef1234567890abcdef1234567890123456",
+          "checksum": "sha256-012345678901234567890abcdef1234567890abcdef1234567890123456",
+          "critical": true,
+          "description": "Road surface texture",
+          "width": 2048,
+          "height": 2048,
+          "format": "jpg",
+          "quality": "high",
+          "tiling": true
+        }
+      }
+    },
+    "models": {
+      "vehicles": {
+        "sedan": {
+          "path": "models/vehicles/sedan.glb",
+          "size": 1200000,
+          "hash": "sha256-12345678901234567890abcdef1234567890abcdef12345678901234567",
+          "checksum": "sha256-12345678901234567890abcdef1234567890abcdef12345678901234567",
+          "critical": true,
+          "description": "Sedan 3D model",
+          "format": "glb",
+          "vertices": 15000,
+          "triangles": 8000,
+          "materials": 3,
+          "animations": ["idle", "drive"]
+        }
+      },
+      "zombies": {
+        "basic": {
+          "path": "models/zombies/basic.glb",
+          "size": 800000,
+          "hash": "sha256-2345678901234567890abcdef1234567890abcdef123456789012345678",
+          "checksum": "sha256-2345678901234567890abcdef1234567890abcdef123456789012345678",
+          "critical": true,
+          "description": "Basic zombie 3D model",
+          "format": "glb",
+          "vertices": 8000,
+          "triangles": 4000,
+          "materials": 2,
+          "animations": ["walk", "attack", "death"]
+        }
+      },
+      "environment": {
+        "building_01": {
+          "path": "models/environment/building_01.glb",
+          "size": 2000000,
+          "hash": "sha256-345678901234567890abcdef1234567890abcdef1234567890123456789",
+          "checksum": "sha256-345678901234567890abcdef1234567890abcdef1234567890123456789",
+          "critical": false,
+          "description": "Building model 01",
+          "format": "glb",
+          "vertices": 25000,
+          "triangles": 15000,
+          "materials": 5,
+          "lod_levels": 3
+        }
+      }
+    },
+    "data": {
+      "levels": {
+        "level_01": {
+          "path": "data/levels/level_01.json",
+          "size": 50000,
+          "hash": "sha256-45678901234567890abcdef1234567890abcdef12345678901234567890",
+          "checksum": "sha256-45678901234567890abcdef1234567890abcdef12345678901234567890",
+          "critical": true,
+          "description": "Level 1 configuration",
+          "format": "json",
+          "schema_version": "1.0"
+        }
+      },
+      "vehicles": {
+        "configs": {
+          "path": "data/vehicles/configs.json",
+          "size": 30000,
+          "hash": "sha256-5678901234567890abcdef1234567890abcdef123456789012345678901",
+          "checksum": "sha256-5678901234567890abcdef1234567890abcdef123456789012345678901",
+          "critical": true,
+          "description": "Vehicle configuration data",
+          "format": "json",
+          "schema_version": "1.0"
+        }
+      },
+      "zombies": {
+        "configs": {
+          "path": "data/zombies/configs.json",
+          "size": 25000,
+          "hash": "sha256-678901234567890abcdef1234567890abcdef1234567890123456789012",
+          "checksum": "sha256-678901234567890abcdef1234567890abcdef1234567890123456789012",
+          "critical": true,
+          "description": "Zombie configuration data",
+          "format": "json",
+          "schema_version": "1.0"
+        }
+      }
+    },
+    "shaders": {
+      "vehicle": {
+        "vertex": {
+          "path": "shaders/vehicle.vert",
+          "size": 5000,
+          "hash": "sha256-78901234567890abcdef1234567890abcdef12345678901234567890123",
+          "checksum": "sha256-78901234567890abcdef1234567890abcdef12345678901234567890123",
+          "critical": true,
+          "description": "Vehicle vertex shader",
+          "format": "glsl",
+          "version": "330",
+          "type": "vertex"
+        },
+        "fragment": {
+          "path": "shaders/vehicle.frag",
+          "size": 8000,
+          "hash": "sha256-8901234567890abcdef1234567890abcdef123456789012345678901234",
+          "checksum": "sha256-8901234567890abcdef1234567890abcdef123456789012345678901234",
+          "critical": true,
+          "description": "Vehicle fragment shader",
+          "format": "glsl",
+          "version": "330",
+          "type": "fragment"
+        }
+      }
+    },
+    "fonts": {
+      "ui": {
+        "main": {
+          "path": "fonts/game_font.woff2",
+          "size": 120000,
+          "hash": "sha256-901234567890abcdef1234567890abcdef1234567890123456789012345",
+          "checksum": "sha256-901234567890abcdef1234567890abcdef1234567890123456789012345",
+          "critical": true,
+          "description": "Main UI font",
+          "format": "woff2",
+          "family": "GameFont",
+          "weight": "normal",
+          "style": "normal"
+        }
+      }
+    }
+  },
+  "groups": {
+    "critical": {
+      "description": "Essential assets required for basic gameplay",
+      "assets": [
+        "audio/effects/engine_start",
+        "audio/effects/engine_idle",
+        "audio/effects/zombie_hit",
+        "textures/ui/logo",
+        "textures/ui/background_menu",
+        "textures/vehicles/sedan",
+        "textures/environment/road",
+        "models/vehicles/sedan",
+        "models/zombies/basic",
+        "data/levels/level_01",
+        "data/vehicles/configs",
+        "data/zombies/configs",
+        "shaders/vehicle/vertex",
+        "shaders/vehicle/fragment",
+        "fonts/ui/main"
+      ]
+    },
+    "ui": {
+      "description": "User interface assets",
+      "assets": [
+        "textures/ui/logo",
+        "textures/ui/background_menu",
+        "fonts/ui/main"
+      ]
+    },
+    "gameplay": {
+      "description": "Core gameplay assets",
+      "assets": [
+        "audio/effects/engine_start",
+        "audio/effects/engine_idle",
+        "audio/effects/engine_rev",
+        "audio/effects/zombie_hit",
+        "audio/effects/zombie_splat",
+        "textures/vehicles/sedan",
+        "textures/environment/road",
+        "models/vehicles/sedan",
+        "models/zombies/basic",
+        "shaders/vehicle/vertex",
+        "shaders/vehicle/fragment"
+      ]
+    },
+    "environment": {
+      "description": "Environment and level assets",
+      "assets": [
+        "textures/environment/road",
+        "models/environment/building_01",
+        "data/levels/level_01"
+      ]
+    },
+    "audio": {
+      "description": "All audio assets",
+      "assets": [
+        "audio/effects/engine_start",
+        "audio/effects/engine_idle",
+        "audio/effects/engine_rev",
+        "audio/effects/zombie_hit",
+        "audio/effects/zombie_splat",
+        "audio/music/menu_theme",
+        "audio/music/gameplay_theme"
+      ]
+    }
+  },
+  "preloadOrder": [
+    "critical",
+    "ui",
+    "gameplay",
+    "environment",
+    "audio"
+  ],
+  "fallbacks": {
+    "audio/effects/engine_start": "audio/effects/engine_idle",
+    "models/vehicles/sedan": "models/vehicles/basic_car",
+    "textures/vehicles/sedan": "textures/vehicles/default"
+  },
+  "optimization": {
+    "enableCompression": true,
+    "enableCaching": true,
+    "maxCacheSize": 500000000,
+    "compressionLevel": 6,
+    "textureMaxSize": 2048,
+    "audioMaxBitrate": 192
+  }
+}

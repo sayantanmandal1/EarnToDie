@@ -1,0 +1,387 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-08-02T11:52:52.009Z",
+  "description": "Zombie Car Game Audio Asset Manifest",
+  "totalFiles": 51,
+  "categories": {
+    "effects": {
+      "count": 25,
+      "totalDuration": 63.49999999999999,
+      "totalSize": 2057600
+    },
+    "music": {
+      "count": 9,
+      "totalDuration": 1493,
+      "totalSize": 47785216
+    },
+    "ui": {
+      "count": 9,
+      "totalDuration": 9.1,
+      "totalSize": 300416
+    },
+    "environment": {
+      "count": 8,
+      "totalDuration": 126.5,
+      "totalSize": 4056192
+    }
+  },
+  "files": {
+    "effects/engine_start.mp3": {
+      "path": "audio/effects/engine_start.mp3",
+      "duration": 3.5,
+      "description": "V8 engine startup",
+      "size": 113024,
+      "category": "effects"
+    },
+    "effects/engine_idle.mp3": {
+      "path": "audio/effects/engine_idle.mp3",
+      "duration": 5,
+      "description": "V8 engine idle loop",
+      "size": 161024,
+      "category": "effects"
+    },
+    "effects/engine_rev.mp3": {
+      "path": "audio/effects/engine_rev.mp3",
+      "duration": 2,
+      "description": "Engine revving",
+      "size": 65024,
+      "category": "effects"
+    },
+    "effects/engine_v6_start.mp3": {
+      "path": "audio/effects/engine_v6_start.mp3",
+      "duration": 2.8,
+      "description": "V6 engine startup",
+      "size": 90624,
+      "category": "effects"
+    },
+    "effects/engine_v6_idle.mp3": {
+      "path": "audio/effects/engine_v6_idle.mp3",
+      "duration": 4,
+      "description": "V6 engine idle",
+      "size": 129024,
+      "category": "effects"
+    },
+    "effects/engine_diesel_start.mp3": {
+      "path": "audio/effects/engine_diesel_start.mp3",
+      "duration": 4,
+      "description": "Diesel engine startup",
+      "size": 129024,
+      "category": "effects"
+    },
+    "effects/engine_diesel_idle.mp3": {
+      "path": "audio/effects/engine_diesel_idle.mp3",
+      "duration": 6,
+      "description": "Diesel engine idle",
+      "size": 193024,
+      "category": "effects"
+    },
+    "effects/gear_shift.mp3": {
+      "path": "audio/effects/gear_shift.mp3",
+      "duration": 0.5,
+      "description": "Manual transmission shift",
+      "size": 17024,
+      "category": "effects"
+    },
+    "effects/turbo_whistle.mp3": {
+      "path": "audio/effects/turbo_whistle.mp3",
+      "duration": 1.2,
+      "description": "Turbocharger whistle",
+      "size": 39424,
+      "category": "effects"
+    },
+    "effects/metal_crunch_light.mp3": {
+      "path": "audio/effects/metal_crunch_light.mp3",
+      "duration": 1,
+      "description": "Light metal impact",
+      "size": 33024,
+      "category": "effects"
+    },
+    "effects/metal_crunch_heavy.mp3": {
+      "path": "audio/effects/metal_crunch_heavy.mp3",
+      "duration": 2,
+      "description": "Heavy metal collision",
+      "size": 65024,
+      "category": "effects"
+    },
+    "effects/glass_shatter.mp3": {
+      "path": "audio/effects/glass_shatter.mp3",
+      "duration": 1.5,
+      "description": "Glass breaking",
+      "size": 49024,
+      "category": "effects"
+    },
+    "effects/tire_screech.mp3": {
+      "path": "audio/effects/tire_screech.mp3",
+      "duration": 2.5,
+      "description": "Tire screeching",
+      "size": 81024,
+      "category": "effects"
+    },
+    "effects/brake_squeal.mp3": {
+      "path": "audio/effects/brake_squeal.mp3",
+      "duration": 1.8,
+      "description": "Brake squealing",
+      "size": 58624,
+      "category": "effects"
+    },
+    "effects/zombie_hit_soft.mp3": {
+      "path": "audio/effects/zombie_hit_soft.mp3",
+      "duration": 0.8,
+      "description": "Soft zombie impact",
+      "size": 26624,
+      "category": "effects"
+    },
+    "effects/zombie_hit_hard.mp3": {
+      "path": "audio/effects/zombie_hit_hard.mp3",
+      "duration": 1.2,
+      "description": "Hard zombie impact",
+      "size": 39424,
+      "category": "effects"
+    },
+    "effects/bone_crack.mp3": {
+      "path": "audio/effects/bone_crack.mp3",
+      "duration": 0.6,
+      "description": "Bone breaking",
+      "size": 20224,
+      "category": "effects"
+    },
+    "effects/zombie_splat.mp3": {
+      "path": "audio/effects/zombie_splat.mp3",
+      "duration": 1,
+      "description": "Gore splatter",
+      "size": 33024,
+      "category": "effects"
+    },
+    "effects/zombie_groan_low.mp3": {
+      "path": "audio/effects/zombie_groan_low.mp3",
+      "duration": 3,
+      "description": "Low zombie groan",
+      "size": 97024,
+      "category": "effects"
+    },
+    "effects/zombie_groan_aggressive.mp3": {
+      "path": "audio/effects/zombie_groan_aggressive.mp3",
+      "duration": 2.5,
+      "description": "Aggressive growl",
+      "size": 81024,
+      "category": "effects"
+    },
+    "effects/zombie_scream.mp3": {
+      "path": "audio/effects/zombie_scream.mp3",
+      "duration": 2,
+      "description": "Zombie attack scream",
+      "size": 65024,
+      "category": "effects"
+    },
+    "effects/zombie_death.mp3": {
+      "path": "audio/effects/zombie_death.mp3",
+      "duration": 2.8,
+      "description": "Zombie death rattle",
+      "size": 90624,
+      "category": "effects"
+    },
+    "effects/zombie_horde_ambient.mp3": {
+      "path": "audio/effects/zombie_horde_ambient.mp3",
+      "duration": 10,
+      "description": "Distant horde",
+      "size": 321024,
+      "category": "effects"
+    },
+    "effects/zombie_footsteps_shamble.mp3": {
+      "path": "audio/effects/zombie_footsteps_shamble.mp3",
+      "duration": 1,
+      "description": "Shambling footsteps",
+      "size": 33024,
+      "category": "effects"
+    },
+    "effects/zombie_footsteps_run.mp3": {
+      "path": "audio/effects/zombie_footsteps_run.mp3",
+      "duration": 0.8,
+      "description": "Running footsteps",
+      "size": 26624,
+      "category": "effects"
+    },
+    "music/menu_theme.mp3": {
+      "path": "audio/music/menu_theme.mp3",
+      "duration": 180,
+      "description": "Main menu orchestral theme",
+      "size": 5761024,
+      "category": "music"
+    },
+    "music/menu_electronic.mp3": {
+      "path": "audio/music/menu_electronic.mp3",
+      "duration": 200,
+      "description": "Electronic menu theme",
+      "size": 6401024,
+      "category": "music"
+    },
+    "music/gameplay_calm.mp3": {
+      "path": "audio/music/gameplay_calm.mp3",
+      "duration": 240,
+      "description": "Calm exploration music",
+      "size": 7681024,
+      "category": "music"
+    },
+    "music/gameplay_tension.mp3": {
+      "path": "audio/music/gameplay_tension.mp3",
+      "duration": 180,
+      "description": "Building tension music",
+      "size": 5761024,
+      "category": "music"
+    },
+    "music/gameplay_action.mp3": {
+      "path": "audio/music/gameplay_action.mp3",
+      "duration": 220,
+      "description": "High-intensity action music",
+      "size": 7041024,
+      "category": "music"
+    },
+    "music/gameplay_horror.mp3": {
+      "path": "audio/music/gameplay_horror.mp3",
+      "duration": 300,
+      "description": "Horror ambient soundscape",
+      "size": 9601024,
+      "category": "music"
+    },
+    "music/victory_fanfare.mp3": {
+      "path": "audio/music/victory_fanfare.mp3",
+      "duration": 15,
+      "description": "Victory fanfare",
+      "size": 481024,
+      "category": "music"
+    },
+    "music/game_over.mp3": {
+      "path": "audio/music/game_over.mp3",
+      "duration": 8,
+      "description": "Game over sting",
+      "size": 257024,
+      "category": "music"
+    },
+    "music/garage_theme.mp3": {
+      "path": "audio/music/garage_theme.mp3",
+      "duration": 150,
+      "description": "Garage/upgrade music",
+      "size": 4801024,
+      "category": "music"
+    },
+    "ui/button_click.mp3": {
+      "path": "audio/ui/button_click.mp3",
+      "duration": 0.2,
+      "description": "Button click",
+      "size": 7424,
+      "category": "ui"
+    },
+    "ui/button_hover.mp3": {
+      "path": "audio/ui/button_hover.mp3",
+      "duration": 0.1,
+      "description": "Button hover",
+      "size": 4224,
+      "category": "ui"
+    },
+    "ui/menu_transition.mp3": {
+      "path": "audio/ui/menu_transition.mp3",
+      "duration": 0.8,
+      "description": "Menu transition",
+      "size": 26624,
+      "category": "ui"
+    },
+    "ui/notification.mp3": {
+      "path": "audio/ui/notification.mp3",
+      "duration": 1.5,
+      "description": "Achievement notification",
+      "size": 49024,
+      "category": "ui"
+    },
+    "ui/error.mp3": {
+      "path": "audio/ui/error.mp3",
+      "duration": 0.5,
+      "description": "Error sound",
+      "size": 17024,
+      "category": "ui"
+    },
+    "ui/purchase_success.mp3": {
+      "path": "audio/ui/purchase_success.mp3",
+      "duration": 1,
+      "description": "Purchase success",
+      "size": 33024,
+      "category": "ui"
+    },
+    "ui/purchase_fail.mp3": {
+      "path": "audio/ui/purchase_fail.mp3",
+      "duration": 0.8,
+      "description": "Purchase failure",
+      "size": 26624,
+      "category": "ui"
+    },
+    "ui/level_complete.mp3": {
+      "path": "audio/ui/level_complete.mp3",
+      "duration": 3,
+      "description": "Level completion",
+      "size": 97024,
+      "category": "ui"
+    },
+    "ui/checkpoint.mp3": {
+      "path": "audio/ui/checkpoint.mp3",
+      "duration": 1.2,
+      "description": "Checkpoint reached",
+      "size": 39424,
+      "category": "ui"
+    },
+    "environment/wind_light.mp3": {
+      "path": "audio/environment/wind_light.mp3",
+      "duration": 30,
+      "description": "Light wind ambient",
+      "size": 961024,
+      "category": "environment"
+    },
+    "environment/wind_heavy.mp3": {
+      "path": "audio/environment/wind_heavy.mp3",
+      "duration": 25,
+      "description": "Heavy wind with debris",
+      "size": 801024,
+      "category": "environment"
+    },
+    "environment/rain_light.mp3": {
+      "path": "audio/environment/rain_light.mp3",
+      "duration": 40,
+      "description": "Light rain",
+      "size": 1281024,
+      "category": "environment"
+    },
+    "environment/thunder.mp3": {
+      "path": "audio/environment/thunder.mp3",
+      "duration": 4,
+      "description": "Thunder crack",
+      "size": 129024,
+      "category": "environment"
+    },
+    "environment/debris_impact.mp3": {
+      "path": "audio/environment/debris_impact.mp3",
+      "duration": 1.5,
+      "description": "Debris impact",
+      "size": 49024,
+      "category": "environment"
+    },
+    "environment/fire_crackle.mp3": {
+      "path": "audio/environment/fire_crackle.mp3",
+      "duration": 20,
+      "description": "Fire crackling",
+      "size": 641024,
+      "category": "environment"
+    },
+    "environment/explosion_small.mp3": {
+      "path": "audio/environment/explosion_small.mp3",
+      "duration": 2,
+      "description": "Small explosion",
+      "size": 65024,
+      "category": "environment"
+    },
+    "environment/explosion_large.mp3": {
+      "path": "audio/environment/explosion_large.mp3",
+      "duration": 4,
+      "description": "Large explosion",
+      "size": 129024,
+      "category": "environment"
+    }
+  }
+}
