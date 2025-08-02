@@ -361,12 +361,20 @@ export class RobustSaveAPI extends SaveAPI {
                     data: localSaveData,
                     message: 'Local data is newer, uploaded to server'
                 };
-            } else {
+            } else if (serverData) {
                 // Same timestamp, data is in sync
                 return {
                     action: 'none',
                     data: localSaveData,
                     message: 'Data is already in sync'
+                };
+            } else {
+                // No server data, upload local data
+                await this.uploadSaveData(localSaveData);
+                return {
+                    action: 'upload',
+                    data: localSaveData,
+                    message: 'No server data found, uploaded local data'
                 };
             }
         } catch (error) {
