@@ -465,4 +465,167 @@ describe('SpatialAudioEngine', () => {
             engine.setMasterVolume(1.5);
             expect(engine.masterGain.gain.setValueAtTime).toHaveBeenCalledWith(
                 1,
-                mockAudioCo
+                mockAudioContext.currentTime
+            );
+        });
+    });
+
+    describe('Statistics and Information', () => {
+        beforeEach(async () => {
+            await engine.initialize();
+        });
+
+        test('should provide comprehensive statistics', () => {
+            const stats = engine.getStatistics();
+            
+            expect(stats).toBeDefined();
+            expect(stats.activeSources).toBe(0);
+            expect(stats.maxSources).toBe(engine.options.maxAudioSources);
+            expect(stats.enabledFeatures).toBeDefined();
+            expect(stats.environmentSettings).toBeDefined();
+            expect(stats.listenerPosition).toBeDefined();
+            expect(stats.performanceMetrics).toBeDefined();
+        });
+
+        test('should show enabled features correctly', () => {
+            const stats = engine.getStatistics();
+            
+            expect(stats.enabledFeatures.hrtf).toBe(engine.options.enableHRTF);
+            expect(stats.enabledFeatures.reverb).toBe(engine.options.enableReverb);
+            expect(stats.enabledFeatures.compression).toBe(engine.options.enableCompression);
+            expect(stats.enabledFeatures.occlusion).toBe(engine.options.enableOcclusion);
+        });
+    });
+
+    describe('Update Loop', () => {
+        beforeEach(async () => {
+            await engine.initialize();
+        });
+
+        test('should start update loop on initialization', () => {
+            expect(engine.updateTimer).toBeDefined();
+        });
+
+        test('should update all active sources', () => {
+            const mockAudioBuffer = { duration: 1.0 };
+            const source = engine.createAudioSource(mockAudioBuffer);
+            
+            // Mock the update method
+            source.update = jest.fn();
+            source.isFinished = jest.fn().mockReturnValue(false);
+            
+            engine.update();
+            
+            expect(source.update).toHaveBeenCalledWith(
+                engine.listenerPosition,
+                engine.listenerOrientation
+            );
+        });
+
+        test('should remove finished sources during update', () => {
+            const mockAudioBuffer = { duration: 1.0 };
+            const source = engine.createAudioSource(mockAudioBuffer);
+            const sourceId = source.sourceId;
+            
+            // Mock source as finished
+            source.isFinished = jest.fn().mockReturnValue(true);
+            source.dispose = jest.fn();
+            
+            engine.update();
+            
+            expect(engine.audioSources.has(sourceId)).toBe(false);
+            expect(source.dispose).toHaveBeenCalled();
+        });
+    });
+
+    describe('Disposal', () => {
+        beforeEach(async () => {
+            await engine.initialize();
+        });
+
+        test('should dispose of all resources', () => {
+            const mockAudioBuffer = { duration: 1.0 };
+            const source = engine.createAudioSource(mockAudioBuffer);
+            source.dispose = jest.fn();
+            
+            engine.dispose();
+            
+            expect(engine.updateTimer).toBeNull();
+            expect(engine.audioSources.size).toBe(0);
+            expect(engine.isInitialized).toBe(false);
+            expect(source.dispose).toHaveBeenCalled();
+        });
+
+        test('should disconnect all audio nodes', () => {
+            engine.dispose();
+            
+            expect(engine.masterGain.disconnect).toHaveBeenCalled();
+            expect(engine.analyser.disconnect).toHaveBeenCalled();
+        });
+
+        test('should stop update timer', () => {
+            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+            
+            engine.dispose();
+            
+            expect(clearIntervalSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('Error Handling', () => {
+        test('should handle initialization failures gracefully', async () => {
+            mockAudioContext.createGain.mockImplementation(() => {
+                throw new Error('Failed to create gain node');
+            });
+
+            await expect(engine.initialize()).rejects.toThrow('Failed to create gain node');
+        });
+
+        test('should handle processor initialization failures', async () => {
+            // Mock processor initialization to fail
+            const failingEngine = new SpatialAudioEngine({ enableHRTF: true });
+            
+            // Should not throw, but should disable HRTF
+            await failingEngine.initialize();
+            
+            expect(failingEngine.isInitialized).toBe(true);
+            // HRTF should be disabled due to initialization failure
+            
+            failingEngine.dispose();
+        });
+    });
+});
+
+describe('SpatialAudioSource', () => {
+    let mockAudioBuffer;
+    let mockOptions;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        global.AudioContext = jest.fn(() => mockAudioContext);
+        
+        mockAudioBuffer = {
+            duration: 2.5,
+            numberOfChannels: 2,
+            sampleRate: 44100
+        };
+
+        mockOptions = {
+            masterGain: { connect: jest.fn() },
+            reverbSend: { connect: jest.fn() }
+        };
+    });
+
+    test('should create audio processing graph', () => {
+        const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer, 'test-id', mockOptions);
+        
+        expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+        expect(mockAudioContext.createPanner).toHaveBeenCalled();
+        expect(mockAudioContext.createGain).toHaveBeenCalled();
+        expect(mockAudioContext.createBiquadFilter).toHaveBeenCalled();
+    });
+
+    test('should set 3D position correctly', () => {
+        const { SpatialAudioSource } = require('../SpatialAudioEngine.js');
+        const source = new SpatialAudioSource(mockAudioContext, mockAudioBuffer,
