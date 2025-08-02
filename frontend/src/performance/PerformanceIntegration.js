@@ -1,5 +1,5 @@
 import { PerformanceManager } from './PerformanceManager';
-import { ObjectPool } from './ObjectPool';
+import { PoolManager } from './ObjectPool';
 import { LODSystem } from './LODSystem';
 import { TextureOptimizer } from './TextureOptimizer';
 import { PerformanceBenchmark } from './PerformanceBenchmark';
@@ -31,7 +31,7 @@ export class PerformanceIntegration {
             this.performanceManager = new PerformanceManager(this.gameEngine);
             
             // Initialize pool manager with common pools
-            this.poolManager = new ObjectPool();
+            this.poolManager = new PoolManager();
             this._setupObjectPools();
             
             // Initialize LOD system
@@ -392,19 +392,19 @@ export class PerformanceIntegration {
      * Dispose of all performance systems
      */
     dispose() {
-        if (this.performanceManager) {
+        if (this.performanceManager && typeof this.performanceManager.dispose === 'function') {
             this.performanceManager.dispose();
         }
         
-        if (this.poolManager) {
+        if (this.poolManager && typeof this.poolManager.clearAll === 'function') {
             this.poolManager.clearAll();
         }
         
-        if (this.lodSystem) {
+        if (this.lodSystem && typeof this.lodSystem.dispose === 'function') {
             this.lodSystem.dispose();
         }
         
-        if (this.textureOptimizer) {
+        if (this.textureOptimizer && typeof this.textureOptimizer.dispose === 'function') {
             this.textureOptimizer.dispose();
         }
         

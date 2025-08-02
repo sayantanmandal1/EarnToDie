@@ -157,16 +157,16 @@ export class SpatialAudio {
      * Update spatial audio source position
      */
     updateSourcePosition(spatialSource, newPosition, velocity = null) {
-        if (!spatialSource) return;
+        if (!spatialSource || !spatialSource.position || !spatialSource.lastPosition) return;
 
         // Update position
         spatialSource.lastPosition.copy(spatialSource.position);
         spatialSource.position.copy(newPosition);
         
         // Update velocity if provided, otherwise calculate from position change
-        if (velocity) {
+        if (velocity && spatialSource.velocity) {
             spatialSource.velocity.copy(velocity);
-        } else {
+        } else if (spatialSource.velocity) {
             spatialSource.velocity.subVectors(spatialSource.position, spatialSource.lastPosition);
         }
 

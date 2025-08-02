@@ -3,7 +3,7 @@ import { GameEngine } from './engine/GameEngine';
 import { GameStateManager } from './engine/GameStateManager';
 import { VehicleManager } from './vehicles/VehicleManager';
 import { ZombieManager } from './zombies/ZombieManager';
-import { LevelManager } from './levels/LevelManager';
+import LevelManager from './levels/LevelManager';
 import { UpgradeManager } from './upgrades/UpgradeManager';
 import { ScoringSystem } from './scoring/ScoringSystem';
 import { CombatSystem } from './combat/CombatSystem';
@@ -107,13 +107,27 @@ export class ZombieCarGame extends React.Component {
         this.updateLoadingState(20, 'Initializing error handling...');
         
         // Initialize error handling system
-        this.errorHandler = new ErrorHandler();
-        this.errorHandler.initialize();
+        this.errorHandler = new ErrorHandler({
+            enableReporting: false // Disable error reporting in development
+        });
 
         this.updateLoadingState(30, 'Loading save data...');
         
         // Initialize save system
-        this.saveManager = new SaveManager();
+        // Create a simple API client mock for now since backend is not available
+        const mockApiClient = {
+            request: async (endpoint) => {
+                throw new Error(`Backend not available: ${endpoint}`);
+            },
+            get: async (endpoint) => {
+                throw new Error(`Backend not available: ${endpoint}`);
+            },
+            post: async (endpoint, data) => {
+                throw new Error(`Backend not available: ${endpoint}`);
+            }
+        };
+        
+        this.saveManager = new SaveManager(mockApiClient);
         await this.saveManager.initialize();
 
         this.updateLoadingState(40, 'Setting up game state management...');
@@ -126,7 +140,7 @@ export class ZombieCarGame extends React.Component {
         
         // Initialize vehicle and upgrade systems
         this.vehicleManager = new VehicleManager(this.gameEngine);
-        this.upgradeManager = new UpgradeManager();
+        this.upgradeManager = new UpgradeManager(this.gameEngine, mockApiClient);
         await this.vehicleManager.initialize();
         await this.upgradeManager.initialize();
 

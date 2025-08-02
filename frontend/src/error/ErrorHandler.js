@@ -46,7 +46,8 @@ export class ErrorHandler {
 
         // Handle unhandled promise rejections
         window.addEventListener('unhandledrejection', (event) => {
-            this.handleError(new PromiseRejectionError(event.reason, {
+            const mockHandleError = this.handleError.bind(this);
+            mockHandleError(new PromiseRejectionError(event.reason, {
                 promise: event.promise
             }));
         });
@@ -261,13 +262,20 @@ export class ErrorHandler {
         const attempts = this.recoveryAttempts.get(attemptKey) || 0;
         
         if (attempts >= 3) {
-            return { success: false, reason: 'Too many recovery attempts' };
+            return { 
+                success: false, 
+                reason: 'Too many recovery attempts'
+            };
         }
 
         try {
             this.recoveryAttempts.set(attemptKey, attempts + 1);
             const result = await strategy(error, context);
-            return { success: true, result };
+            return { 
+                success: true, 
+                result,
+                reason: 'Recovery successful'
+            };
         } catch (recoveryError) {
             return { 
                 success: false, 
@@ -310,6 +318,11 @@ export class ErrorHandler {
      * Report error to server
      */
     async _reportError(errorInfo) {
+        // Skip reporting if backend is not available (development mode)
+        if (!this.options.enableReporting) {
+            return;
+        }
+        
         try {
             await fetch(this.options.reportingEndpoint, {
                 method: 'POST',
@@ -322,7 +335,9 @@ export class ErrorHandler {
                 })
             });
         } catch (reportingError) {
-            console.warn('Failed to report error:', reportingError);
+            // Disable reporting after first failure to avoid spam
+            this.options.enableReporting = false;
+            console.warn('Error reporting disabled due to backend unavailability');
         }
     }
 

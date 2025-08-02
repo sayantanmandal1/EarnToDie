@@ -156,6 +156,13 @@ export class PerformanceDegradationHandler {
     }
 
     /**
+     * Check memory pressure (for testing)
+     */
+    _checkMemoryPressure() {
+        this._monitorMemoryUsage();
+    }
+
+    /**
      * Check if performance adjustment is needed
      */
     _checkPerformanceAdjustment() {

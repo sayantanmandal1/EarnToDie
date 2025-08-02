@@ -46,7 +46,13 @@ export class AudioIntegration {
         try {
             // Initialize core audio manager
             this.audioManager = new AudioManager(this.gameEngine);
-            await this.audioManager.initialize();
+            const initResult = await this.audioManager.initialize();
+            
+            // Return false if audio manager failed to initialize
+            if (!initResult) {
+                console.warn('AudioManager failed to initialize');
+                return false;
+            }
             
             // Initialize spatial audio system
             this.spatialAudio = new SpatialAudio(this.audioManager);
@@ -58,6 +64,15 @@ export class AudioIntegration {
             
             // Connect audio manager with spatial audio
             this.audioManager.spatialAudio = this.spatialAudio;
+            
+            // Ensure musicSystem exists
+            if (!this.audioManager.musicSystem) {
+                this.audioManager.musicSystem = {
+                    currentTrack: null,
+                    isPlaying: false,
+                    volume: 1.0
+                };
+            }
             
             // Setup event listeners for game systems
             this._setupEventListeners();
@@ -230,7 +245,9 @@ export class AudioIntegration {
     _setupEventListeners() {
         // Listen for window focus/blur to pause/resume audio
         window.addEventListener('focus', () => {
-            if (this.audioManager && this.audioManager.audioContext && this.audioManager.audioContext.state === 'suspended') {
+            if (this.audioManager && this.audioManager.audioContext && 
+                this.audioManager.audioContext.state === 'suspended' &&
+                typeof this.audioManager.audioContext.resume === 'function') {
                 this.audioManager.audioContext.resume();
             }
         });
@@ -238,6 +255,19 @@ export class AudioIntegration {
         window.addEventListener('blur', () => {
             // Optionally pause audio when window loses focus
             // this.audioManager.setVolume('master', 0.3);
+        });
+
+        // Handle user interaction to resume audio context
+        const resumeAudioContext = () => {
+            if (this.audioManager && this.audioManager.audioContext && 
+                this.audioManager.audioContext.state === 'suspended') {
+                this.audioManager.audioContext.resume().catch(console.warn);
+            }
+        };
+
+        // Add listeners for user interactions
+        ['click', 'keydown', 'touchstart'].forEach(eventType => {
+            document.addEventListener(eventType, resumeAudioContext, { once: true });
         });
     }
 
@@ -265,7 +295,9 @@ export class AudioIntegration {
         }
         
         // Play impact sound with spatial positioning
-        this.audioManager.playImpactSound(impactType, position, intensity);
+        if (this.audioManager && typeof this.audioManager.playImpactSound === 'function') {
+            this.audioManager.playImpactSound(impactType, position, intensity);
+        }
         
         // Update music intensity based on combat activity
         this.musicIntensity.combatActivity = Math.min(1.0, this.musicIntensity.combatActivity + 0.2);
@@ -453,7 +485,7 @@ export class AudioIntegration {
         this.audioManager.setMusicIntensity(this.musicIntensity.current);
         
         // Switch music tracks based on intensity
-        if (this.gameState === 'gameplay') {
+        if (this.gameState === 'gameplay' && this.audioManager.musicSystem) {
             if (this.musicIntensity.current > 0.7 && this.audioManager.musicSystem.currentTrack !== 'gameplay_intense') {
                 this.audioManager.playMusic('gameplay_intense');
             } else if (this.musicIntensity.current <= 0.7 && this.audioManager.musicSystem.currentTrack !== 'gameplay_calm') {

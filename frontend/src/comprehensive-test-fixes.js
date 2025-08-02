@@ -47,7 +47,11 @@ const createComprehensiveThreeMock = () => {
         opacity: params.opacity || 1,
         transparent: params.transparent || false,
         dispose: jest.fn(),
-        clone: jest.fn().mockReturnValue(createMaterial(params))
+        clone: jest.fn().mockImplementation(() => {
+            const newMaterial = createMaterial(params);
+            newMaterial.clone = jest.fn().mockReturnValue(newMaterial);
+            return newMaterial;
+        })
     });
 
     const createGeometry = () => ({
@@ -69,7 +73,11 @@ const createComprehensiveThreeMock = () => {
             }
         },
         dispose: jest.fn(),
-        clone: jest.fn().mockReturnValue(createGeometry()),
+        clone: jest.fn().mockImplementation(() => {
+            const newGeometry = createGeometry();
+            newGeometry.clone = jest.fn().mockReturnValue(newGeometry);
+            return newGeometry;
+        }),
         computeBoundingBox: jest.fn(),
         computeBoundingSphere: jest.fn()
     });
@@ -87,7 +95,11 @@ const createComprehensiveThreeMock = () => {
         add: jest.fn(),
         remove: jest.fn(),
         traverse: jest.fn(),
-        clone: jest.fn().mockReturnValue(createMesh(geometry, material)),
+        clone: jest.fn().mockImplementation(() => {
+            const newMesh = createMesh(geometry, material);
+            newMesh.clone = jest.fn().mockReturnValue(newMesh);
+            return newMesh;
+        }),
         dispose: jest.fn()
     });
 
@@ -102,7 +114,11 @@ const createComprehensiveThreeMock = () => {
         flipY: true,
         needsUpdate: false,
         dispose: jest.fn(),
-        clone: jest.fn().mockReturnValue(createTexture())
+        clone: jest.fn().mockImplementation(() => {
+            const newTexture = createTexture();
+            newTexture.clone = jest.fn().mockReturnValue(newTexture);
+            return newTexture;
+        })
     });
 
     return {

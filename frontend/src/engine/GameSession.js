@@ -273,7 +273,7 @@ export class GameSession extends EventEmitter {
         if (!this.startTime) return 0;
         
         const endTime = this.endTime || Date.now();
-        return (endTime - this.startTime) / 1000;
+        return Math.round((endTime - this.startTime) / 1000);
     }
 
     /**

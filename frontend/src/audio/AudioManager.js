@@ -179,11 +179,13 @@ export class AudioManager {
             gainNode.gain.setValueAtTime(finalVolume, this.audioContext.currentTime);
             
             // Set playback rate for pitch control
-            source.playbackRate.setValueAtTime(pitch, this.audioContext.currentTime);
+            if (source.playbackRate && typeof source.playbackRate.setValueAtTime === 'function') {
+                source.playbackRate.setValueAtTime(pitch, this.audioContext.currentTime);
+            }
             
             // Setup spatial audio if position is provided
             let pannerNode = null;
-            if (position && this.listener) {
+            if (position && this.listener && typeof this.audioContext.createPanner === 'function') {
                 pannerNode = this.audioContext.createPanner();
                 pannerNode.panningModel = 'HRTF';
                 pannerNode.distanceModel = 'inverse';
@@ -192,9 +194,11 @@ export class AudioManager {
                 pannerNode.rolloffFactor = this.rolloffFactor;
                 
                 // Set position
-                pannerNode.positionX.setValueAtTime(position.x, this.audioContext.currentTime);
-                pannerNode.positionY.setValueAtTime(position.y, this.audioContext.currentTime);
-                pannerNode.positionZ.setValueAtTime(position.z, this.audioContext.currentTime);
+                if (pannerNode.positionX && typeof pannerNode.positionX.setValueAtTime === 'function') {
+                    pannerNode.positionX.setValueAtTime(position.x, this.audioContext.currentTime);
+                    pannerNode.positionY.setValueAtTime(position.y, this.audioContext.currentTime);
+                    pannerNode.positionZ.setValueAtTime(position.z, this.audioContext.currentTime);
+                }
                 
                 // Connect: source -> panner -> gain -> destination
                 source.connect(pannerNode);
@@ -401,8 +405,12 @@ export class AudioManager {
             
             // Apply changes smoothly
             const currentTime = this.audioContext.currentTime;
-            this.engineAudio.source.playbackRate.setTargetAtTime(pitch, currentTime, 0.1);
-            this.engineAudio.gainNode.gain.setTargetAtTime(finalVolume, currentTime, 0.1);
+            if (this.engineAudio.source.playbackRate && typeof this.engineAudio.source.playbackRate.setTargetAtTime === 'function') {
+                this.engineAudio.source.playbackRate.setTargetAtTime(pitch, currentTime, 0.1);
+            }
+            if (this.engineAudio.gainNode.gain && typeof this.engineAudio.gainNode.gain.setTargetAtTime === 'function') {
+                this.engineAudio.gainNode.gain.setTargetAtTime(finalVolume, currentTime, 0.1);
+            }
             
         } catch (error) {
             console.error('Failed to update engine audio:', error);

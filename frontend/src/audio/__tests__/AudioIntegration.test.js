@@ -61,7 +61,16 @@ describe('AudioIntegration', () => {
             startEngineAudio: jest.fn(),
             stopEngineAudio: jest.fn(),
             updateEngineAudio: jest.fn(),
-            dispose: jest.fn()
+            dispose: jest.fn(),
+            musicSystem: {
+                currentTrack: null,
+                isPlaying: false,
+                volume: 1,
+                tracks: {}
+            },
+            audioContext: {
+                resume: jest.fn()
+            }
         };
         
         mockSpatialAudio = {

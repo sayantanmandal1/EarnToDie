@@ -241,7 +241,7 @@ export class GameStateManager extends EventEmitter {
         const allCompleted = objectives.every(objective => objective.isCompleted());
 
         if (allCompleted) {
-            this.endGame('level_completed', true);
+            this.setState(GameState.LEVEL_COMPLETE);
             return true;
         }
 
@@ -259,19 +259,19 @@ export class GameStateManager extends EventEmitter {
 
         // Check vehicle health
         if (vehicle.getHealth() <= 0) {
-            this.endGame('vehicle_destroyed', false);
+            this.setState(GameState.GAME_OVER);
             return true;
         }
 
         // Check fuel
         if (vehicle.getFuel() <= 0) {
-            this.endGame('out_of_fuel', false);
+            this.setState(GameState.GAME_OVER);
             return true;
         }
 
         // Check if vehicle is stuck or out of bounds
         if (this._isVehicleStuck(vehicle)) {
-            this.endGame('vehicle_stuck', false);
+            this.setState(GameState.GAME_OVER);
             return true;
         }
 

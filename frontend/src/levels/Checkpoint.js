@@ -6,7 +6,9 @@ import * as THREE from 'three';
 export default class Checkpoint {
     constructor(config, scene) {
         this.id = config.id;
-        this.position = new THREE.Vector3(config.position.x, 0, config.position.z);
+        this.position = config.position ? 
+            new THREE.Vector3(config.position.x || 0, 0, config.position.z || 0) :
+            new THREE.Vector3(0, 0, 0);
         this.radius = config.radius || 20;
         this.scene = scene;
         
@@ -38,8 +40,10 @@ export default class Checkpoint {
         });
         
         this.mesh = new THREE.Mesh(pillarGeometry, pillarMaterial);
-        this.mesh.position.copy(this.position);
-        this.mesh.position.y = 5;
+        if (this.mesh.position && typeof this.mesh.position.copy === 'function') {
+            this.mesh.position.copy(this.position);
+            this.mesh.position.y = 5;
+        }
         this.mesh.userData = { type: 'checkpoint', checkpoint: this };
         
         // Create checkpoint base
