@@ -45,7 +45,12 @@ describe('Checkpoint', () => {
         THREE.Mesh = jest.fn().mockImplementation((geometry, material) => ({
             geometry,
             material,
-            position: { copy: jest.fn(), y: 0 },
+            position: { 
+                copy: jest.fn(),
+                y: 0,
+                x: 0,
+                z: 0
+            },
             userData: {},
             rotation: { y: 0 }
         }));

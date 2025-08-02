@@ -117,7 +117,8 @@ describe('ErrorHandler', () => {
             errorHandler.registerRecoveryStrategy('test_error', mockRecovery);
 
             const error = new GameError('Test error');
-            error.constructor.name = 'TestError'; // Mock error type
+            // Mock the error type detection instead of modifying constructor.name
+            Object.defineProperty(error, 'name', { value: 'TestError', writable: true });
             
             // Mock the error type detection
             errorHandler._getErrorType = jest.fn().mockReturnValue('test_error');

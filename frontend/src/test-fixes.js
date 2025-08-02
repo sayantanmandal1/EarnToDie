@@ -125,6 +125,8 @@ const createAudioContextMock = () => {
         playbackRate: {
             setValueAtTime: jest.fn(),
             setTargetAtTime: jest.fn(),
+            linearRampToValueAtTime: jest.fn(),
+            exponentialRampToValueAtTime: jest.fn(),
             value: 1
         },
         onended: null

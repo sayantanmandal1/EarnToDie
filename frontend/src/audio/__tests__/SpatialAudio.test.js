@@ -18,7 +18,11 @@ const mockAudioManager = {
             connect: jest.fn(),
             start: jest.fn(),
             stop: jest.fn(),
-            playbackRate: { setValueAtTime: jest.fn() },
+            playbackRate: { 
+                setValueAtTime: jest.fn(),
+                setTargetAtTime: jest.fn(),
+                value: 1
+            },
             onended: null,
             loop: false
         })),
