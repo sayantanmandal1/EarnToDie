@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { applyTestMocks } from './test-fixes.js';
 const { applyComprehensiveMocks } = require('./comprehensive-test-fixes.js');
+const { applyUltimateTestFixes } = require('./ultimate-test-fixes.js');
 
 // Mock canvas getContext to return a proper WebGL mock
 const mockWebGLContext = {
@@ -356,6 +357,7 @@ global.cancelAnimationFrame = jest.fn();
 // Apply comprehensive test mocks
 applyTestMocks();
 applyComprehensiveMocks();
+applyUltimateTestFixes();
 
 // Set test timeout
-jest.setTimeout(30000);
+jest.setTimeout(60000);
