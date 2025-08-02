@@ -11,6 +11,7 @@ import { SaveManager } from './save/SaveManager';
 import { ErrorHandler } from './error/ErrorHandler';
 import { PerformanceManager } from './performance/PerformanceManager';
 import { FinalIntegration } from './integration/FinalIntegration';
+import { electronIntegration } from './electron/ElectronIntegration';
 
 // UI Components
 import MainMenu from './components/MainMenu';
@@ -43,6 +44,7 @@ export class ZombieCarGame extends React.Component {
         this.errorHandler = null;
         this.performanceManager = null;
         this.finalIntegration = null;
+        this.electronIntegration = electronIntegration;
 
         this.state = {
             gameState: 'MAIN_MENU', // MAIN_MENU, GARAGE, LEVEL_SELECT, PLAYING, PAUSED, GAME_OVER, SETTINGS
@@ -84,6 +86,9 @@ export class ZombieCarGame extends React.Component {
 
     async componentDidMount() {
         try {
+            // Setup Electron integration first
+            this.setupElectronIntegration();
+            
             await this.initializeGame();
         } catch (error) {
             this.handleError(error);
@@ -92,6 +97,61 @@ export class ZombieCarGame extends React.Component {
 
     componentWillUnmount() {
         this.cleanup();
+    }
+
+    /**
+     * Setup Electron integration and menu handlers
+     */
+    setupElectronIntegration() {
+        if (!this.electronIntegration.isElectron) {
+            console.log('Running in web mode - Electron integration disabled');
+            return;
+        }
+
+        console.log('Setting up Electron integration...');
+
+        // Register menu handlers
+        this.electronIntegration.registerMenuHandler('new-game', () => {
+            this.startNewGame();
+        });
+
+        this.electronIntegration.registerMenuHandler('save-game', () => {
+            this.saveGame();
+        });
+
+        this.electronIntegration.registerMenuHandler('load-game', () => {
+            this.loadGame();
+        });
+
+        this.electronIntegration.registerMenuHandler('toggle-pause', () => {
+            this.togglePause();
+        });
+
+        this.electronIntegration.registerMenuHandler('restart-level', () => {
+            this.restartLevel();
+        });
+
+        this.electronIntegration.registerMenuHandler('settings', () => {
+            this.setState({ gameState: 'SETTINGS' });
+        });
+
+        this.electronIntegration.registerMenuHandler('zoom-in', () => {
+            this.adjustZoom(1.1);
+        });
+
+        this.electronIntegration.registerMenuHandler('zoom-out', () => {
+            this.adjustZoom(0.9);
+        });
+
+        this.electronIntegration.registerMenuHandler('reset-zoom', () => {
+            this.resetZoom();
+        });
+
+        this.electronIntegration.registerMenuHandler('show-controls', () => {
+            this.showControlsHelp();
+        });
+
+        console.log('Electron integration setup complete');
     }
 
     /**
@@ -596,6 +656,86 @@ export class ZombieCarGame extends React.Component {
     }
 
     /**
+     * Electron-specific methods
+     */
+    
+    async saveGame() {
+        if (!this.electronIntegration.isElectron) {
+            console.warn('Save dialog only available in desktop version');
+            return;
+        }
+
+        try {
+            const result = await this.electronIntegration.showSaveDialog();
+            if (!result.canceled && result.filePath) {
+                const saveData = this.saveManager.exportSaveData();
+                // TODO: Write save data to file
+                console.log('Game saved to:', result.filePath);
+            }
+        } catch (error) {
+            console.error('Failed to save game:', error);
+            await this.electronIntegration.reportError(error);
+        }
+    }
+
+    async loadGame() {
+        if (!this.electronIntegration.isElectron) {
+            console.warn('Load dialog only available in desktop version');
+            return;
+        }
+
+        try {
+            const result = await this.electronIntegration.showOpenDialog();
+            if (!result.canceled && result.filePaths.length > 0) {
+                // TODO: Read save data from file
+                console.log('Loading game from:', result.filePaths[0]);
+            }
+        } catch (error) {
+            console.error('Failed to load game:', error);
+            await this.electronIntegration.reportError(error);
+        }
+    }
+
+    startNewGame() {
+        this.setState({ gameState: 'LEVEL_SELECT' });
+    }
+
+    togglePause() {
+        if (this.state.gameState === 'PLAYING') {
+            this.setState({ gameState: 'PAUSED' });
+        } else if (this.state.gameState === 'PAUSED') {
+            this.setState({ gameState: 'PLAYING' });
+        }
+    }
+
+    restartLevel() {
+        if (this.levelManager && this.state.gameState === 'PLAYING') {
+            this.levelManager.restartLevel();
+        }
+    }
+
+    adjustZoom(factor) {
+        if (this.gameEngine && this.gameEngine.camera) {
+            const camera = this.gameEngine.camera;
+            camera.zoom *= factor;
+            camera.updateProjectionMatrix();
+        }
+    }
+
+    resetZoom() {
+        if (this.gameEngine && this.gameEngine.camera) {
+            const camera = this.gameEngine.camera;
+            camera.zoom = 1;
+            camera.updateProjectionMatrix();
+        }
+    }
+
+    showControlsHelp() {
+        // TODO: Show controls help dialog
+        console.log('Showing controls help...');
+    }
+
+    /**
      * Cleanup resources
      */
     cleanup() {
@@ -613,6 +753,11 @@ export class ZombieCarGame extends React.Component {
         
         if (this.finalIntegration) {
             this.finalIntegration.dispose();
+        }
+
+        // Cleanup Electron integration
+        if (this.electronIntegration) {
+            this.electronIntegration.dispose();
         }
     }
 

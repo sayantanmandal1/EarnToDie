@@ -1,14 +1,16 @@
 import { EventEmitter } from 'events';
+import { databaseIntegration } from '../database/DatabaseIntegration.js';
 
 /**
  * SaveManager handles comprehensive save state management for game progress
- * Provides localStorage persistence, backend sync, validation, and recovery mechanisms
+ * Provides localStorage persistence, database storage, backend sync, validation, and recovery mechanisms
  */
 export class SaveManager extends EventEmitter {
     constructor(apiClient, options = {}) {
         super();
         
         this.apiClient = apiClient;
+        this.databaseIntegration = databaseIntegration;
         this.options = {
             autoSaveInterval: options.autoSaveInterval || 30000, // 30 seconds
             maxLocalSaves: options.maxLocalSaves || 10,
@@ -83,12 +85,74 @@ export class SaveManager extends EventEmitter {
     }
 
     /**
+     * Load save data from database or localStorage
+     */
+    async loadSaveData() {
+        try {
+            if (this.databaseIntegration.isAvailable()) {
+                // Load from database
+                const profile = await this.databaseIntegration.getPlayerProfile();
+                const vehicles = await this.databaseIntegration.getPlayerVehicles();
+                const levelProgress = await this.databaseIntegration.getLevelProgress();
+                
+                // Update save state with database data
+                this.saveState.player = {
+                    id: profile.id,
+                    username: profile.username,
+                    currency: profile.total_currency,
+                    level: profile.level,
+                    totalScore: 0, // Calculate from level progress
+                    experience: profile.experience,
+                    totalDistance: profile.total_distance,
+                    totalZombiesKilled: profile.total_zombies_killed,
+                    totalPlayTime: profile.total_play_time
+                };
+                
+                this.saveState.vehicles = vehicles.reduce((acc, vehicle) => {
+                    acc[vehicle.vehicle_type] = {
+                        owned: vehicle.is_owned,
+                        upgrades: vehicle.upgrade_levels,
+                        customization: vehicle.customization
+                    };
+                    return acc;
+                }, {});
+                
+                this.saveState.levelProgress = levelProgress.reduce((acc, progress) => {
+                    acc[progress.level_id] = {
+                        completed: progress.is_completed,
+                        bestScore: progress.best_score,
+                        bestTime: progress.best_time,
+                        stars: progress.stars_earned,
+                        completionCount: progress.completion_count
+                    };
+                    return acc;
+                }, {});
+                
+                this.saveState.settings = profile.settings || {};
+                
+                console.log('Save data loaded from database');
+            } else {
+                // Fallback to localStorage
+                await this.loadFromLocalStorage();
+                console.log('Save data loaded from localStorage (database not available)');
+            }
+        } catch (error) {
+            console.error('Failed to load save data:', error);
+            // Fallback to localStorage on database error
+            await this.loadFromLocalStorage();
+        }
+    }
+
+    /**
      * Initialize the save manager
      */
     async initialize() {
         try {
-            // Load existing save data
-            await this.loadFromLocalStorage();
+            // Initialize database integration first
+            await this.databaseIntegration.initialize();
+            
+            // Load existing save data (prioritize database over localStorage)
+            await this.loadSaveData();
             
             // Load sync status
             this.loadSyncStatus();
@@ -268,7 +332,7 @@ export class SaveManager extends EventEmitter {
     }
 
     /**
-     * Save current state to localStorage
+     * Save current state to database and localStorage
      */
     async saveToLocalStorage() {
         try {
@@ -278,7 +342,12 @@ export class SaveManager extends EventEmitter {
             // Create backup before saving
             await this.createBackup();
             
-            // Prepare data for storage
+            // Save to database first (if available)
+            if (this.databaseIntegration.isAvailable()) {
+                await this.saveToDatabase();
+            }
+            
+            // Prepare data for localStorage storage
             let dataToSave;
             if (this.options.compressionEnabled) {
                 dataToSave = this.compressData(this.saveState);
@@ -286,20 +355,79 @@ export class SaveManager extends EventEmitter {
                 dataToSave = JSON.stringify(this.saveState);
             }
             
-            // Save to localStorage
+            // Save to localStorage as backup
             localStorage.setItem(this.storageKeys.mainSave, dataToSave);
             
             // Mark as having pending changes for sync
             this.syncStatus.pendingChanges = true;
             this.saveSyncStatus();
             
-            console.log('Save data written to localStorage');
+            console.log('Save data written to database and localStorage');
             this.emit('saveCompleted', this.saveState);
             return true;
         } catch (error) {
-            console.error('Failed to save to localStorage:', error);
+            console.error('Failed to save data:', error);
             this.emit('saveError', error);
             throw error;
+        }
+    }
+
+    /**
+     * Save current state to database
+     */
+    async saveToDatabase() {
+        try {
+            if (!this.databaseIntegration.isAvailable()) {
+                return false;
+            }
+
+            // Update player profile
+            await this.databaseIntegration.updatePlayerProfile({
+                username: this.saveState.player.username,
+                level: this.saveState.player.level,
+                experience: this.saveState.player.experience || 0,
+                total_currency: this.saveState.player.currency,
+                total_distance: this.saveState.player.totalDistance || 0,
+                total_zombies_killed: this.saveState.player.totalZombiesKilled || 0,
+                total_play_time: this.saveState.player.totalPlayTime || 0,
+                settings: this.saveState.settings
+            });
+
+            // Update vehicle data
+            for (const [vehicleType, vehicleData] of Object.entries(this.saveState.vehicles)) {
+                if (vehicleData.owned) {
+                    // Check if vehicle exists, if not add it
+                    const vehicles = await this.databaseIntegration.getPlayerVehicles();
+                    const existingVehicle = vehicles.find(v => v.vehicle_type === vehicleType);
+                    
+                    if (!existingVehicle) {
+                        await this.databaseIntegration.purchaseVehicle(vehicleType, 0); // Free add for save restore
+                    } else {
+                        // Update existing vehicle
+                        await this.databaseIntegration.databaseManager.updatePlayerVehicle(existingVehicle.id, {
+                            upgrade_levels: vehicleData.upgrades,
+                            customization: vehicleData.customization
+                        });
+                    }
+                }
+            }
+
+            // Update level progress
+            for (const [levelId, progress] of Object.entries(this.saveState.levelProgress)) {
+                await this.databaseIntegration.updateLevelProgress(levelId, {
+                    score: progress.bestScore,
+                    time: progress.bestTime,
+                    completed: progress.completed,
+                    stars: progress.stars
+                });
+            }
+
+            console.log('Save data written to database');
+            return true;
+            
+        } catch (error) {
+            console.error('Failed to save to database:', error);
+            return false;
         }
     }
 

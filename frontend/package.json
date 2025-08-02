@@ -2,7 +2,8 @@
   "name": "zombie-car-game-frontend",
   "version": "1.0.0",
   "description": "Frontend for zombie car game built with Three.js",
-  "main": "src/index.js",
+  "main": "electron/main.js",
+  "homepage": "./",
   "scripts": {
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
@@ -23,13 +24,22 @@
     "lint:fix": "eslint src/ --fix",
     "start": "webpack serve --mode development --open",
     "clean": "rm -rf dist",
-    "serve": "npx serve -s dist -l 3000"
+    "serve": "npx serve -s dist -l 3000",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:pack": "npm run build && electron-builder",
+    "electron:dist": "npm run build && electron-builder --publish=never",
+    "electron:publish": "npm run build && electron-builder --publish=always",
+    "preelectron:pack": "npm run build",
+    "preelectron:dist": "npm run build"
   },
   "dependencies": {
     "axios": "^1.6.0",
+    "better-sqlite3": "^12.2.0",
     "cannon-es": "^0.20.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "sqlite3": "^5.1.7",
     "three": "^0.158.0"
   },
   "devDependencies": {
@@ -41,9 +51,13 @@
     "babel-loader": "^9.1.3",
     "canvas": "^2.11.2",
     "compression-webpack-plugin": "^10.0.0",
+    "concurrently": "^9.2.0",
     "core-js": "^3.33.0",
     "css-loader": "^6.8.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
+    "electron": "^37.2.5",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2",
     "eslint": "^8.54.0",
     "eslint-plugin-react": "^7.33.2",
     "file-loader": "^6.2.0",
@@ -54,6 +68,7 @@
     "mini-css-extract-plugin": "^2.7.6",
     "style-loader": "^3.3.3",
     "terser-webpack-plugin": "^5.3.9",
+    "wait-on": "^8.0.4",
     "webpack": "^5.89.0",
     "webpack-bundle-analyzer": "^4.9.1",
     "webpack-cli": "^5.1.4",
@@ -67,5 +82,108 @@
     "physics"
   ],
   "author": "Zombie Car Game Team",
-  "license": "MIT"
+  "license": "MIT",
+  "build": {
+    "appId": "com.zombiecargame.app",
+    "productName": "Zombie Car Game",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Zombie Car Game",
+      "include": "installer.nsh"
+    },
+    "dmg": {
+      "title": "Zombie Car Game",
+      "icon": "assets/icon.icns",
+      "background": "assets/dmg-background.png",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
+  }
 }
