@@ -1,1 +1,731 @@
-/**\n * Asset Integrity Integration\n * Integrates asset verification, repair, and manifest generation systems\n */\nimport AssetVerificationSystem from './AssetVerificationSystem.js';\nimport AssetRepairSystem from './AssetRepairSystem.js';\nimport AssetManifestGenerator from './AssetManifestGenerator.js';\n\nclass AssetIntegrityIntegration {\n    constructor(config = {}) {\n        this.config = {\n            enableVerification: true,\n            enableRepair: true,\n            enableManifestGeneration: false, // Usually done at build time\n            performStartupCheck: true,\n            autoRepairCritical: true,\n            reportingEnabled: true,\n            debugMode: process.env.NODE_ENV === 'development',\n            ...config\n        };\n        \n        // Components\n        this.verificationSystem = null;\n        this.repairSystem = null;\n        this.manifestGenerator = null;\n        \n        // State\n        this.initialized = false;\n        this.startupCheckCompleted = false;\n        \n        // Metrics\n        this.integrationMetrics = {\n            initializationTime: 0,\n            startupCheckTime: 0,\n            totalVerifications: 0,\n            totalRepairs: 0,\n            lastHealthCheck: null,\n            systemHealth: 'unknown'\n        };\n        \n        // Event listeners\n        this.eventListeners = new Map();\n        \n        this.initialize();\n    }\n    \n    /**\n     * Initialize asset integrity integration\n     */\n    async initialize() {\n        const startTime = performance.now();\n        console.log('Initializing Asset Integrity Integration...');\n        \n        try {\n            // Initialize verification system\n            if (this.config.enableVerification) {\n                this.verificationSystem = new AssetVerificationSystem({\n                    debugMode: this.config.debugMode,\n                    enableAutoRepair: false // We'll handle repair through repair system\n                });\n                \n                await this.verificationSystem.initialize();\n                this.setupVerificationEventHandlers();\n                console.log('Asset verification system initialized');\n            }\n            \n            // Initialize repair system\n            if (this.config.enableRepair && this.verificationSystem) {\n                this.repairSystem = new AssetRepairSystem(this.verificationSystem, {\n                    debugMode: this.config.debugMode\n                });\n                \n                this.setupRepairEventHandlers();\n                console.log('Asset repair system initialized');\n            }\n            \n            // Initialize manifest generator (if enabled)\n            if (this.config.enableManifestGeneration) {\n                this.manifestGenerator = new AssetManifestGenerator({\n                    debugMode: this.config.debugMode\n                });\n                console.log('Asset manifest generator initialized');\n            }\n            \n            // Setup integration event handlers\n            this.setupIntegrationEventHandlers();\n            \n            // Perform startup check\n            if (this.config.performStartupCheck && this.verificationSystem) {\n                await this.performStartupIntegrityCheck();\n            }\n            \n            // Setup periodic health monitoring\n            this.setupHealthMonitoring();\n            \n            const endTime = performance.now();\n            this.integrationMetrics.initializationTime = endTime - startTime;\n            this.initialized = true;\n            \n            console.log(`Asset Integrity Integration initialized in ${Math.round(this.integrationMetrics.initializationTime)}ms`);\n            this.emit('initialized', {\n                initializationTime: this.integrationMetrics.initializationTime,\n                components: {\n                    verification: !!this.verificationSystem,\n                    repair: !!this.repairSystem,\n                    manifestGeneration: !!this.manifestGenerator\n                }\n            });\n            \n        } catch (error) {\n            console.error('Failed to initialize Asset Integrity Integration:', error);\n            this.emit('initializationError', { error });\n            throw error;\n        }\n    }\n    \n    /**\n     * Setup verification system event handlers\n     */\n    setupVerificationEventHandlers() {\n        if (!this.verificationSystem) return;\n        \n        this.verificationSystem.on('verificationCompleted', (results) => {\n            this.integrationMetrics.totalVerifications++;\n            \n            // Auto-repair critical assets if enabled\n            if (this.config.autoRepairCritical && this.repairSystem) {\n                const criticalAssets = this.getCriticalAssetsNeedingRepair();\n                if (criticalAssets.length > 0) {\n                    console.log(`Auto-repairing ${criticalAssets.length} critical assets`);\n                    this.repairSystem.scheduleRepair();\n                }\n            }\n            \n            // Forward event\n            this.emit('verificationCompleted', results);\n        });\n        \n        this.verificationSystem.on('verificationError', (error) => {\n            console.error('Verification error:', error);\n            this.emit('verificationError', error);\n        });\n        \n        this.verificationSystem.on('startupCheckCompleted', (results) => {\n            this.startupCheckCompleted = true;\n            this.integrationMetrics.startupCheckTime = results.duration;\n            this.emit('startupCheckCompleted', results);\n        });\n    }\n    \n    /**\n     * Setup repair system event handlers\n     */\n    setupRepairEventHandlers() {\n        if (!this.repairSystem) return;\n        \n        this.repairSystem.on('repairCompleted', (results) => {\n            this.integrationMetrics.totalRepairs += results.completed;\n            \n            // Re-verify repaired assets\n            if (results.completed > 0 && this.verificationSystem) {\n                setTimeout(() => {\n                    this.verificationSystem.verifyAllAssets(false);\n                }, 1000);\n            }\n            \n            // Forward event\n            this.emit('repairCompleted', results);\n        });\n        \n        this.repairSystem.on('repairError', (error) => {\n            console.error('Repair error:', error);\n            this.emit('repairError', error);\n        });\n        \n        this.repairSystem.on('criticalAssetRepairFailed', (data) => {\n            console.error('Critical asset repair failed:', data);\n            this.emit('criticalAssetRepairFailed', data);\n        });\n    }\n    \n    /**\n     * Setup integration event handlers\n     */\n    setupIntegrationEventHandlers() {\n        // Listen for online/offline events\n        window.addEventListener('online', () => {\n            console.log('Connection restored - resuming asset operations');\n            this.handleConnectionRestored();\n        });\n        \n        window.addEventListener('offline', () => {\n            console.log('Connection lost - pausing asset operations');\n            this.handleConnectionLost();\n        });\n        \n        // Listen for page visibility changes\n        document.addEventListener('visibilitychange', () => {\n            if (!document.hidden) {\n                // Page became visible - check for updates\n                this.handlePageVisible();\n            }\n        });\n    }\n    \n    /**\n     * Perform startup integrity check\n     */\n    async performStartupIntegrityCheck() {\n        if (!this.verificationSystem) {\n            throw new Error('Verification system not available');\n        }\n        \n        console.log('Performing startup integrity check...');\n        \n        try {\n            const results = await this.verificationSystem.performStartupCheck();\n            \n            // Show user notification if critical issues found\n            if (results.corrupted > 0 || results.missing > 0) {\n                this.showIntegrityIssueNotification(results);\n            }\n            \n            return results;\n            \n        } catch (error) {\n            console.error('Startup integrity check failed:', error);\n            this.showIntegrityErrorNotification(error);\n            throw error;\n        }\n    }\n    \n    /**\n     * Get critical assets needing repair\n     */\n    getCriticalAssetsNeedingRepair() {\n        if (!this.verificationSystem || !this.verificationSystem.manifest) {\n            return [];\n        }\n        \n        const criticalAssets = [];\n        const corruptedAssets = Array.from(this.verificationSystem.corruptedAssets);\n        const missingAssets = Array.from(this.verificationSystem.missingAssets);\n        const assetsNeedingRepair = [...corruptedAssets, ...missingAssets];\n        \n        for (const assetPath of assetsNeedingRepair) {\n            const assetInfo = this.verificationSystem.manifest.assets[assetPath];\n            if (assetInfo && assetInfo.critical) {\n                criticalAssets.push(assetPath);\n            }\n        }\n        \n        return criticalAssets;\n    }\n    \n    /**\n     * Show integrity issue notification\n     */\n    showIntegrityIssueNotification(results) {\n        const notification = document.createElement('div');\n        notification.className = 'asset-integrity-notification';\n        notification.innerHTML = `\n            <div style=\"\n                position: fixed;\n                top: 20px;\n                right: 20px;\n                background: #ff9800;\n                color: white;\n                padding: 20px;\n                border-radius: 8px;\n                box-shadow: 0 4px 12px rgba(0,0,0,0.3);\n                z-index: 10000;\n                max-width: 400px;\n                font-family: Arial, sans-serif;\n            \">\n                <div style=\"font-weight: bold; margin-bottom: 10px;\">\n                    ⚠️ Asset Integrity Issues Detected\n                </div>\n                <div style=\"margin-bottom: 15px; font-size: 14px;\">\n                    ${results.corrupted > 0 ? `${results.corrupted} corrupted assets` : ''}\n                    ${results.corrupted > 0 && results.missing > 0 ? ' and ' : ''}\n                    ${results.missing > 0 ? `${results.missing} missing assets` : ''}\n                    detected. The game may not function properly.\n                </div>\n                <div style=\"display: flex; gap: 10px;\">\n                    <button id=\"repair-assets\" style=\"\n                        background: white;\n                        color: #ff9800;\n                        border: none;\n                        padding: 8px 16px;\n                        border-radius: 4px;\n                        cursor: pointer;\n                        font-weight: bold;\n                    \">Repair Now</button>\n                    <button id=\"dismiss-notification\" style=\"\n                        background: transparent;\n                        color: white;\n                        border: 1px solid white;\n                        padding: 8px 16px;\n                        border-radius: 4px;\n                        cursor: pointer;\n                    \">Dismiss</button>\n                </div>\n            </div>\n        `;\n        \n        document.body.appendChild(notification);\n        \n        // Setup button handlers\n        document.getElementById('repair-assets').addEventListener('click', () => {\n            if (this.repairSystem) {\n                this.repairSystem.scheduleRepair();\n            }\n            notification.remove();\n        });\n        \n        document.getElementById('dismiss-notification').addEventListener('click', () => {\n            notification.remove();\n        });\n        \n        // Auto-dismiss after 30 seconds\n        setTimeout(() => {\n            if (notification.parentNode) {\n                notification.remove();\n            }\n        }, 30000);\n    }\n    \n    /**\n     * Show integrity error notification\n     */\n    showIntegrityErrorNotification(error) {\n        const notification = document.createElement('div');\n        notification.innerHTML = `\n            <div style=\"\n                position: fixed;\n                top: 20px;\n                right: 20px;\n                background: #f44336;\n                color: white;\n                padding: 20px;\n                border-radius: 8px;\n                box-shadow: 0 4px 12px rgba(0,0,0,0.3);\n                z-index: 10000;\n                max-width: 400px;\n                font-family: Arial, sans-serif;\n            \">\n                <div style=\"font-weight: bold; margin-bottom: 10px;\">\n                    🚨 Asset Integrity Check Failed\n                </div>\n                <div style=\"margin-bottom: 15px; font-size: 14px;\">\n                    Unable to verify game assets. The game may not function properly.\n                </div>\n                <button onclick=\"this.parentElement.parentElement.remove()\" style=\"\n                    background: white;\n                    color: #f44336;\n                    border: none;\n                    padding: 8px 16px;\n                    border-radius: 4px;\n                    cursor: pointer;\n                    font-weight: bold;\n                \">Dismiss</button>\n            </div>\n        `;\n        \n        document.body.appendChild(notification);\n        \n        // Auto-dismiss after 30 seconds\n        setTimeout(() => {\n            if (notification.parentNode) {\n                notification.remove();\n            }\n        }, 30000);\n    }\n    \n    /**\n     * Setup health monitoring\n     */\n    setupHealthMonitoring() {\n        // Perform health check every 5 minutes\n        setInterval(() => {\n            this.performHealthCheck();\n        }, 300000);\n        \n        // Initial health check\n        setTimeout(() => {\n            this.performHealthCheck();\n        }, 5000);\n    }\n    \n    /**\n     * Perform health check\n     */\n    async performHealthCheck() {\n        try {\n            let overallHealth = 'healthy';\n            const healthData = {\n                timestamp: Date.now(),\n                verification: null,\n                repair: null,\n                overall: overallHealth\n            };\n            \n            // Check verification system health\n            if (this.verificationSystem) {\n                const verificationHealth = this.verificationSystem.getHealthStatus();\n                healthData.verification = verificationHealth;\n                \n                if (verificationHealth.status !== 'healthy') {\n                    overallHealth = 'degraded';\n                }\n            }\n            \n            // Check repair system health\n            if (this.repairSystem) {\n                const repairStatus = this.repairSystem.getRepairStatus();\n                healthData.repair = repairStatus;\n                \n                if (repairStatus.progress.status === 'error') {\n                    overallHealth = 'unhealthy';\n                }\n            }\n            \n            healthData.overall = overallHealth;\n            this.integrationMetrics.systemHealth = overallHealth;\n            this.integrationMetrics.lastHealthCheck = Date.now();\n            \n            // Emit health check event\n            this.emit('healthCheck', healthData);\n            \n            // Log health issues\n            if (overallHealth !== 'healthy') {\n                console.warn('Asset integrity system health issues detected:', healthData);\n            }\n            \n        } catch (error) {\n            console.error('Health check failed:', error);\n            this.integrationMetrics.systemHealth = 'error';\n        }\n    }\n    \n    /**\n     * Handle connection restored\n     */\n    async handleConnectionRestored() {\n        // Resume verification\n        if (this.verificationSystem) {\n            setTimeout(() => {\n                this.verificationSystem.verifyAllAssets(false);\n            }, 2000);\n        }\n        \n        // Check for manifest updates\n        if (this.verificationSystem) {\n            try {\n                await this.verificationSystem.updateManifest();\n            } catch (error) {\n                console.warn('Failed to check for manifest updates:', error);\n            }\n        }\n    }\n    \n    /**\n     * Handle connection lost\n     */\n    handleConnectionLost() {\n        // Cancel active repairs\n        if (this.repairSystem) {\n            this.repairSystem.cancelActiveDownloads();\n        }\n    }\n    \n    /**\n     * Handle page visible\n     */\n    handlePageVisible() {\n        // Check if we need to perform verification\n        const timeSinceLastCheck = Date.now() - (this.integrationMetrics.lastHealthCheck || 0);\n        \n        if (timeSinceLastCheck > 600000) { // 10 minutes\n            this.performHealthCheck();\n        }\n    }\n    \n    /**\n     * Verify all assets\n     */\n    async verifyAllAssets(showProgress = true) {\n        if (!this.verificationSystem) {\n            throw new Error('Verification system not available');\n        }\n        \n        return await this.verificationSystem.verifyAllAssets(showProgress);\n    }\n    \n    /**\n     * Repair assets\n     */\n    async repairAssets() {\n        if (!this.repairSystem) {\n            throw new Error('Repair system not available');\n        }\n        \n        return await this.repairSystem.scheduleRepair();\n    }\n    \n    /**\n     * Generate asset manifest\n     */\n    async generateManifest(assetList) {\n        if (!this.manifestGenerator) {\n            this.manifestGenerator = new AssetManifestGenerator();\n        }\n        \n        return await this.manifestGenerator.generateFromAssetList(assetList);\n    }\n    \n    /**\n     * Get comprehensive status\n     */\n    getStatus() {\n        const status = {\n            initialized: this.initialized,\n            startupCheckCompleted: this.startupCheckCompleted,\n            metrics: { ...this.integrationMetrics },\n            components: {\n                verification: this.verificationSystem ? this.verificationSystem.getHealthStatus() : null,\n                repair: this.repairSystem ? this.repairSystem.getRepairStatus() : null\n            }\n        };\n        \n        return status;\n    }\n    \n    /**\n     * Get detailed integrity report\n     */\n    generateIntegrityReport() {\n        if (!this.verificationSystem) {\n            throw new Error('Verification system not available');\n        }\n        \n        const verificationReport = this.verificationSystem.generateIntegrityReport();\n        const repairHistory = this.repairSystem ? this.repairSystem.getRepairHistory(50) : [];\n        \n        return {\n            ...verificationReport,\n            integration: {\n                metrics: this.integrationMetrics,\n                repairHistory,\n                components: {\n                    verification: !!this.verificationSystem,\n                    repair: !!this.repairSystem,\n                    manifestGeneration: !!this.manifestGenerator\n                }\n            }\n        };\n    }\n    \n    /**\n     * Export integrity report\n     */\n    exportIntegrityReport(format = 'json') {\n        const report = this.generateIntegrityReport();\n        \n        switch (format) {\n            case 'json':\n                return JSON.stringify(report, null, 2);\n            case 'html':\n                return this.convertReportToHTML(report);\n            default:\n                return report;\n        }\n    }\n    \n    /**\n     * Convert report to HTML\n     */\n    convertReportToHTML(report) {\n        return `\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Asset Integrity Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 20px; }\n        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }\n        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }\n        .metric-card { background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd; }\n        .status-healthy { color: #4CAF50; }\n        .status-degraded { color: #FF9800; }\n        .status-unhealthy { color: #F44336; }\n        table { border-collapse: collapse; width: 100%; margin-top: 20px; }\n        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }\n        th { background-color: #f2f2f2; }\n    </style>\n</head>\n<body>\n    <h1>Asset Integrity Report</h1>\n    \n    <div class=\"summary\">\n        <h2>Summary</h2>\n        <p><strong>Status:</strong> <span class=\"status-${report.summary.status}\">${report.summary.status.toUpperCase()}</span></p>\n        <p><strong>Generated:</strong> ${report.timestamp}</p>\n        <p><strong>System Health:</strong> <span class=\"status-${report.integration.metrics.systemHealth}\">${report.integration.metrics.systemHealth.toUpperCase()}</span></p>\n    </div>\n    \n    <div class=\"metrics\">\n        <div class=\"metric-card\">\n            <h3>Verification Metrics</h3>\n            <p><strong>Total Verifications:</strong> ${report.integration.metrics.totalVerifications}</p>\n            <p><strong>Total Repairs:</strong> ${report.integration.metrics.totalRepairs}</p>\n            <p><strong>Initialization Time:</strong> ${Math.round(report.integration.metrics.initializationTime)}ms</p>\n        </div>\n        \n        <div class=\"metric-card\">\n            <h3>Asset Status</h3>\n            <p><strong>Total Assets:</strong> ${report.summary.totalAssets}</p>\n            <p><strong>Verified:</strong> ${report.summary.verifiedAssets}</p>\n            <p><strong>Corrupted:</strong> ${report.summary.corruptedAssets}</p>\n            <p><strong>Missing:</strong> ${report.summary.missingAssets}</p>\n        </div>\n    </div>\n    \n    ${report.integration.repairHistory.length > 0 ? `\n    <h2>Recent Repairs</h2>\n    <table>\n        <tr>\n            <th>Asset</th>\n            <th>Timestamp</th>\n            <th>Success</th>\n            <th>Attempts</th>\n            <th>Size</th>\n        </tr>\n        ${report.integration.repairHistory.slice(0, 10).map(repair => `\n        <tr>\n            <td>${repair.path}</td>\n            <td>${new Date(repair.timestamp).toLocaleString()}</td>\n            <td>${repair.success ? '✅' : '❌'}</td>\n            <td>${repair.attempts}</td>\n            <td>${repair.size ? Math.round(repair.size / 1024) + ' KB' : 'N/A'}</td>\n        </tr>\n        `).join('')}\n    </table>\n    ` : ''}\n    \n</body>\n</html>\n        `;\n    }\n    \n    /**\n     * Event system\n     */\n    on(event, callback) {\n        if (!this.eventListeners.has(event)) {\n            this.eventListeners.set(event, []);\n        }\n        this.eventListeners.get(event).push(callback);\n    }\n    \n    off(event, callback) {\n        if (this.eventListeners.has(event)) {\n            const listeners = this.eventListeners.get(event);\n            const index = listeners.indexOf(callback);\n            if (index > -1) {\n                listeners.splice(index, 1);\n            }\n        }\n    }\n    \n    emit(event, data) {\n        if (this.eventListeners.has(event)) {\n            this.eventListeners.get(event).forEach(callback => {\n                try {\n                    callback(data);\n                } catch (error) {\n                    console.error(`Error in event listener for ${event}:`, error);\n                }\n            });\n        }\n    }\n    \n    /**\n     * Update configuration\n     */\n    updateConfig(newConfig) {\n        this.config = { ...this.config, ...newConfig };\n        \n        // Update component configurations\n        if (this.verificationSystem && newConfig.verification) {\n            this.verificationSystem.updateConfig(newConfig.verification);\n        }\n        \n        if (this.repairSystem && newConfig.repair) {\n            this.repairSystem.updateConfig(newConfig.repair);\n        }\n        \n        console.log('Asset integrity integration configuration updated:', this.config);\n    }\n    \n    /**\n     * Cleanup and destroy\n     */\n    destroy() {\n        // Destroy components\n        if (this.verificationSystem) {\n            this.verificationSystem.destroy();\n        }\n        \n        if (this.repairSystem) {\n            this.repairSystem.destroy();\n        }\n        \n        // Clear event listeners\n        this.eventListeners.clear();\n        \n        // Reset state\n        this.initialized = false;\n        this.startupCheckCompleted = false;\n        \n        console.log('Asset Integrity Integration destroyed');\n    }\n}\n\nexport default AssetIntegrityIntegration;"
+/**
+ * Asset Integrity Integration System
+ * Integrates all asset verification, repair, and update systems
+ */
+import AssetVerificationSystem from './AssetVerificationSystem.js';
+import AssetUpdateManager from './AssetUpdateManager.js';
+
+class AssetIntegrityIntegration {
+    constructor(assetManager, config = {}) {
+        this.assetManager = assetManager;
+        
+        // Configuration
+        this.config = {
+            enableVerification: true,
+            enableAutoRepair: true,
+            enableAutoUpdate: false,
+            enableStartupCheck: true,
+            enablePeriodicCheck: true,
+            startupTimeout: 30000, // 30 seconds
+            reportingEndpoint: '/api/assets/integrity-report',
+            debugMode: process.env.NODE_ENV === 'development',
+            ...config
+        };
+
+        // System components
+        this.verificationSystem = null;
+        this.updateManager = null;
+        
+        // State tracking
+        this.initialized = false;
+        this.startupCheckCompleted = false;
+        this.lastIntegrityReport = null;
+        
+        // Event listeners
+        this.eventListeners = new Map();
+        
+        // Metrics
+        this.metrics = {
+            startupTime: 0,
+            totalChecks: 0,
+            failedChecks: 0,
+            repairedAssets: 0,
+            updatedAssets: 0,
+            criticalErrors: 0
+        };
+
+        this.initialize();
+    }
+
+    /**
+     * Initialize asset integrity system
+     */
+    async initialize() {
+        console.log('Initializing Asset Integrity Integration...');
+        const startTime = Date.now();
+
+        try {
+            // Initialize verification system
+            await this.initializeVerificationSystem();
+            
+            // Initialize update manager
+            await this.initializeUpdateManager();
+            
+            // Setup event listeners
+            this.setupEventListeners();
+            
+            // Perform startup integrity check
+            if (this.config.enableStartupCheck) {
+                await this.performStartupIntegrityCheck();
+            }
+            
+            this.initialized = true;
+            this.metrics.startupTime = Date.now() - startTime;
+            
+            console.log(`Asset Integrity Integration initialized in ${this.metrics.startupTime}ms`);
+            
+            // Emit initialization complete event
+            this.emit('initialized', {
+                startupTime: this.metrics.startupTime,
+                verificationEnabled: this.config.enableVerification,
+                autoRepairEnabled: this.config.enableAutoRepair,
+                autoUpdateEnabled: this.config.enableAutoUpdate
+            });
+            
+        } catch (error) {
+            console.error('Failed to initialize Asset Integrity Integration:', error);
+            this.metrics.criticalErrors++;
+            throw error;
+        }
+    }
+
+    /**
+     * Initialize verification system
+     */
+    async initializeVerificationSystem() {
+        console.log('Initializing asset verification system...');
+        
+        this.verificationSystem = new AssetVerificationSystem(this.assetManager, {
+            enableVerification: this.config.enableVerification,
+            enableAutoRepair: this.config.enableAutoRepair,
+            debugMode: this.config.debugMode
+        });
+
+        // Listen to verification events
+        this.verificationSystem.addEventListener?.('assetCorrupted', (event) => {
+            this.handleAssetCorruption(event.detail);
+        });
+
+        this.verificationSystem.addEventListener?.('assetRepaired', (event) => {
+            this.handleAssetRepair(event.detail);
+        });
+
+        console.log('Asset verification system initialized');
+    }
+
+    /**
+     * Initialize update manager
+     */
+    async initializeUpdateManager() {
+        console.log('Initializing asset update manager...');
+        
+        this.updateManager = new AssetUpdateManager(this.verificationSystem, {
+            enableAutoUpdate: this.config.enableAutoUpdate,
+            debugMode: this.config.debugMode
+        });
+
+        // Listen to update events
+        this.updateManager.on('updateAvailable', (updateInfo) => {
+            this.handleUpdateAvailable(updateInfo);
+        });
+
+        this.updateManager.on('updateCompleted', (result) => {
+            this.handleUpdateCompleted(result);
+        });
+
+        this.updateManager.on('updateFailed', (error) => {
+            this.handleUpdateFailed(error);
+        });
+
+        console.log('Asset update manager initialized');
+    }
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Listen for asset manager events
+        if (this.assetManager && this.assetManager.addEventListener) {
+            this.assetManager.addEventListener('assetLoaded', (event) => {
+                this.handleAssetLoaded(event.detail);
+            });
+
+            this.assetManager.addEventListener('assetError', (event) => {
+                this.handleAssetError(event.detail);
+            });
+        }
+
+        // Listen for application lifecycle events
+        window.addEventListener('beforeunload', () => {
+            this.handleApplicationShutdown();
+        });
+
+        // Listen for network status changes
+        window.addEventListener('online', () => {
+            this.handleNetworkRestore();
+        });
+
+        window.addEventListener('offline', () => {
+            this.handleNetworkLoss();
+        });
+    }
+
+    /**
+     * Perform startup integrity check
+     */
+    async performStartupIntegrityCheck() {
+        console.log('Performing startup integrity check...');
+        const startTime = Date.now();
+
+        try {
+            // Set timeout for startup check
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Startup check timeout')), this.config.startupTimeout);
+            });
+
+            // Perform verification with timeout
+            const verificationPromise = this.verificationSystem.forceVerification();
+            
+            const results = await Promise.race([verificationPromise, timeoutPromise]);
+            
+            // Analyze results
+            const report = this.analyzeVerificationResults(results);
+            
+            // Generate startup report
+            const startupReport = {
+                timestamp: Date.now(),
+                duration: Date.now() - startTime,
+                totalAssets: report.totalAssets,
+                validAssets: report.validAssets,
+                corruptedAssets: report.corruptedAssets,
+                repairedAssets: report.repairedAssets,
+                criticalIssues: report.criticalIssues,
+                status: report.criticalIssues.length > 0 ? 'warning' : 'healthy'
+            };
+
+            this.lastIntegrityReport = startupReport;
+            this.startupCheckCompleted = true;
+
+            console.log(`Startup integrity check completed in ${startupReport.duration}ms`);
+            console.log(`Status: ${startupReport.status}`);
+            console.log(`Assets: ${startupReport.validAssets}/${startupReport.totalAssets} valid`);
+
+            if (startupReport.corruptedAssets > 0) {
+                console.warn(`Found ${startupReport.corruptedAssets} corrupted assets`);
+            }
+
+            // Emit startup check completed event
+            this.emit('startupCheckCompleted', startupReport);
+
+            // Send report to server if configured
+            if (this.config.reportingEndpoint) {
+                await this.sendIntegrityReport(startupReport);
+            }
+
+            return startupReport;
+
+        } catch (error) {
+            console.error('Startup integrity check failed:', error);
+            this.metrics.criticalErrors++;
+            
+            const failedReport = {
+                timestamp: Date.now(),
+                duration: Date.now() - startTime,
+                status: 'failed',
+                error: error.message,
+                criticalIssues: [error.message]
+            };
+
+            this.lastIntegrityReport = failedReport;
+            this.emit('startupCheckFailed', failedReport);
+            
+            throw error;
+        }
+    }
+
+    /**
+     * Analyze verification results
+     */
+    analyzeVerificationResults(results) {
+        const report = {
+            totalAssets: results.length,
+            validAssets: 0,
+            corruptedAssets: 0,
+            repairedAssets: 0,
+            criticalIssues: [],
+            warnings: []
+        };
+
+        results.forEach(result => {
+            if (result.valid) {
+                report.validAssets++;
+            } else {
+                report.corruptedAssets++;
+                
+                if (result.error) {
+                    report.criticalIssues.push(`Asset ${result.assetId}: ${result.error}`);
+                } else {
+                    report.warnings.push(`Asset ${result.assetId}: checksum mismatch`);
+                }
+            }
+        });
+
+        // Check for critical thresholds
+        const corruptionRate = report.corruptedAssets / report.totalAssets;
+        if (corruptionRate > 0.1) { // More than 10% corrupted
+            report.criticalIssues.push(`High corruption rate: ${(corruptionRate * 100).toFixed(1)}%`);
+        }
+
+        return report;
+    }
+
+    /**
+     * Handle asset corruption
+     */
+    handleAssetCorruption(assetInfo) {
+        console.warn(`Asset corruption detected: ${assetInfo.assetId}`);
+        
+        this.metrics.failedChecks++;
+        
+        // Emit corruption event
+        this.emit('assetCorrupted', assetInfo);
+        
+        // Trigger repair if auto-repair is enabled
+        if (this.config.enableAutoRepair && this.verificationSystem) {
+            this.verificationSystem.queueAssetRepair(assetInfo.assetId);
+        }
+    }
+
+    /**
+     * Handle asset repair
+     */
+    handleAssetRepair(assetInfo) {
+        console.log(`Asset repaired: ${assetInfo.assetId}`);
+        
+        this.metrics.repairedAssets++;
+        
+        // Emit repair event
+        this.emit('assetRepaired', assetInfo);
+        
+        // Notify asset manager if available
+        if (this.assetManager && this.assetManager.onAssetRepaired) {
+            this.assetManager.onAssetRepaired(assetInfo.assetId);
+        }
+    }
+
+    /**
+     * Handle update available
+     */
+    handleUpdateAvailable(updateInfo) {
+        console.log(`Asset update available: ${updateInfo.currentVersion} -> ${updateInfo.newVersion}`);
+        
+        // Emit update available event
+        this.emit('updateAvailable', updateInfo);
+        
+        // Auto-apply update if enabled
+        if (this.config.enableAutoUpdate) {
+            console.log('Auto-applying update...');
+            this.updateManager.applyUpdate(updateInfo).catch(error => {
+                console.error('Auto-update failed:', error);
+            });
+        }
+    }
+
+    /**
+     * Handle update completed
+     */
+    handleUpdateCompleted(result) {
+        console.log(`Asset update completed: ${result.updateInfo.newVersion}`);
+        
+        this.metrics.updatedAssets += result.updateInfo.totalChanges;
+        
+        // Emit update completed event
+        this.emit('updateCompleted', result);
+        
+        // Perform verification after update
+        if (this.verificationSystem) {
+            setTimeout(() => {
+                this.verificationSystem.forceVerification().catch(error => {
+                    console.error('Post-update verification failed:', error);
+                });
+            }, 1000);
+        }
+    }
+
+    /**
+     * Handle update failed
+     */
+    handleUpdateFailed(error) {
+        console.error('Asset update failed:', error);
+        
+        this.metrics.criticalErrors++;
+        
+        // Emit update failed event
+        this.emit('updateFailed', error);
+    }
+
+    /**
+     * Handle asset loaded
+     */
+    handleAssetLoaded(assetInfo) {
+        // Register asset for verification if not already registered
+        if (this.verificationSystem && !this.verificationSystem.assetRegistry.has(assetInfo.id)) {
+            this.verificationSystem.registerAsset(assetInfo.id, assetInfo);
+        }
+    }
+
+    /**
+     * Handle asset error
+     */
+    handleAssetError(assetInfo) {
+        console.warn(`Asset error: ${assetInfo.id} - ${assetInfo.error}`);
+        
+        // Queue for verification and potential repair
+        if (this.verificationSystem) {
+            this.verificationSystem.queueAssetVerification(assetInfo.id);
+        }
+    }
+
+    /**
+     * Handle network restore
+     */
+    handleNetworkRestore() {
+        console.log('Network restored - resuming asset operations');
+        
+        // Resume update operations
+        if (this.updateManager) {
+            this.updateManager.resumeDownloads();
+        }
+        
+        // Resume verification operations
+        if (this.verificationSystem && this.verificationSystem.repairQueue.length > 0) {
+            this.verificationSystem.processRepairQueue();
+        }
+    }
+
+    /**
+     * Handle network loss
+     */
+    handleNetworkLoss() {
+        console.log('Network lost - pausing network-dependent operations');
+        
+        // Pause update operations
+        if (this.updateManager) {
+            this.updateManager.pauseActiveDownloads();
+        }
+    }
+
+    /**
+     * Handle application shutdown
+     */
+    handleApplicationShutdown() {
+        console.log('Application shutting down - saving asset integrity state');
+        
+        // Save current state
+        if (this.verificationSystem) {
+            this.verificationSystem.saveAssetRegistry();
+        }
+        
+        if (this.updateManager) {
+            this.updateManager.saveUpdateHistory();
+            this.updateManager.saveCurrentManifest();
+        }
+    }
+
+    /**
+     * Send integrity report to server
+     */
+    async sendIntegrityReport(report) {
+        try {
+            const response = await fetch(this.config.reportingEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...report,
+                    userAgent: navigator.userAgent,
+                    timestamp: Date.now()
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            console.log('Integrity report sent successfully');
+        } catch (error) {
+            console.warn('Failed to send integrity report:', error);
+        }
+    }
+
+    /**
+     * Perform manual integrity check
+     */
+    async performIntegrityCheck() {
+        console.log('Performing manual integrity check...');
+        
+        if (!this.verificationSystem) {
+            throw new Error('Verification system not initialized');
+        }
+
+        this.metrics.totalChecks++;
+        
+        try {
+            const results = await this.verificationSystem.forceVerification();
+            const report = this.analyzeVerificationResults(results);
+            
+            const integrityReport = {
+                timestamp: Date.now(),
+                type: 'manual',
+                ...report
+            };
+
+            this.lastIntegrityReport = integrityReport;
+            
+            // Emit integrity check completed event
+            this.emit('integrityCheckCompleted', integrityReport);
+            
+            return integrityReport;
+        } catch (error) {
+            this.metrics.failedChecks++;
+            throw error;
+        }
+    }
+
+    /**
+     * Force asset repair
+     */
+    async forceAssetRepair(assetId) {
+        console.log(`Forcing repair for asset: ${assetId}`);
+        
+        if (!this.verificationSystem) {
+            throw new Error('Verification system not initialized');
+        }
+
+        try {
+            await this.verificationSystem.forceRepair(assetId);
+            this.metrics.repairedAssets++;
+            
+            // Emit repair completed event
+            this.emit('assetRepairCompleted', { assetId });
+            
+            return { success: true, assetId };
+        } catch (error) {
+            console.error(`Failed to repair asset ${assetId}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check for updates
+     */
+    async checkForUpdates() {
+        console.log('Checking for asset updates...');
+        
+        if (!this.updateManager) {
+            throw new Error('Update manager not initialized');
+        }
+
+        return await this.updateManager.forceUpdateCheck();
+    }
+
+    /**
+     * Apply available updates
+     */
+    async applyUpdates() {
+        console.log('Applying available updates...');
+        
+        if (!this.updateManager) {
+            throw new Error('Update manager not initialized');
+        }
+
+        // Check for updates first
+        const updateInfo = await this.updateManager.checkForUpdates();
+        
+        if (!updateInfo.hasUpdates) {
+            return { success: false, message: 'No updates available' };
+        }
+
+        // Apply updates
+        return await this.updateManager.applyUpdate(updateInfo);
+    }
+
+    /**
+     * Get system status
+     */
+    getSystemStatus() {
+        return {
+            initialized: this.initialized,
+            startupCheckCompleted: this.startupCheckCompleted,
+            verificationSystem: this.verificationSystem ? this.verificationSystem.getVerificationStatus() : null,
+            updateManager: this.updateManager ? this.updateManager.getUpdateStatus() : null,
+            lastIntegrityReport: this.lastIntegrityReport,
+            metrics: { ...this.metrics }
+        };
+    }
+
+    /**
+     * Get detailed integrity report
+     */
+    getIntegrityReport() {
+        const status = this.getSystemStatus();
+        
+        return {
+            timestamp: Date.now(),
+            systemStatus: status,
+            assetRegistry: this.verificationSystem ? this.verificationSystem.getIntegrityReport() : null,
+            updateHistory: this.updateManager ? this.updateManager.getUpdateHistory() : null,
+            recommendations: this.generateRecommendations(status)
+        };
+    }
+
+    /**
+     * Generate recommendations based on system status
+     */
+    generateRecommendations(status) {
+        const recommendations = [];
+
+        if (!status.initialized) {
+            recommendations.push({
+                type: 'critical',
+                message: 'Asset integrity system not initialized',
+                action: 'Restart application or contact support'
+            });
+            return recommendations;
+        }
+
+        if (status.verificationSystem) {
+            const verificationStatus = status.verificationSystem;
+            
+            if (verificationStatus.corruptedAssets > 0) {
+                recommendations.push({
+                    type: 'warning',
+                    message: `${verificationStatus.corruptedAssets} corrupted assets detected`,
+                    action: 'Enable auto-repair or manually repair assets'
+                });
+            }
+
+            if (verificationStatus.pendingVerification > 10) {
+                recommendations.push({
+                    type: 'info',
+                    message: 'Many assets pending verification',
+                    action: 'Consider performing manual integrity check'
+                });
+            }
+        }
+
+        if (status.updateManager) {
+            const updateStatus = status.updateManager;
+            
+            if (updateStatus.pendingVersion) {
+                recommendations.push({
+                    type: 'info',
+                    message: `Update available: ${updateStatus.currentVersion} -> ${updateStatus.pendingVersion}`,
+                    action: 'Apply update to get latest assets and fixes'
+                });
+            }
+
+            if (updateStatus.metrics.failedUpdates > 0) {
+                recommendations.push({
+                    type: 'warning',
+                    message: 'Previous updates have failed',
+                    action: 'Check network connection and retry updates'
+                });
+            }
+        }
+
+        if (status.metrics.criticalErrors > 0) {
+            recommendations.push({
+                type: 'critical',
+                message: `${status.metrics.criticalErrors} critical errors detected`,
+                action: 'Review error logs and contact support if issues persist'
+            });
+        }
+
+        return recommendations;
+    }
+
+    /**
+     * Event system
+     */
+    on(event, callback) {
+        if (!this.eventListeners.has(event)) {
+            this.eventListeners.set(event, []);
+        }
+        this.eventListeners.get(event).push(callback);
+    }
+
+    off(event, callback) {
+        if (!this.eventListeners.has(event)) return;
+        const listeners = this.eventListeners.get(event);
+        const index = listeners.indexOf(callback);
+        if (index > -1) {
+            listeners.splice(index, 1);
+        }
+    }
+
+    emit(event, data) {
+        if (!this.eventListeners.has(event)) return;
+        const listeners = this.eventListeners.get(event);
+        listeners.forEach(callback => {
+            try {
+                callback(data);
+            } catch (error) {
+                console.error(`Error in event listener for ${event}:`, error);
+            }
+        });
+    }
+
+    /**
+     * Update configuration
+     */
+    updateConfig(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        
+        // Update subsystem configurations
+        if (this.verificationSystem) {
+            this.verificationSystem.updateConfig({
+                enableVerification: this.config.enableVerification,
+                enableAutoRepair: this.config.enableAutoRepair,
+                debugMode: this.config.debugMode
+            });
+        }
+
+        if (this.updateManager) {
+            this.updateManager.updateConfig({
+                enableAutoUpdate: this.config.enableAutoUpdate,
+                debugMode: this.config.debugMode
+            });
+        }
+
+        console.log('Asset Integrity Integration configuration updated:', this.config);
+    }
+
+    /**
+     * Cleanup and destroy
+     */
+    destroy() {
+        console.log('Destroying Asset Integrity Integration');
+        
+        // Destroy subsystems
+        if (this.verificationSystem) {
+            this.verificationSystem.destroy();
+        }
+        
+        if (this.updateManager) {
+            this.updateManager.destroy();
+        }
+        
+        // Clear event listeners
+        this.eventListeners.clear();
+        
+        // Reset state
+        this.initialized = false;
+        this.startupCheckCompleted = false;
+        
+        console.log('Asset Integrity Integration destroyed');
+    }
+}
+
+export default AssetIntegrityIntegration;
