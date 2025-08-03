@@ -1,0 +1,691 @@
+/* In-Game HUD Styles */
+.in-game-hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+    font-family: 'Orbitron', 'Arial', sans-serif;
+    color: #ffffff;
+}
+
+.in-game-hud * {
+    box-sizing: border-box;
+}
+
+/* Damage Overlay */
+.damage-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transition: background 0.3s ease;
+    z-index: 1;
+}
+
+/* Top HUD Bar */
+.hud-top-bar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.health-display {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.health-icon {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.health-bar {
+    width: 200px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-right: 10px;
+    border: 1px solid #333;
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000 0%, #ffff00 50%, #00ff00 100%);
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.health-text {
+    font-weight: bold;
+    font-size: 18px;
+    min-width: 50px;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.objective-display {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.current-objective {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: 2px solid #ffff00;
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
+    max-width: 400px;
+}
+
+.objective-icon {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.objective-text {
+    font-weight: bold;
+    margin-right: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.objective-progress {
+    width: 100px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.objective-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffff00, #00ff00);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.pause-button {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    cursor: pointer;
+    font-size: 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.pause-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+/* Vehicle Status Panel */
+.vehicle-status-panel {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.speedometer {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+    text-align: center;
+    min-width: 120px;
+}
+
+.speed-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    line-height: 1;
+}
+
+.speed-unit {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-top: 5px;
+}
+
+.vehicle-gauges {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.gauge {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #444;
+    min-width: 200px;
+}
+
+.gauge-label {
+    font-size: 12px;
+    color: #aaaaaa;
+    min-width: 50px;
+    margin-right: 10px;
+}
+
+.gauge-bar {
+    flex: 1;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-right: 10px;
+    border: 1px solid #333;
+}
+
+.gauge-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 6px;
+}
+
+.fuel-fill {
+    background: linear-gradient(90deg, #ff0000 0%, #ffff00 50%, #00ff00 100%);
+}
+
+.health-fill {
+    background: linear-gradient(90deg, #ff0000 0%, #ffaa00 50%, #00ff00 100%);
+}
+
+.gauge-value {
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 35px;
+    text-align: right;
+    color: #ffffff;
+}
+
+.gear-display {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    border-radius: 15px;
+    border: 1px solid #444;
+    justify-content: space-between;
+}
+
+.gear-label {
+    font-size: 12px;
+    color: #aaaaaa;
+}
+
+.gear-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+}
+
+/* Minimap */
+.minimap-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.minimap-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.minimap-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.minimap-legend {
+    display: flex;
+    gap: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+}
+
+.legend-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+.player-color { background: #00ff00; }
+.zombie-color { background: #ff0000; }
+.objective-color { background: #ffff00; }
+
+.minimap-canvas {
+    display: block;
+    border-radius: 0 0 13px 13px;
+}
+
+/* Combat HUD */
+.combat-hud {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 15;
+}
+
+.crosshair {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.crosshair-horizontal,
+.crosshair-vertical {
+    position: absolute;
+    background: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+}
+
+.crosshair-horizontal {
+    width: 20px;
+    height: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.crosshair-vertical {
+    width: 2px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.weapon-info {
+    position: absolute;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    text-align: center;
+    min-width: 150px;
+}
+
+.weapon-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.ammo-display {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00ffff;
+}
+
+.current-ammo {
+    color: #00ff00;
+}
+
+.ammo-separator {
+    color: #aaaaaa;
+    margin: 0 5px;
+}
+
+.total-ammo {
+    color: #ffff00;
+}
+
+.reload-indicator {
+    font-size: 12px;
+    color: #ff8800;
+    margin-top: 5px;
+    animation: pulse 1s infinite;
+}
+
+/* Hit Markers */
+.hit-marker {
+    position: absolute;
+    pointer-events: none;
+    z-index: 20;
+    animation: hitMarkerFade 1s ease-out forwards;
+}
+
+.hit-marker-cross {
+    font-size: 24px;
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    font-weight: bold;
+}
+
+.hit-marker-damage {
+    font-size: 14px;
+    color: #ffff00;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* Damage Indicators */
+.damage-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: center;
+    pointer-events: none;
+    z-index: 18;
+    animation: damageIndicatorFade 2s ease-out forwards;
+}
+
+.damage-arrow {
+    font-size: 48px;
+    color: #ff0000;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    text-align: center;
+    margin-bottom: -10px;
+}
+
+.damage-amount {
+    font-size: 18px;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Notifications */
+.notifications-container {
+    position: absolute;
+    top: 100px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: auto;
+    z-index: 12;
+    max-width: 350px;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #00ff00;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    animation: notificationSlide 0.3s ease-out;
+}
+
+.notification.warning {
+    border-left-color: #ff8800;
+}
+
+.notification.error {
+    border-left-color: #ff0000;
+}
+
+.notification.info {
+    border-left-color: #00ffff;
+}
+
+.notification-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.notification-message {
+    font-size: 12px;
+    color: #cccccc;
+    line-height: 1.4;
+}
+
+/* HUD Controls */
+.hud-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.hud-toggle {
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    border: 1px solid #444;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.hud-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+}
+
+.hud-toggle-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    padding: 15px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.hud-toggle-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes hitMarkerFade {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+@keyframes damageIndicatorFade {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+@keyframes notificationSlide {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .hud-top-bar {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .objective-display {
+        order: -1;
+    }
+    
+    .health-display,
+    .pause-button {
+        align-self: center;
+    }
+    
+    .vehicle-status-panel {
+        bottom: 10px;
+        left: 10px;
+    }
+    
+    .minimap-container {
+        top: 10px;
+        right: 10px;
+        transform: scale(0.8);
+    }
+    
+    .notifications-container {
+        top: 80px;
+        right: 10px;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .in-game-hud {
+        font-size: 14px;
+    }
+    
+    .health-bar {
+        width: 150px;
+    }
+    
+    .speedometer {
+        padding: 15px;
+        min-width: 100px;
+    }
+    
+    .speed-value {
+        font-size: 28px;
+    }
+    
+    .vehicle-gauges .gauge {
+        min-width: 150px;
+        padding: 6px 10px;
+    }
+    
+    .minimap-container {
+        transform: scale(0.7);
+    }
+    
+    .crosshair {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .crosshair-horizontal {
+        width: 15px;
+    }
+    
+    .crosshair-vertical {
+        height: 15px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .in-game-hud {
+        filter: contrast(1.5);
+    }
+    
+    .health-fill,
+    .fuel-fill,
+    .gauge-fill {
+        background: #00ff00;
+    }
+    
+    .damage-overlay {
+        filter: contrast(2);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .in-game-hud *,
+    .in-game-hud *::before,
+    .in-game-hud *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

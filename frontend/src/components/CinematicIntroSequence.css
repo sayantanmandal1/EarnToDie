@@ -1,0 +1,228 @@
+/**
+ * Cinematic Intro Sequence Styles
+ * High-quality visual intro with smooth animations and effects
+ */
+
+.cinematic-intro-sequence {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Orbitron', 'Arial', sans-serif;
+    overflow: hidden;
+    z-index: 2000;
+}
+
+.intro-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.intro-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.fade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    transition: opacity 1s ease-in-out;
+    z-index: 1;
+}
+
+.scene-content {
+    position: relative;
+    text-align: center;
+    z-index: 3;
+}
+
+.intro-logo {
+    margin-bottom: 2rem;
+    transition: transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 2s ease-out;
+}
+
+.intro-logo img {
+    width: 300px;
+    height: auto;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.5));
+}
+
+.intro-text {
+    transition: opacity 1.5s ease-out;
+}
+
+.intro-text h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    margin: 0 0 1rem 0;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 3s ease-in-out infinite;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.intro-text p {
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: #cccccc;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.subtitles {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    max-width: 80%;
+    animation: subtitle-fade-in 0.5s ease-out;
+    z-index: 4;
+}
+
+@keyframes subtitle-fade-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.skip-button {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    z-index: 5;
+    backdrop-filter: blur(10px);
+}
+
+.skip-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.skip-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .intro-text h1 {
+        font-size: 2.5rem;
+    }
+    
+    .intro-text p {
+        font-size: 1.2rem;
+    }
+    
+    .intro-logo img {
+        width: 200px;
+    }
+    
+    .subtitles {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        max-width: 90%;
+    }
+    
+    .skip-button {
+        bottom: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro-text h1 {
+        font-size: 2rem;
+        letter-spacing: 0.1em;
+    }
+    
+    .intro-text p {
+        font-size: 1rem;
+    }
+    
+    .intro-logo img {
+        width: 150px;
+    }
+}
+
+/* Animation keyframes for various effects */
+@keyframes logo-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 50px rgba(255, 255, 255, 0.8));
+    }
+}
+
+@keyframes text-pulse {
+    0%, 100% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+    }
+}
+
+/* Apply animations when elements are active */
+.intro-logo.active {
+    animation: logo-glow 2s ease-in-out infinite;
+}
+
+.intro-text.active h1 {
+    animation: gradient-shift 3s ease-in-out infinite, text-pulse 2s ease-in-out infinite;
+}

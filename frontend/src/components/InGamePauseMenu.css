@@ -1,0 +1,515 @@
+/* In-Game Pause Menu Styles */
+.pause-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', 'Arial', sans-serif;
+    animation: pauseMenuFadeIn 0.3s ease-out;
+}
+
+.pause-menu-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.pause-menu-container {
+    position: relative;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(40, 40, 60, 0.95));
+    border: 2px solid #00ffff;
+    border-radius: 20px;
+    box-shadow: 
+        0 0 50px rgba(0, 255, 255, 0.3),
+        inset 0 0 50px rgba(0, 255, 255, 0.1);
+    padding: 40px;
+    min-width: 500px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    outline: none;
+    animation: pauseMenuSlideIn 0.4s ease-out;
+}
+
+.pause-menu-header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    padding-bottom: 20px;
+}
+
+.pause-menu-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #00ffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    margin: 0 0 10px 0;
+    letter-spacing: 2px;
+}
+
+.pause-menu-subtitle {
+    font-size: 18px;
+    color: #aaaaaa;
+    margin: 0;
+}
+
+.pause-menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.pause-menu-option {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid transparent;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.pause-menu-option:hover,
+.pause-menu-option.selected {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    transform: translateX(10px);
+}
+
+.option-icon {
+    font-size: 16px;
+    color: #00ffff;
+    margin-right: 15px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.option-label {
+    flex: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.pause-menu-footer {
+    text-align: center;
+    border-top: 1px solid rgba(0, 255, 255, 0.3);
+    padding-top: 20px;
+}
+
+.controls-hint {
+    font-size: 14px;
+    color: #888888;
+    font-style: italic;
+}
+
+/* Save/Load Menu Styles */
+.save-load-menu {
+    animation: slideInFromRight 0.3s ease-out;
+}
+
+.save-load-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00ffff;
+    text-align: center;
+    margin: 0 0 30px 0;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+.save-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.save-slot {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #444444;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-slot:hover {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.save-slot.empty {
+    border-style: dashed;
+    opacity: 0.7;
+}
+
+.save-slot.occupied {
+    border-color: #00ff00;
+}
+
+.save-slot.occupied:hover {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.slot-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ffff;
+    margin-right: 25px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.slot-empty {
+    font-size: 18px;
+    color: #888888;
+    font-style: italic;
+}
+
+.slot-info {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+}
+
+.slot-level {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffff00;
+}
+
+.slot-progress {
+    font-size: 16px;
+    color: #00ff00;
+}
+
+.slot-timestamp {
+    font-size: 14px;
+    color: #aaaaaa;
+}
+
+.slot-playtime {
+    font-size: 14px;
+    color: #aaaaaa;
+    text-align: right;
+}
+
+.save-load-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Confirm Dialog Styles */
+.confirm-dialog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-content {
+    background: linear-gradient(135deg, rgba(40, 20, 20, 0.95), rgba(60, 40, 40, 0.95));
+    border: 2px solid #ff4444;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
+    max-width: 400px;
+}
+
+.confirm-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff4444;
+    margin: 0 0 15px 0;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+}
+
+.confirm-message {
+    font-size: 16px;
+    color: #ffffff;
+    margin: 0 0 25px 0;
+    line-height: 1.5;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Button Styles */
+.confirm-button,
+.cancel-button {
+    padding: 12px 25px;
+    border: 2px solid;
+    border-radius: 25px;
+    background: transparent;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.confirm-button {
+    color: #ff4444;
+    border-color: #ff4444;
+}
+
+.confirm-button:hover {
+    background: #ff4444;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+}
+
+.cancel-button {
+    color: #aaaaaa;
+    border-color: #aaaaaa;
+}
+
+.cancel-button:hover {
+    background: #aaaaaa;
+    color: #000000;
+    box-shadow: 0 0 20px rgba(170, 170, 170, 0.4);
+}
+
+/* Animations */
+@keyframes pauseMenuFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pauseMenuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scrollbar Styles */
+.pause-menu-container::-webkit-scrollbar,
+.save-slots::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pause-menu-container::-webkit-scrollbar-track,
+.save-slots::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.pause-menu-container::-webkit-scrollbar-thumb,
+.save-slots::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+.pause-menu-container::-webkit-scrollbar-thumb:hover,
+.save-slots::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .pause-menu-container {
+        min-width: 90vw;
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .pause-menu-title {
+        font-size: 36px;
+    }
+
+    .pause-menu-subtitle {
+        font-size: 16px;
+    }
+
+    .pause-menu-option {
+        padding: 12px 20px;
+        font-size: 18px;
+    }
+
+    .save-load-title {
+        font-size: 28px;
+    }
+
+    .save-slot {
+        padding: 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .slot-number {
+        margin-right: 0;
+        margin-bottom: 10px;
+        min-width: auto;
+        text-align: left;
+    }
+
+    .slot-info {
+        width: 100%;
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .slot-playtime {
+        text-align: left;
+    }
+
+    .confirm-content {
+        margin: 20px;
+        padding: 25px 20px;
+    }
+
+    .confirm-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .confirm-button,
+    .cancel-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .pause-menu-container {
+        min-width: 95vw;
+        padding: 25px 15px;
+        margin: 10px;
+    }
+
+    .pause-menu-title {
+        font-size: 28px;
+    }
+
+    .pause-menu-option {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+
+    .option-icon {
+        font-size: 14px;
+        margin-right: 10px;
+        min-width: 15px;
+    }
+
+    .save-load-title {
+        font-size: 24px;
+    }
+
+    .slot-number {
+        font-size: 20px;
+    }
+
+    .controls-hint {
+        font-size: 12px;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .pause-menu-container {
+        background: rgba(0, 0, 0, 0.95);
+        border-color: #ffffff;
+    }
+
+    .pause-menu-option {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .pause-menu-option:hover,
+    .pause-menu-option.selected {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #ffffff;
+    }
+
+    .save-slot {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #ffffff;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .pause-menu-overlay,
+    .pause-menu-container,
+    .save-load-menu,
+    .confirm-dialog,
+    .pause-menu-option,
+    .save-slot,
+    .confirm-button,
+    .cancel-button {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .pause-menu-option:hover,
+    .pause-menu-option.selected {
+        transform: none !important;
+    }
+
+    .save-slot:hover {
+        transform: none !important;
+    }
+}
