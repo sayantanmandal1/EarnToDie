@@ -402,4 +402,126 @@ describe('Physics Simulation Tests', () => {
                 // Apply drive force
                 physicsEngine.applyForce(vehicle, { x: driveForce, y: 0, z: 0 });
                 
+                // Apply drag and rolling resistance
+                const dragForce = -0.5 * 1.225 * 0.3 * 2.5 * Math.pow(vehicle.velocity.x, 2); // Air drag
+                const rollingResistance = -vehicle.mass * 9.81 * 0.015; // Rolling resistance
+                
+                physicsEngine.applyForce(vehicle, { 
+                    x: dragForce + rollingResistance, 
+                    y: 0, 
+                    z: 0 
+                });
+                
+                physicsEngine.step(1/60);
+                
+                // Update RPM based on vehicle speed
+                rpm = Math.max(1000, (vehicle.velocity.x / wheelRadius) * 60 / (2 * Math.PI) * 3.5); // Gear ratio 3.5
+                
+                results.push({
+                    time: i / 60,
+                    velocity: vehicle.velocity.x,
+                    position: vehicle.position.x,
+                    rpm: rpm,
+                    torque: torque
+                });
+            }
             
+            // Check realistic acceleration
+            const finalVelocity = results[results.length - 1].velocity;
+            const maxVelocity = Math.max(...results.map(r => r.velocity));
+            
+            expect(finalVelocity).toBeGreaterThan(20); // Should reach reasonable speed
+            expect(finalVelocity).toBeLessThan(60); // But not unrealistic speed
+            expect(maxVelocity).toBe(finalVelocity); // Should still be accelerating at end
+            
+            // Check 0-100 km/h time (0-27.78 m/s)
+            const time100kmh = results.find(r => r.velocity >= 27.78)?.time;
+            if (time100kmh) {
+                expect(time100kmh).toBeGreaterThan(5); // Realistic acceleration time
+                expect(time100kmh).toBeLessThan(15);
+            }
+        });
+
+        test('should handle complex multi-body interactions', async () => {
+            // Create multiple vehicles and obstacles
+            const vehicles = [];
+            const obstacles = [];
+            
+            // Create 3 vehicles
+            for (let i = 0; i < 3; i++) {
+                const vehicle = physicsEngine.createVehicleBody({
+                    mass: 1500,
+                    dimensions: { length: 4.5, width: 2.0, height: 1.5 }
+                });
+                vehicle.position = { x: i * 10, y: 0, z: 0 };
+                vehicle.velocity = { x: 5 + i * 2, y: 0, z: 0 };
+                vehicles.push(vehicle);
+            }
+            
+            // Create obstacles
+            for (let i = 0; i < 2; i++) {
+                const obstacle = physicsEngine.createStaticBody({
+                    dimensions: { length: 2, width: 2, height: 2 }
+                });
+                obstacle.position = { x: 15 + i * 8, y: 0, z: 2 };
+                obstacles.push(obstacle);
+            }
+            
+            // Simulate interaction
+            let totalCollisions = 0;
+            
+            for (let step = 0; step < 500; step++) {
+                // Check for collisions between all bodies
+                for (let i = 0; i < vehicles.length; i++) {
+                    for (let j = i + 1; j < vehicles.length; j++) {
+                        if (physicsEngine.checkCollision(vehicles[i], vehicles[j])) {
+                            physicsEngine.resolveCollision(vehicles[i], vehicles[j]);
+                            totalCollisions++;
+                        }
+                    }
+                    
+                    // Check vehicle-obstacle collisions
+                    for (const obstacle of obstacles) {
+                        if (physicsEngine.checkCollision(vehicles[i], obstacle)) {
+                            physicsEngine.resolveCollision(vehicles[i], obstacle);
+                            totalCollisions++;
+                        }
+                    }
+                }
+                
+                physicsEngine.step(1/60);
+            }
+            
+            // Verify that simulation completed without errors
+            expect(totalCollisions).toBeGreaterThanOrEqual(0);
+            
+            // Check that vehicles have moved
+            vehicles.forEach((vehicle, index) => {
+                expect(vehicle.position.x).toBeGreaterThan(index * 10);
+            });
+        });
+    });
+
+    describe('Performance Tests', () => {
+        test('should maintain performance with many physics bodies', async () => {
+            const bodyCount = 100;
+            const bodies = [];
+            
+            const { result: creationTime } = await global.testUtils.measurePerformance(async () => {
+                // Create many physics bodies
+                for (let i = 0; i < bodyCount; i++) {
+                    const body = physicsEngine.createVehicleBody({
+                        mass: 1000 + Math.random() * 1000,
+                        dimensions: { 
+                            length: 3 + Math.random() * 3, 
+                            width: 1.5 + Math.random() * 1, 
+                            height: 1 + Math.random() * 1 
+                        }
+                    });
+                    body.position = {
+                        x: (Math.random() - 0.5) * 200,
+                        y: Math.random() * 10,
+                        z: (Math.random() - 0.5) * 200
+                    };
+                    bodies.push(body);
+                }
