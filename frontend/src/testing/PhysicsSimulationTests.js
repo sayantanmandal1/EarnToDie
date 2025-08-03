@@ -325,4 +325,81 @@ describe('Physics Simulation Tests', () => {
                 const temperature = 100; // High temperature
                 const load = 5000; // High load (N)
                 
-                const wearRate
+                const wearRate = tireSimulator.calculateWearRate(slipRatio, temperature, load);
+                tireWear += wearRate * timeStep;
+            }
+            
+            expect(tireWear).toBeGreaterThan(0);
+            expect(tireWear).toBeLessThan(1); // Should not wear out completely in 1000 steps
+        });
+    });
+
+    describe('Physics Integration Tests', () => {
+        test('should handle vehicle-to-vehicle collision', async () => {
+            const vehicleData = {
+                mass: 1500,
+                dimensions: { length: 4.5, width: 2.0, height: 1.5 }
+            };
+
+            const vehicle1 = physicsEngine.createVehicleBody(vehicleData);
+            const vehicle2 = physicsEngine.createVehicleBody(vehicleData);
+            
+            // Set up collision scenario
+            vehicle1.position = { x: 0, y: 0, z: 0 };
+            vehicle1.velocity = { x: 10, y: 0, z: 0 }; // 10 m/s forward
+            
+            vehicle2.position = { x: 10, y: 0, z: 0 };
+            vehicle2.velocity = { x: 0, y: 0, z: 0 }; // Stationary
+            
+            // Simulate until collision
+            let collisionDetected = false;
+            let steps = 0;
+            
+            while (!collisionDetected && steps < 100) {
+                physicsEngine.step(1/60);
+                
+                const distance = Math.abs(vehicle1.position.x - vehicle2.position.x);
+                if (distance < 4.5) { // Vehicle length
+                    collisionDetected = true;
+                    
+                    // Apply collision response
+                    const collision = physicsEngine.resolveCollision(vehicle1, vehicle2);
+                    
+                    expect(collision).toBeDefined();
+                    expect(collision.impulse).toBeGreaterThan(0);
+                    
+                    // Both vehicles should have changed velocities
+                    expect(vehicle1.velocity.x).toBeLessThan(10);
+                    expect(vehicle2.velocity.x).toBeGreaterThan(0);
+                }
+                
+                steps++;
+            }
+            
+            expect(collisionDetected).toBe(true);
+        });
+
+        test('should simulate realistic vehicle dynamics', async () => {
+            const vehicleData = {
+                mass: 1500,
+                dimensions: { length: 4.5, width: 2.0, height: 1.5 },
+                centerOfMass: { x: 0, y: -0.3, z: 0.2 } // Slightly forward and low
+            };
+
+            const vehicle = physicsEngine.createVehicleBody(vehicleData);
+            const engine = new EngineSimulator({ maxPower: 150, maxTorque: 250 });
+            
+            // Simulate acceleration from standstill
+            const results = [];
+            let rpm = 1000;
+            
+            for (let i = 0; i < 300; i++) { // 5 seconds at 60fps
+                const throttle = 0.8;
+                const torque = engine.calculateTorque(rpm, throttle);
+                const wheelRadius = 0.3; // 30cm wheel radius
+                const driveForce = torque / wheelRadius;
+                
+                // Apply drive force
+                physicsEngine.applyForce(vehicle, { x: driveForce, y: 0, z: 0 });
+                
+            
