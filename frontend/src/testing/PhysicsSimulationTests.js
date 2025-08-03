@@ -117,3 +117,212 @@ describe('Physics Simulation Tests', () => {
 
     describe('Engine Simulator', () => {
         let engineSimulator;
+
+        beforeEach(() => {
+            engineSimulator = new EngineSimulator({
+                maxPower: 200, // 200 HP
+                maxTorque: 300, // 300 Nm
+                maxRPM: 6000,
+                idleRPM: 800
+            });
+        });
+
+        test('should calculate torque curve correctly', () => {
+            // Test torque at different RPM values
+            const torqueAt2000 = engineSimulator.calculateTorque(2000);
+            const torqueAt4000 = engineSimulator.calculateTorque(4000);
+            const torqueAt6000 = engineSimulator.calculateTorque(6000);
+            
+            expect(torqueAt2000).toBeGreaterThan(0);
+            expect(torqueAt4000).toBeGreaterThan(torqueAt2000); // Peak torque around mid-range
+            expect(torqueAt6000).toBeLessThan(torqueAt4000); // Torque drops at high RPM
+        });
+
+        test('should simulate engine load correctly', () => {
+            const baseRPM = 3000;
+            const throttle = 0.8; // 80% throttle
+            
+            const torque = engineSimulator.calculateTorque(baseRPM, throttle);
+            const power = engineSimulator.calculatePower(baseRPM, throttle);
+            
+            expect(torque).toBeGreaterThan(0);
+            expect(power).toBeGreaterThan(0);
+            expect(power).toBe((torque * baseRPM * 2 * Math.PI) / 60 / 1000); // Power = Torque * Angular Velocity
+        });
+
+        test('should handle engine braking', () => {
+            const rpm = 3000;
+            const throttle = 0; // No throttle = engine braking
+            
+            const brakingTorque = engineSimulator.calculateEngineBraking(rpm);
+            
+            expect(brakingTorque).toBeLessThan(0); // Negative torque for braking
+            expect(Math.abs(brakingTorque)).toBeGreaterThan(0);
+        });
+
+        test('should simulate realistic fuel consumption', () => {
+            const rpm = 2500;
+            const throttle = 0.6;
+            const timeStep = 1/60;
+            
+            const fuelConsumption = engineSimulator.calculateFuelConsumption(rpm, throttle, timeStep);
+            
+            expect(fuelConsumption).toBeGreaterThan(0);
+            expect(fuelConsumption).toBeLessThan(1); // Reasonable consumption per frame
+        });
+    });
+
+    describe('Suspension Simulator', () => {
+        let suspensionSimulator;
+
+        beforeEach(() => {
+            suspensionSimulator = new SuspensionSimulator({
+                springRate: 25000, // N/m
+                damperRate: 3000, // Ns/m
+                maxCompression: 0.15, // 15cm
+                maxExtension: 0.10, // 10cm
+                restLength: 0.35 // 35cm
+            });
+        });
+
+        test('should calculate spring force correctly', () => {
+            const compression = 0.05; // 5cm compression
+            const springForce = suspensionSimulator.calculateSpringForce(compression);
+            
+            expect(springForce).toBeGreaterThan(0);
+            expect(springForce).toBe(25000 * compression); // F = k * x
+        });
+
+        test('should calculate damper force correctly', () => {
+            const velocity = 0.5; // 0.5 m/s compression velocity
+            const damperForce = suspensionSimulator.calculateDamperForce(velocity);
+            
+            expect(damperForce).toBeGreaterThan(0);
+            expect(damperForce).toBe(3000 * velocity); // F = c * v
+        });
+
+        test('should handle suspension limits', () => {
+            const maxCompression = 0.20; // Exceeds limit
+            const force = suspensionSimulator.calculateSpringForce(maxCompression);
+            
+            // Force should be clamped to maximum compression
+            expect(force).toBe(25000 * 0.15); // Limited to maxCompression
+        });
+
+        test('should simulate realistic suspension behavior', async () => {
+            const { result, executionTime } = await global.testUtils.measurePerformance(async () => {
+                const results = [];
+                
+                // Simulate suspension compression and rebound
+                for (let i = 0; i < 100; i++) {
+                    const time = i * 0.01; // 10ms steps
+                    const displacement = Math.sin(time * 2 * Math.PI) * 0.05; // 5cm oscillation
+                    const velocity = Math.cos(time * 2 * Math.PI) * 0.05 * 2 * Math.PI;
+                    
+                    const springForce = suspensionSimulator.calculateSpringForce(Math.abs(displacement));
+                    const damperForce = suspensionSimulator.calculateDamperForce(velocity);
+                    const totalForce = springForce + damperForce;
+                    
+                    results.push({
+                        time,
+                        displacement,
+                        velocity,
+                        force: totalForce
+                    });
+                }
+                
+                return results;
+            });
+            
+            expect(result).toHaveLength(100);
+            expect(executionTime).toBeLessThan(10); // Should complete quickly
+            
+            // Check that forces are reasonable
+            const maxForce = Math.max(...result.map(r => Math.abs(r.force)));
+            expect(maxForce).toBeGreaterThan(0);
+            expect(maxForce).toBeLessThan(10000); // Reasonable maximum force
+        });
+    });
+
+    describe('Tire Physics Simulator', () => {
+        let tireSimulator;
+
+        beforeEach(() => {
+            tireSimulator = new TirePhysicsSimulator({
+                width: 225, // mm
+                aspectRatio: 45, // %
+                rimDiameter: 17, // inches
+                maxGrip: 1.2,
+                rollingResistance: 0.015,
+                thermalProperties: {
+                    optimalTemp: 80, // Celsius
+                    maxTemp: 120
+                }
+            });
+        });
+
+        test('should calculate tire dimensions correctly', () => {
+            const dimensions = tireSimulator.calculateDimensions();
+            
+            expect(dimensions.width).toBe(0.225); // 225mm = 0.225m
+            expect(dimensions.sidewallHeight).toBeCloseTo(0.10125); // 225 * 0.45 / 1000
+            expect(dimensions.outerDiameter).toBeGreaterThan(0.6); // Reasonable tire diameter
+        });
+
+        test('should simulate grip based on slip ratio', () => {
+            const slipRatios = [0, 0.05, 0.1, 0.15, 0.2, 0.3];
+            const gripValues = slipRatios.map(slip => tireSimulator.calculateGrip(slip));
+            
+            // Grip should increase with slip ratio up to a point, then decrease
+            expect(gripValues[0]).toBe(0); // No grip at zero slip
+            expect(gripValues[1]).toBeGreaterThan(gripValues[0]);
+            expect(gripValues[2]).toBeGreaterThan(gripValues[1]);
+            
+            // Find peak grip
+            const peakGrip = Math.max(...gripValues);
+            expect(peakGrip).toBeLessThanOrEqual(1.2); // Should not exceed max grip
+        });
+
+        test('should simulate tire temperature effects', () => {
+            const temperatures = [20, 40, 60, 80, 100, 120, 140];
+            const gripModifiers = temperatures.map(temp => 
+                tireSimulator.calculateTemperatureEffect(temp)
+            );
+            
+            // Grip should be optimal around 80°C
+            const optimalIndex = temperatures.indexOf(80);
+            const optimalGrip = gripModifiers[optimalIndex];
+            
+            expect(optimalGrip).toBeCloseTo(1.0, 1); // Should be close to 1.0 at optimal temp
+            expect(gripModifiers[0]).toBeLessThan(optimalGrip); // Cold tires have less grip
+            expect(gripModifiers[gripModifiers.length - 1]).toBeLessThan(optimalGrip); // Overheated tires have less grip
+        });
+
+        test('should calculate rolling resistance correctly', () => {
+            const speeds = [0, 10, 20, 30, 50]; // m/s
+            const resistanceForces = speeds.map(speed => 
+                tireSimulator.calculateRollingResistance(speed, 1500) // 1500kg vehicle
+            );
+            
+            // Rolling resistance should increase with speed
+            expect(resistanceForces[0]).toBe(0); // No resistance at zero speed
+            expect(resistanceForces[1]).toBeGreaterThan(0);
+            expect(resistanceForces[4]).toBeGreaterThan(resistanceForces[1]);
+            
+            // Should be proportional to vehicle weight
+            const heavierResistance = tireSimulator.calculateRollingResistance(30, 2000);
+            const lighterResistance = tireSimulator.calculateRollingResistance(30, 1500);
+            expect(heavierResistance).toBeGreaterThan(lighterResistance);
+        });
+
+        test('should simulate tire wear correctly', () => {
+            let tireWear = 0;
+            const timeStep = 1/60;
+            
+            // Simulate aggressive driving for 1000 steps
+            for (let i = 0; i < 1000; i++) {
+                const slipRatio = 0.15; // High slip
+                const temperature = 100; // High temperature
+                const load = 5000; // High load (N)
+                
+                const wearRate
