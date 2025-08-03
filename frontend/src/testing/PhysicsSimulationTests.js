@@ -525,3 +525,54 @@ describe('Physics Simulation Tests', () => {
                     };
                     bodies.push(body);
                 }
+            });
+            
+            expect(creationTime).toBeLessThan(1000); // Should create 100 bodies in under 1 second
+            
+            const { result: simulationTime } = await global.testUtils.measurePerformance(async () => {
+                // Simulate 60 steps (1 second at 60fps)
+                for (let i = 0; i < 60; i++) {
+                    physicsEngine.step(1/60);
+                }
+            });
+            
+            expect(simulationTime).toBeLessThan(1000); // Should simulate 1 second in under 1 second real time
+            
+            // Cleanup
+            bodies.forEach(body => physicsEngine.removeBody(body));
+        });
+
+        test('should handle physics step timing accurately', async () => {
+            const targetTimeStep = 1/60; // 60 FPS
+            const steps = 100;
+            const stepTimes = [];
+            
+            for (let i = 0; i < steps; i++) {
+                const { executionTime } = await global.testUtils.measurePerformance(async () => {
+                    physicsEngine.step(targetTimeStep);
+                });
+                stepTimes.push(executionTime);
+            }
+            
+            const averageStepTime = stepTimes.reduce((sum, time) => sum + time, 0) / steps;
+            const maxStepTime = Math.max(...stepTimes);
+            
+            // Average step time should be much less than target frame time (16.67ms)
+            expect(averageStepTime).toBeLessThan(5); // 5ms average
+            expect(maxStepTime).toBeLessThan(16.67); // No step should exceed frame time
+            
+            // Check consistency (standard deviation should be low)
+            const variance = stepTimes.reduce((sum, time) => sum + Math.pow(time - averageStepTime, 2), 0) / steps;
+            const standardDeviation = Math.sqrt(variance);
+            
+            expect(standardDeviation).toBeLessThan(2); // Low variation in step times
+        });
+    });
+});
+
+export default {
+    name: 'Physics Simulation Tests',
+    description: 'Comprehensive physics engine testing suite',
+    category: 'physics',
+    priority: 'high'
+};
