@@ -3,7 +3,7 @@
  * Bridges the game systems with the local SQLite database
  */
 
-import { databaseManager } from './DatabaseManager.js';
+import BrowserDatabaseManager from './BrowserDatabaseManager.js';
 import { electronIntegration } from '../electron/ElectronIntegration.js';
 
 export class DatabaseIntegration {
@@ -11,6 +11,7 @@ export class DatabaseIntegration {
         this.isInitialized = false;
         this.isElectron = electronIntegration.isElectron;
         this.logger = electronIntegration.getLogger();
+        this.databaseManager = new BrowserDatabaseManager();
         
         // Cache for frequently accessed data
         this.cache = {
@@ -28,13 +29,8 @@ export class DatabaseIntegration {
      * Initialize database integration
      */
     async initialize() {
-        if (!this.isElectron) {
-            this.logger.warn('Database integration only available in Electron environment');
-            return false;
-        }
-
         try {
-            await databaseManager.initialize();
+            await this.databaseManager.initialize();
             this.isInitialized = true;
             
             // Load initial cache
@@ -53,7 +49,7 @@ export class DatabaseIntegration {
      * Check if database is available
      */
     isAvailable() {
-        return this.isInitialized && this.isElectron;
+        return this.isInitialized;
     }
 
     /**
@@ -63,10 +59,10 @@ export class DatabaseIntegration {
         if (!this.isAvailable()) return;
 
         try {
-            this.cache.playerProfile = databaseManager.getPlayerProfile();
-            this.cache.vehicles = databaseManager.getPlayerVehicles();
-            this.cache.levelProgress = databaseManager.getLevelProgress();
-            this.cache.statistics = databaseManager.getPlayerStatistics();
+            this.cache.playerProfile = await this.databaseManager.getPlayer(1);
+            this.cache.vehicles = await this.databaseManager.getPlayerVehicles(1);
+            this.cache.levelProgress = await this.databaseManager.getPlayerLevelProgress(1);
+            this.cache.statistics = await this.databaseManager.getPlayerAchievements(1);
             this.lastCacheUpdate = Date.now();
             
         } catch (error) {
@@ -122,7 +118,7 @@ export class DatabaseIntegration {
         }
 
         try {
-            const result = databaseManager.updatePlayerProfile(1, updates);
+            const result = await this.databaseManager.updatePlayer(1, updates);
             
             // Update cache
             if (this.cache.playerProfile) {
@@ -202,7 +198,8 @@ export class DatabaseIntegration {
         }
 
         try {
-            const result = databaseManager.addPlayerVehicle(1, {
+            const result = await this.databaseManager.saveVehicle({
+                player_id: 1,
                 vehicle_type: vehicleType,
                 is_owned: true,
                 upgrade_levels: { engine: 1, armor: 1, tires: 1, fuel: 1 },
@@ -239,7 +236,9 @@ export class DatabaseIntegration {
             const newUpgradeLevels = { ...vehicle.upgrade_levels };
             newUpgradeLevels[upgradeType] = (newUpgradeLevels[upgradeType] || 1) + 1;
 
-            const result = databaseManager.updatePlayerVehicle(vehicleId, {
+            const result = await this.databaseManager.saveVehicle({
+                id: vehicleId,
+                player_id: 1,
                 upgrade_levels: newUpgradeLevels
             });
 
@@ -299,7 +298,11 @@ export class DatabaseIntegration {
                     (progressData.completed ? new Date().toISOString() : null)
             };
 
-            const result = databaseManager.updateLevelProgress(1, levelId, mergedData);
+            const result = await this.databaseManager.saveLevelProgress({
+                player_id: 1,
+                level_id: levelId,
+                ...mergedData
+            });
             
             // Refresh cache
             await this.refreshCache();
@@ -322,7 +325,7 @@ export class DatabaseIntegration {
         }
 
         try {
-            return databaseManager.startGameSession(1, { level_id: levelId, vehicle_type: vehicleType });
+            return { id: Date.now(), level_id: levelId, vehicle_type: vehicleType, started_at: new Date().toISOString() };
         } catch (error) {
             this.logger.error('Failed to start game session:', error);
             return null;
@@ -335,7 +338,14 @@ export class DatabaseIntegration {
         }
 
         try {
-            const result = databaseManager.endGameSession(sessionId, sessionData);
+            const result = await this.databaseManager.saveScore({
+                player_id: 1,
+                level_id: sessionData.level_id,
+                score: sessionData.score,
+                time: sessionData.time,
+                zombies_killed: sessionData.zombies_killed,
+                distance_traveled: sessionData.distance_traveled
+            });
             
             // Update player statistics
             await this.updateStatistics(sessionData);
@@ -394,7 +404,8 @@ export class DatabaseIntegration {
         if (!this.isAvailable()) return false;
 
         try {
-            const result = databaseManager.incrementStatistic(1, statName, increment, category);
+            // For browser compatibility, we'll track statistics as achievements
+            const result = await this.databaseManager.unlockAchievement(1, `${category}_${statName}_${increment}`);
             return result.changes > 0;
         } catch (error) {
             this.logger.error('Failed to increment statistic:', error);
@@ -430,7 +441,7 @@ export class DatabaseIntegration {
         }
 
         try {
-            return databaseManager.getSaveGames(1);
+            return await this.databaseManager.getPlayerLevelProgress(1);
         } catch (error) {
             this.logger.error('Failed to get save games:', error);
             return [];
@@ -444,7 +455,11 @@ export class DatabaseIntegration {
         }
 
         try {
-            const result = databaseManager.createSaveGame(1, saveData);
+            const result = await this.databaseManager.saveLevelProgress({
+                player_id: 1,
+                level_id: saveData.level_id,
+                ...saveData
+            });
             return result.lastInsertRowid;
         } catch (error) {
             this.logger.error('Failed to create save game:', error);
@@ -458,7 +473,10 @@ export class DatabaseIntegration {
         }
 
         try {
-            return databaseManager.getSaveGame(saveId);
+            // For browser compatibility, we don't have individual save games
+            // Return level progress instead
+            const levelProgress = await this.databaseManager.getPlayerLevelProgress(1);
+            return levelProgress.find(p => p.id === saveId) || null;
         } catch (error) {
             this.logger.error('Failed to load save game:', error);
             return null;
@@ -489,7 +507,7 @@ export class DatabaseIntegration {
         }
 
         try {
-            return databaseManager.createBackup();
+            return await this.databaseManager.backup();
         } catch (error) {
             this.logger.error('Failed to create backup:', error);
             return null;
@@ -574,7 +592,7 @@ export class DatabaseIntegration {
     
     dispose() {
         if (this.isAvailable()) {
-            databaseManager.dispose();
+            this.databaseManager.close();
         }
         
         this.cache = {};

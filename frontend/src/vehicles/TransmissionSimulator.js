@@ -540,4 +540,4 @@ export class TransmissionSimulator extends EventEmitter {
      */
     dispose() {
         this.removeAllListeners();
-    }
+    }}

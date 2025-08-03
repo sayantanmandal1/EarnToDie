@@ -5,6 +5,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const CompressionPlugin = require('compression-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
@@ -97,6 +98,10 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+        process: 'process/browser',
+      }),
       new HtmlWebpackPlugin({
         template: './public/index.html',
         title: 'Zombie Car Game',
@@ -152,6 +157,26 @@ module.exports = (env, argv) => {
       alias: {
         '@': path.resolve(__dirname, 'src'),
       },
+      fallback: {
+        "fs": false,
+        "path": require.resolve("path-browserify"),
+        "util": require.resolve("util/"),
+        "crypto": require.resolve("crypto-browserify"),
+        "stream": require.resolve("stream-browserify"),
+        "buffer": require.resolve("buffer/"),
+        "process": require.resolve("process/browser"),
+        "os": require.resolve("os-browserify/browser"),
+        "assert": require.resolve("assert/"),
+        "url": require.resolve("url/"),
+        "querystring": require.resolve("querystring-es3"),
+        "http": require.resolve("stream-http"),
+        "https": require.resolve("https-browserify"),
+        "zlib": require.resolve("browserify-zlib"),
+        "net": false,
+        "tls": false,
+        "child_process": false,
+        "dns": false
+      }
     },
     optimization: {
       minimize: isProduction,

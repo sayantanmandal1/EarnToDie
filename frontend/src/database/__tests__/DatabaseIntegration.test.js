@@ -33,8 +33,8 @@ describe('DatabaseIntegration', () => {
     describe('Initialization', () => {
         test('should initialize without Electron', async () => {
             const result = await dbIntegration.initialize();
-            expect(result).toBe(false);
-            expect(dbIntegration.isAvailable()).toBe(false);
+            expect(result).toBe(true); // Now works in browser environment
+            expect(dbIntegration.isAvailable()).toBe(true); // Available in both browser and Electron
         });
 
         test('should provide default player profile when database not available', async () => {
