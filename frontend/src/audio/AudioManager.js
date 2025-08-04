@@ -534,10 +534,8 @@ export class AudioManager {
                     // Loading progress
                 },
                 (error) => {
-                    // Only log audio errors in development, not in production
-                    if (process.env.NODE_ENV === 'development') {
-                        console.warn(`Failed to load audio: ${path}`, error.message || error);
-                    }
+                    // Silently handle audio loading errors to prevent console spam
+                    // Audio system will continue to work without the failed files
                     resolve(); // Don't reject to allow other assets to load
                 }
             );
