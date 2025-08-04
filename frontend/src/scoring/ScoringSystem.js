@@ -57,6 +57,15 @@ export class ScoringSystem extends EventEmitter {
     }
 
     /**
+     * Initialize the scoring system (async version for compatibility)
+     */
+    async initialize() {
+        // Scoring system is already initialized in constructor
+        // This method exists for compatibility with other systems
+        return Promise.resolve();
+    }
+
+    /**
      * Setup event listeners for combat and game events
      */
     _setupEventListeners() {

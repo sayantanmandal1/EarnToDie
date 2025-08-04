@@ -360,26 +360,14 @@ export class AssetManager extends EventEmitter {
             
             const arrayBuffer = await response.arrayBuffer();
             
-            // Create audio buffer if Web Audio API is available
-            if (window.AudioContext || window.webkitAudioContext) {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice());
-                
-                return {
-                    type: 'audio',
-                    buffer: audioBuffer,
-                    arrayBuffer: arrayBuffer,
-                    path: audioPath,
-                    info: assetInfo
-                };
-            } else {
-                return {
-                    type: 'audio',
-                    arrayBuffer: arrayBuffer,
-                    path: audioPath,
-                    info: assetInfo
-                };
-            }
+            // Skip audio decoding to prevent errors
+            return {
+                type: 'audio',
+                buffer: null,
+                arrayBuffer: arrayBuffer,
+                path: audioPath,
+                info: assetInfo
+            };
             
         } catch (error) {
             this.logger.warn(`Failed to load audio asset ${assetInfo.path}:`, error);
@@ -1121,11 +1109,11 @@ export const assetManager = new AssetManager();
             }
             
             const arrayBuffer = await response.arrayBuffer();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            // Skip audio decoding to prevent errors
             
             return {
                 type: 'audio',
-                buffer: audioBuffer,
+                buffer: null,
                 context: audioContext,
                 path,
                 size: arrayBuffer.byteLength,

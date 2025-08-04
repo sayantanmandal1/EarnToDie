@@ -85,6 +85,13 @@ export class SaveManager extends EventEmitter {
     }
 
     /**
+     * Load player data (alias for loadSaveData for compatibility)
+     */
+    async loadPlayerData() {
+        return await this.loadSaveData();
+    }
+
+    /**
      * Load save data from database or localStorage
      */
     async loadSaveData() {

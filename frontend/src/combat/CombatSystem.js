@@ -37,6 +37,15 @@ export class CombatSystem {
     }
 
     /**
+     * Initialize the combat system (async version for compatibility)
+     */
+    async initialize() {
+        // Combat system is already initialized in constructor
+        // This method exists for compatibility with other systems
+        return Promise.resolve();
+    }
+
+    /**
      * Initialize the combat system
      */
     _setupCombatSystem() {

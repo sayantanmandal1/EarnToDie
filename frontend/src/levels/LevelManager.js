@@ -37,6 +37,15 @@ export default class LevelManager {
     }
 
     /**
+     * Initialize the level manager (async version for compatibility)
+     */
+    async initialize() {
+        // Level manager is already initialized in constructor
+        // This method exists for compatibility with other systems
+        return Promise.resolve();
+    }
+
+    /**
      * Initialize available levels
      */
     initializeLevels() {
