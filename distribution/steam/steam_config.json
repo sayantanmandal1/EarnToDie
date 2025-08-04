@@ -1,0 +1,255 @@
+{
+  "app_info": {
+    "app_id": "TBD",
+    "app_name": "Zombie Car Game",
+    "app_type": "game",
+    "developer": "Independent Developer",
+    "publisher": "Independent Developer",
+    "release_date": "TBD",
+    "early_access": false
+  },
+  
+  "store_page": {
+    "short_description": "Drive through zombie-infested landscapes in this intense survival action game featuring realistic vehicle physics and intelligent zombie AI.",
+    
+    "detailed_description": "Zombie Car Game combines intense vehicular combat with survival horror elements in a uniquely immersive experience. Drive through procedurally generated zombie-infested landscapes using your vehicle as both transportation and weapon.\n\nKey Features:\n• Realistic Vehicle Physics - Advanced engine, transmission, and suspension simulation\n• Intelligent Zombie AI - Dynamic behavior with swarm mechanics and pathfinding\n• Procedural Level Generation - Infinite replayability with varied terrain and objectives\n• Deep Customization System - Extensive vehicle upgrades and visual modifications\n• Professional 3D Audio - Spatial audio with HRTF for immersive sound experience\n• Cross-Platform Support - Optimized for Windows, macOS, and Linux\n• Comprehensive Damage System - Realistic vehicle damage affecting performance\n• Dynamic Weather and Time - Environmental effects that impact gameplay\n• Achievement System - Unlock new vehicles and customization options\n• Professional Polish - High-quality graphics, UI, and user experience",
+    
+    "tags": [
+      "Action",
+      "Survival",
+      "Zombies",
+      "Driving",
+      "Physics",
+      "Indie",
+      "Singleplayer",
+      "Atmospheric",
+      "Horror",
+      "Arcade",
+      "Simulation",
+      "Procedural Generation",
+      "Customization",
+      "Gore",
+      "Violent"
+    ],
+    
+    "categories": [
+      "Single-player",
+      "Steam Achievements",
+      "Full controller support",
+      "Steam Cloud",
+      "Steam Leaderboards"
+    ],
+    
+    "genres": [
+      "Action",
+      "Indie",
+      "Racing",
+      "Simulation"
+    ],
+    
+    "languages": {
+      "supported": [
+        "English"
+      ],
+      "full_audio": [
+        "English"
+      ],
+      "subtitles": [
+        "English"
+      ]
+    }
+  },
+  
+  "pricing": {
+    "base_price": 1999,
+    "currency": "USD",
+    "regional_pricing": true,
+    "discount_eligible": true,
+    "bundle_eligible": true
+  },
+  
+  "system_requirements": {
+    "windows": {
+      "minimum": {
+        "os": "Windows 10 64-bit (version 1903 or later)",
+        "processor": "Intel Core i5-4590 / AMD FX 8350 or equivalent",
+        "memory": "8 GB RAM",
+        "graphics": "NVIDIA GTX 960 / AMD R9 280 / Intel UHD Graphics 630",
+        "directx": "Version 11",
+        "network": "Broadband Internet connection",
+        "storage": "4 GB available space",
+        "sound_card": "DirectX compatible",
+        "additional_notes": "Integrated graphics may require reduced settings"
+      },
+      "recommended": {
+        "os": "Windows 11 64-bit (latest version)",
+        "processor": "Intel Core i7-8700K / AMD Ryzen 5 3600 or better",
+        "memory": "16 GB RAM",
+        "graphics": "NVIDIA GTX 1660 Ti / AMD RX 580 / Intel Arc A380 or better",
+        "directx": "Version 12",
+        "network": "Broadband Internet connection (25 Mbps+)",
+        "storage": "8 GB available space (SSD recommended)",
+        "sound_card": "Dedicated sound card or high-quality integrated audio",
+        "additional_notes": "SSD storage for faster loading times"
+      }
+    },
+    "mac": {
+      "minimum": {
+        "os": "macOS 10.15 Catalina or later",
+        "processor": "Intel Core i5 2.7GHz / Apple M1 or equivalent",
+        "memory": "8 GB RAM",
+        "graphics": "Intel Iris Pro 5200 / AMD Radeon R9 M370X / Apple M1 integrated",
+        "network": "Broadband Internet connection",
+        "storage": "4 GB available space",
+        "additional_notes": "Metal API support required"
+      },
+      "recommended": {
+        "os": "macOS 12 Monterey or later",
+        "processor": "Intel Core i7 3.2GHz / Apple M1 Pro or better",
+        "memory": "16 GB RAM",
+        "graphics": "AMD Radeon Pro 560X / Apple M1 Pro integrated or better",
+        "network": "Broadband Internet connection (25 Mbps+)",
+        "storage": "8 GB available space (SSD recommended)",
+        "additional_notes": "Apple Silicon optimized for best performance"
+      }
+    },
+    "linux": {
+      "minimum": {
+        "os": "Ubuntu 18.04 LTS / CentOS 7 / Fedora 30 or equivalent",
+        "processor": "Intel Core i5-4590 / AMD FX 8350 or equivalent",
+        "memory": "8 GB RAM",
+        "graphics": "NVIDIA GTX 960 / AMD R9 280 with updated drivers",
+        "network": "Broadband Internet connection",
+        "storage": "4 GB available space",
+        "additional_notes": "OpenGL 3.3 support required, PulseAudio or ALSA for audio"
+      },
+      "recommended": {
+        "os": "Ubuntu 20.04 LTS / CentOS 8 / Fedora 35 or equivalent",
+        "processor": "Intel Core i7-8700K / AMD Ryzen 5 3600 or better",
+        "memory": "16 GB RAM",
+        "graphics": "NVIDIA GTX 1660 Ti / AMD RX 580 with latest drivers",
+        "network": "Broadband Internet connection (25 Mbps+)",
+        "storage": "8 GB available space (SSD recommended)",
+        "additional_notes": "Vulkan API support for enhanced performance"
+      }
+    }
+  },
+  
+  "content_rating": {
+    "esrb": "T",
+    "esrb_descriptors": [
+      "Violence",
+      "Blood and Gore",
+      "Mild Language"
+    ],
+    "pegi": "16",
+    "pegi_descriptors": [
+      "Violence",
+      "Realistic Violence"
+    ]
+  },
+  
+  "achievements": {
+    "total_count": 50,
+    "categories": [
+      "Combat Mastery",
+      "Vehicle Expertise",
+      "Exploration",
+      "Survival Challenges",
+      "Customization",
+      "Hidden Secrets"
+    ]
+  },
+  
+  "steam_features": {
+    "cloud_saves": true,
+    "achievements": true,
+    "leaderboards": true,
+    "trading_cards": false,
+    "workshop": false,
+    "overlay": true,
+    "controller_support": "full",
+    "vr_support": false,
+    "remote_play": true
+  },
+  
+  "dlc_plans": {
+    "planned": false,
+    "season_pass": false,
+    "cosmetic_dlc": false,
+    "expansion_packs": false
+  },
+  
+  "marketing": {
+    "coming_soon": true,
+    "wishlist_campaign": true,
+    "beta_testing": false,
+    "press_preview": true,
+    "influencer_program": true,
+    "steam_festivals": [
+      "Steam Next Fest",
+      "Steam Indie Game Festival"
+    ]
+  },
+  
+  "technical": {
+    "build_config": {
+      "depot_id": "TBD",
+      "content_root": "dist/",
+      "executable": "zombie-car-game.exe",
+      "launch_options": [
+        {
+          "description": "Play Zombie Car Game",
+          "executable": "zombie-car-game.exe",
+          "arguments": "",
+          "type": "default"
+        },
+        {
+          "description": "Play in Windowed Mode",
+          "executable": "zombie-car-game.exe",
+          "arguments": "--windowed",
+          "type": "option"
+        },
+        {
+          "description": "Play with Debug Console",
+          "executable": "zombie-car-game.exe",
+          "arguments": "--debug",
+          "type": "option"
+        }
+      ]
+    },
+    
+    "auto_update": {
+      "enabled": true,
+      "background_download": true,
+      "delta_patching": true
+    },
+    
+    "drm": {
+      "steam_drm": true,
+      "third_party_drm": false,
+      "always_online": false
+    }
+  },
+  
+  "community": {
+    "forums": true,
+    "guides": true,
+    "screenshots": true,
+    "artwork": true,
+    "videos": true,
+    "news": true,
+    "discussions": true
+  },
+  
+  "analytics": {
+    "steam_analytics": true,
+    "custom_events": [
+      "level_completed",
+      "vehicle_upgraded",
+      "achievement_unlocked",
+      "crash_occurred",
+      "session_length"
+    ]
+  }
+}
