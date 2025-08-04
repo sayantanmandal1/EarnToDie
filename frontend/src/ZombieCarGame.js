@@ -12,6 +12,7 @@ import { ErrorHandler } from './error/ErrorHandler';
 import { PerformanceManager } from './performance/PerformanceManager';
 import { FinalIntegration } from './integration/FinalIntegration';
 import { electronIntegration } from './electron/ElectronIntegration';
+import ApiClient from './utils/ApiClient';
 
 // UI Components
 import MainMenu from './components/MainMenu';
@@ -201,133 +202,7 @@ export class ZombieCarGame extends React.Component {
         
         // Initialize save system
         // Create real API client for backend connection
-        const apiClient = {
-            baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080',
-            
-            request: async function(endpoint, options = {}) {
-                try {
-                    const url = `${this.baseURL}${endpoint}`;
-                    const response = await fetch(url, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...options.headers
-                        },
-                        ...options
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    return await response.json();
-                } catch (error) {
-                    console.warn(`API request failed for ${endpoint}:`, error.message);
-                    // Return fallback data for development
-                    return this.getFallbackData(endpoint);
-                }
-            },
-            
-            get: async function(endpoint) {
-                return this.request(endpoint, { method: 'GET' });
-            },
-            
-            post: async function(endpoint, data) {
-                return this.request(endpoint, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-            },
-            
-            getFallbackData: (endpoint) => {
-                // Provide comprehensive fallback data when backend is not available
-                console.log(`Using fallback data for: ${endpoint}`);
-                
-                if (endpoint.includes('/vehicles/available')) {
-                    return {
-                        data: {
-                            vehicles: [
-                                { 
-                                    id: 1, 
-                                    type: 'sedan', 
-                                    name: 'Sedan', 
-                                    price: 0, 
-                                    owned: true,
-                                    stats: { speed: 80, armor: 60, handling: 70 }
-                                },
-                                { 
-                                    id: 2, 
-                                    type: 'suv', 
-                                    name: 'SUV', 
-                                    price: 5000, 
-                                    owned: false,
-                                    stats: { speed: 70, armor: 80, handling: 60 }
-                                },
-                                { 
-                                    id: 3, 
-                                    type: 'truck', 
-                                    name: 'Truck', 
-                                    price: 10000, 
-                                    owned: false,
-                                    stats: { speed: 60, armor: 100, handling: 50 }
-                                }
-                            ]
-                        }
-                    };
-                } else if (endpoint.includes('/vehicles') && !endpoint.includes('available')) {
-                    return { 
-                        data: { 
-                            vehicles: [
-                                { 
-                                    id: 1, 
-                                    type: 'sedan', 
-                                    name: 'Sedan', 
-                                    owned: true,
-                                    upgrades: { engine: 1, armor: 1, tires: 1 }
-                                }
-                            ] 
-                        } 
-                    };
-                } else if (endpoint.includes('/player/profile')) {
-                    return {
-                        data: {
-                            player: {
-                                id: 1,
-                                name: 'Player',
-                                currency: 1000,
-                                level: 1,
-                                experience: 0,
-                                stats: {
-                                    zombiesKilled: 0,
-                                    distanceTraveled: 0,
-                                    gamesPlayed: 0
-                                }
-                            }
-                        }
-                    };
-                } else if (endpoint.includes('/player/save')) {
-                    return { 
-                        data: { 
-                            save_data: {
-                                player: {
-                                    currency: 1000,
-                                    level: 1,
-                                    experience: 0
-                                },
-                                vehicles: [],
-                                levelProgress: {},
-                                settings: {
-                                    graphics: 'medium',
-                                    audio: { master: 0.8, effects: 0.7, music: 0.6 }
-                                }
-                            }
-                        } 
-                    };
-                } else if (endpoint.includes('/game/sessions')) {
-                    return { data: { session_id: 'offline-session-' + Date.now() } };
-                }
-                return { data: {} };
-            }
-        };
+        const apiClient = new ApiClient(process.env.REACT_APP_API_URL || 'http://localhost:8080');
         
         this.saveManager = new SaveManager(apiClient);
         await this.saveManager.initialize();
