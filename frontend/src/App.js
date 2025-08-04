@@ -1,11 +1,14 @@
 import React from 'react';
 import ZombieCarGame from './ZombieCarGame';
+import ErrorBoundary from './components/ErrorBoundary';
 import './styles/App.css';
 
 function App() {
   return (
     <div className="app">
-      <ZombieCarGame />
+      <ErrorBoundary>
+        <ZombieCarGame />
+      </ErrorBoundary>
     </div>
   );
 }

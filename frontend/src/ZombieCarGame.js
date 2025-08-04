@@ -89,6 +89,9 @@ export class ZombieCarGame extends React.Component {
             // Setup Electron integration first
             this.setupElectronIntegration();
             
+            // Add user interaction handler for audio context
+            this.setupAudioContextHandler();
+            
             await this.initializeGame();
         } catch (error) {
             this.handleError(error);
@@ -97,6 +100,29 @@ export class ZombieCarGame extends React.Component {
 
     componentWillUnmount() {
         this.cleanup();
+    }
+
+    /**
+     * Setup audio context handler for user interaction
+     */
+    setupAudioContextHandler() {
+        const resumeAudioContext = () => {
+            if (this.gameEngine && this.gameEngine.audioIntegration && 
+                this.gameEngine.audioIntegration.audioManager && 
+                this.gameEngine.audioIntegration.audioManager.audioContext) {
+                const audioContext = this.gameEngine.audioIntegration.audioManager.audioContext;
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume().catch(error => {
+                        console.warn('Could not resume audio context:', error.message);
+                    });
+                }
+            }
+        };
+
+        // Add listeners for user interactions
+        ['click', 'keydown', 'touchstart'].forEach(eventType => {
+            document.addEventListener(eventType, resumeAudioContext, { once: true });
+        });
     }
 
     /**
@@ -174,20 +200,136 @@ export class ZombieCarGame extends React.Component {
         this.updateLoadingState(30, 'Loading save data...');
         
         // Initialize save system
-        // Create a simple API client mock for now since backend is not available
-        const mockApiClient = {
-            request: async (endpoint) => {
-                throw new Error(`Backend not available: ${endpoint}`);
+        // Create real API client for backend connection
+        const apiClient = {
+            baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080',
+            
+            request: async function(endpoint, options = {}) {
+                try {
+                    const url = `${this.baseURL}${endpoint}`;
+                    const response = await fetch(url, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        },
+                        ...options
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.warn(`API request failed for ${endpoint}:`, error.message);
+                    // Return fallback data for development
+                    return this.getFallbackData(endpoint);
+                }
             },
-            get: async (endpoint) => {
-                throw new Error(`Backend not available: ${endpoint}`);
+            
+            get: async function(endpoint) {
+                return this.request(endpoint, { method: 'GET' });
             },
-            post: async (endpoint, data) => {
-                throw new Error(`Backend not available: ${endpoint}`);
+            
+            post: async function(endpoint, data) {
+                return this.request(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            },
+            
+            getFallbackData: (endpoint) => {
+                // Provide comprehensive fallback data when backend is not available
+                console.log(`Using fallback data for: ${endpoint}`);
+                
+                if (endpoint.includes('/vehicles/available')) {
+                    return {
+                        data: {
+                            vehicles: [
+                                { 
+                                    id: 1, 
+                                    type: 'sedan', 
+                                    name: 'Sedan', 
+                                    price: 0, 
+                                    owned: true,
+                                    stats: { speed: 80, armor: 60, handling: 70 }
+                                },
+                                { 
+                                    id: 2, 
+                                    type: 'suv', 
+                                    name: 'SUV', 
+                                    price: 5000, 
+                                    owned: false,
+                                    stats: { speed: 70, armor: 80, handling: 60 }
+                                },
+                                { 
+                                    id: 3, 
+                                    type: 'truck', 
+                                    name: 'Truck', 
+                                    price: 10000, 
+                                    owned: false,
+                                    stats: { speed: 60, armor: 100, handling: 50 }
+                                }
+                            ]
+                        }
+                    };
+                } else if (endpoint.includes('/vehicles') && !endpoint.includes('available')) {
+                    return { 
+                        data: { 
+                            vehicles: [
+                                { 
+                                    id: 1, 
+                                    type: 'sedan', 
+                                    name: 'Sedan', 
+                                    owned: true,
+                                    upgrades: { engine: 1, armor: 1, tires: 1 }
+                                }
+                            ] 
+                        } 
+                    };
+                } else if (endpoint.includes('/player/profile')) {
+                    return {
+                        data: {
+                            player: {
+                                id: 1,
+                                name: 'Player',
+                                currency: 1000,
+                                level: 1,
+                                experience: 0,
+                                stats: {
+                                    zombiesKilled: 0,
+                                    distanceTraveled: 0,
+                                    gamesPlayed: 0
+                                }
+                            }
+                        }
+                    };
+                } else if (endpoint.includes('/player/save')) {
+                    return { 
+                        data: { 
+                            save_data: {
+                                player: {
+                                    currency: 1000,
+                                    level: 1,
+                                    experience: 0
+                                },
+                                vehicles: [],
+                                levelProgress: {},
+                                settings: {
+                                    graphics: 'medium',
+                                    audio: { master: 0.8, effects: 0.7, music: 0.6 }
+                                }
+                            }
+                        } 
+                    };
+                } else if (endpoint.includes('/game/sessions')) {
+                    return { data: { session_id: 'offline-session-' + Date.now() } };
+                }
+                return { data: {} };
             }
         };
         
-        this.saveManager = new SaveManager(mockApiClient);
+        this.saveManager = new SaveManager(apiClient);
         await this.saveManager.initialize();
 
         this.updateLoadingState(40, 'Setting up game state management...');
@@ -200,7 +342,7 @@ export class ZombieCarGame extends React.Component {
         
         // Initialize vehicle and upgrade systems
         this.vehicleManager = new VehicleManager(this.gameEngine);
-        this.upgradeManager = new UpgradeManager(this.gameEngine, mockApiClient);
+        this.upgradeManager = new UpgradeManager(this.gameEngine, apiClient);
         await this.vehicleManager.initialize();
         await this.upgradeManager.initialize();
 
@@ -878,16 +1020,21 @@ export class ZombieCarGame extends React.Component {
                 {isLoading && (
                     <div className="loading-screen">
                         <div className="loading-content">
-                            <h1>Zombie Car Game</h1>
+                            <h1>🧟‍♂️ Zombie Car Game</h1>
                             <div className="loading-bar">
                                 <div 
                                     className="loading-progress" 
                                     style={{ width: `${loadingProgress}%` }}
                                 />
                             </div>
-                            <p>{loadingMessage}</p>
+                            <p className="loading-message">{loadingMessage}</p>
+                            <div className="loading-percentage">{loadingProgress}%</div>
                             <div className="loading-tips">
-                                <p>Tip: Use WASD to drive, Space to brake!</p>
+                                <p>💡 <strong>Controls:</strong> WASD to drive, Space to brake, Mouse to look around</p>
+                                <p>🎯 <strong>Objective:</strong> Survive the zombie apocalypse and upgrade your vehicle!</p>
+                                {loadingProgress > 50 && (
+                                    <p>🔊 <strong>Audio:</strong> Click anywhere after loading to enable sound</p>
+                                )}
                             </div>
                         </div>
                     </div>
