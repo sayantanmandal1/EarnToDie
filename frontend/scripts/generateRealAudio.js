@@ -90,23 +90,22 @@ class RealAudioGenerator {
         buffer.write('data', 36);
         buffer.writeUInt32LE(numSamples * 2, 40);
 
-        // Generate sine wave samples
+        // Generate sine wave samples with some variation to make it more interesting
         for (let i = 0; i < numSamples; i++) {
-            const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate) * 0.3; // 30% volume
+            const t = i / sampleRate;
+            // Add some harmonics and envelope for more realistic sound
+            const envelope = Math.exp(-t * 2); // Decay envelope
+            const fundamental = Math.sin(2 * Math.PI * frequency * t);
+            const harmonic2 = Math.sin(2 * Math.PI * frequency * 2 * t) * 0.3;
+            const harmonic3 = Math.sin(2 * Math.PI * frequency * 3 * t) * 0.1;
+            
+            const sample = (fundamental + harmonic2 + harmonic3) * envelope * 0.3;
             const intSample = Math.floor(sample * 32767);
             buffer.writeInt16LE(intSample, 44 + i * 2);
         }
 
-        // Convert to MP3-like format by changing extension (browsers can handle WAV)
-        const wavPath = filePath.replace('.mp3', '.wav');
-        await fs.writeFile(wavPath, buffer);
-        
-        // Create a symbolic link or copy with .mp3 extension for compatibility
-        try {
-            await fs.copyFile(wavPath, filePath);
-        } catch (error) {
-            console.warn(`Could not create MP3 version of ${filePath}:`, error.message);
-        }
+        // Write as WAV file (browsers can handle WAV files as MP3)
+        await fs.writeFile(filePath, buffer);
 
         this.generatedFiles.push(filePath);
         console.log(`Generated: ${path.basename(filePath)}`);
