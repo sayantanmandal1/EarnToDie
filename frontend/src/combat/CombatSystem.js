@@ -46,6 +46,22 @@ export class CombatSystem {
     }
 
     /**
+     * Set vehicle manager for combat system integration
+     */
+    setVehicleManager(vehicleManager) {
+        this.vehicleManager = vehicleManager;
+        console.log('VehicleManager connected to CombatSystem');
+    }
+
+    /**
+     * Set zombie manager for combat system integration
+     */
+    setZombieManager(zombieManager) {
+        this.zombieManager = zombieManager;
+        console.log('ZombieManager connected to CombatSystem');
+    }
+
+    /**
      * Initialize the combat system
      */
     _setupCombatSystem() {
