@@ -3,6 +3,21 @@ import { applyTestMocks } from './test-fixes.js';
 const { applyComprehensiveMocks } = require('./comprehensive-test-fixes.js');
 const { applyUltimateTestFixes } = require('./ultimate-test-fixes.js');
 
+// Configure React Testing Library to use legacy renderer
+import { configure } from '@testing-library/react';
+
+configure({
+  // Use legacy renderer to avoid React 18 createRoot issues
+  legacyRoot: true,
+  // Increase timeout for async operations
+  asyncUtilTimeout: 5000,
+  // Configure test ID attribute
+  testIdAttribute: 'data-testid'
+});
+
+// Import React-specific test fixes (temporarily disabled)
+// import './react-test-fixes.js';
+
 // Mock canvas getContext to return a proper WebGL mock
 const mockWebGLContext = {
   getExtension: jest.fn(() => null),
@@ -207,16 +222,31 @@ global.THREE = {
   MeshLambertMaterial: jest.fn(),
   MeshPhongMaterial: jest.fn(),
   Vector3: jest.fn(() => ({
-    set: jest.fn(),
-    copy: jest.fn(),
-    add: jest.fn(),
-    subtract: jest.fn(),
-    multiply: jest.fn(),
-    normalize: jest.fn(),
+    set: jest.fn().mockReturnThis(),
+    copy: jest.fn().mockReturnThis(),
+    add: jest.fn().mockReturnThis(),
+    subtract: jest.fn().mockReturnThis(),
+    sub: jest.fn().mockReturnThis(),
+    multiply: jest.fn().mockReturnThis(),
+    normalize: jest.fn().mockReturnThis(),
     clone: jest.fn(() => ({
+      set: jest.fn().mockReturnThis(),
+      copy: jest.fn().mockReturnThis(),
+      add: jest.fn().mockReturnThis(),
+      subtract: jest.fn().mockReturnThis(),
       sub: jest.fn().mockReturnThis(),
-      normalize: jest.fn().mockReturnThis()
+      multiply: jest.fn().mockReturnThis(),
+      normalize: jest.fn().mockReturnThis(),
+      clone: jest.fn().mockReturnThis(),
+      x: 0,
+      y: 0,
+      z: 0
     })),
+    distanceTo: jest.fn(() => 10),
+    length: jest.fn(() => 1),
+    lengthSq: jest.fn(() => 1),
+    dot: jest.fn(() => 0),
+    cross: jest.fn().mockReturnThis(),
     x: 0,
     y: 0,
     z: 0
@@ -227,7 +257,19 @@ global.THREE = {
   })),
   DirectionalLight: jest.fn(),
   AmbientLight: jest.fn(),
-  Color: jest.fn(),
+  Color: jest.fn(() => ({
+    r: 1,
+    g: 1,
+    b: 1,
+    set: jest.fn().mockReturnThis(),
+    setHex: jest.fn().mockReturnThis(),
+    setRGB: jest.fn().mockReturnThis(),
+    setHSL: jest.fn().mockReturnThis(),
+    clone: jest.fn().mockReturnThis(),
+    copy: jest.fn().mockReturnThis(),
+    getHex: jest.fn(() => 0xffffff),
+    getHexString: jest.fn(() => 'ffffff')
+  })),
   Raycaster: jest.fn(() => ({
     setFromCamera: jest.fn(),
     intersectObjects: jest.fn(() => [])
@@ -353,6 +395,53 @@ global.performance = {
 // Mock requestAnimationFrame
 global.requestAnimationFrame = jest.fn(cb => setTimeout(cb, 16));
 global.cancelAnimationFrame = jest.fn();
+
+// Ensure proper JSDOM setup for React Testing Library
+if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+    // Ensure document.body exists and is a proper DOM element
+    if (!document.body || !document.body.nodeType) {
+        const body = document.createElement('body');
+        if (document.documentElement) {
+            document.documentElement.appendChild(body);
+        } else {
+            // Create full document structure
+            const html = document.createElement('html');
+            const head = document.createElement('head');
+            html.appendChild(head);
+            html.appendChild(body);
+            if (document.appendChild) {
+                document.appendChild(html);
+            }
+        }
+        document.body = body;
+    }
+    
+    // Ensure document.head exists
+    if (!document.head || !document.head.nodeType) {
+        const head = document.createElement('head');
+        if (document.documentElement && document.body) {
+            document.documentElement.insertBefore(head, document.body);
+        }
+        document.head = head;
+    }
+    
+    // Create a root div for React Testing Library
+    let root = document.getElementById('root');
+    if (!root || !root.nodeType) {
+        root = document.createElement('div');
+        root.id = 'root';
+        if (document.body && document.body.appendChild) {
+            document.body.appendChild(root);
+        }
+    }
+    
+    // Ensure the root element is properly attached
+    if (root && !root.parentNode) {
+        if (document.body && document.body.appendChild) {
+            document.body.appendChild(root);
+        }
+    }
+}
 
 // Apply comprehensive test mocks
 applyTestMocks();
