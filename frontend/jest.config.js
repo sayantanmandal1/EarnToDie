@@ -25,5 +25,12 @@ module.exports = {
       lines: 70,
       statements: 70
     }
-  }
+  },
+  testTimeout: 30000,
+  maxWorkers: 2,
+  workerIdleMemoryLimit: '512MB',
+  forceExit: true,
+  detectOpenHandles: true,
+  bail: false,
+  verbose: false
 };

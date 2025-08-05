@@ -487,6 +487,59 @@ const applyComprehensiveMocks = () => {
     global.console.warn = jest.fn();
     global.console.error = jest.fn();
     global.console.log = jest.fn();
+
+    // Add critical missing Three.js constructors for PerformanceManager
+    if (global.THREE) {
+        global.THREE.Frustum = jest.fn(function() {
+            this.planes = new Array(6).fill(null).map(() => ({
+                normal: { x: 0, y: 0, z: 0 },
+                constant: 0,
+                distanceToPoint: jest.fn(() => 0),
+                setFromProjectionMatrix: jest.fn()
+            }));
+            
+            this.setFromProjectionMatrix = jest.fn().mockReturnValue(this);
+            this.intersectsObject = jest.fn(() => true);
+            this.intersectsBox = jest.fn(() => true);
+            this.intersectsSphere = jest.fn(() => true);
+            this.containsPoint = jest.fn(() => true);
+        });
+
+        global.THREE.Matrix4 = jest.fn(function() {
+            this.elements = new Array(16).fill(0);
+            this.elements[0] = this.elements[5] = this.elements[10] = this.elements[15] = 1;
+            
+            this.multiplyMatrices = jest.fn().mockReturnValue(this);
+            this.multiply = jest.fn().mockReturnValue(this);
+            this.makeRotationFromEuler = jest.fn().mockReturnValue(this);
+            this.makeTranslation = jest.fn().mockReturnValue(this);
+            this.makeScale = jest.fn().mockReturnValue(this);
+            this.setPosition = jest.fn().mockReturnValue(this);
+            this.lookAt = jest.fn().mockReturnValue(this);
+            this.copy = jest.fn().mockReturnValue(this);
+            this.clone = jest.fn(() => new global.THREE.Matrix4());
+            this.invert = jest.fn().mockReturnValue(this);
+            this.transpose = jest.fn().mockReturnValue(this);
+            this.determinant = jest.fn(() => 1);
+            this.identity = jest.fn().mockReturnValue(this);
+            this.compose = jest.fn().mockReturnValue(this);
+            this.decompose = jest.fn().mockReturnValue(this);
+        });
+
+        global.THREE.Plane = jest.fn(function(normal = { x: 0, y: 1, z: 0 }, constant = 0) {
+            this.normal = normal;
+            this.constant = constant;
+            
+            this.setFromNormalAndCoplanarPoint = jest.fn().mockReturnValue(this);
+            this.distanceToPoint = jest.fn(() => 0);
+            this.projectPoint = jest.fn((point, target) => target || point);
+            this.clone = jest.fn(() => new global.THREE.Plane(this.normal, this.constant));
+            this.copy = jest.fn().mockReturnValue(this);
+            this.normalize = jest.fn().mockReturnValue(this);
+        });
+
+        console.log('✅ Added missing Three.js constructors: Frustum, Matrix4, Plane');
+    }
 };
 
 // WebGL Mock (from existing code)

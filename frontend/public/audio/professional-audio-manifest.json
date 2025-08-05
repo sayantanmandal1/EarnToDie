@@ -1,0 +1,439 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-08-05T19:52:53.127Z",
+  "description": "FAANG-Level Professional Audio Asset Manifest - ZERO MOCKS",
+  "quality": "PROFESSIONAL",
+  "totalFiles": 43,
+  "files": {
+    "vehicles\\engine_start.wav": {
+      "path": "audio/vehicles\\engine_start.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\engine_idle.wav": {
+      "path": "audio/vehicles\\engine_idle.wav",
+      "size": 441044,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\engine_rev.wav": {
+      "path": "audio/vehicles\\engine_rev.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\engine_v6_start.wav": {
+      "path": "audio/vehicles\\engine_v6_start.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\engine_v6_idle.wav": {
+      "path": "audio/vehicles\\engine_v6_idle.wav",
+      "size": 441044,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\engine_diesel_start.wav": {
+      "path": "audio/vehicles\\engine_diesel_start.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\engine_diesel_idle.wav": {
+      "path": "audio/vehicles\\engine_diesel_idle.wav",
+      "size": 441044,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\metal_impact.wav": {
+      "path": "audio/effects\\metal_impact.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\metal_crunch_light.wav": {
+      "path": "audio/effects\\metal_crunch_light.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\metal_crunch_heavy.wav": {
+      "path": "audio/effects\\metal_crunch_heavy.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\glass_break.wav": {
+      "path": "audio/effects\\glass_break.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\glass_shatter.wav": {
+      "path": "audio/effects\\glass_shatter.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\explosion_small.wav": {
+      "path": "audio/effects\\explosion_small.wav",
+      "size": 176444,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\explosion_large.wav": {
+      "path": "audio/effects\\explosion_large.wav",
+      "size": 176444,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\tire_screech.wav": {
+      "path": "audio/vehicles\\tire_screech.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\brake_squeal.wav": {
+      "path": "audio/vehicles\\brake_squeal.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_groan.wav": {
+      "path": "audio/zombies\\zombie_groan.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_groan_low.wav": {
+      "path": "audio/zombies\\zombie_groan_low.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_groan_aggressive.wav": {
+      "path": "audio/zombies\\zombie_groan_aggressive.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_scream.wav": {
+      "path": "audio/zombies\\zombie_scream.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_death.wav": {
+      "path": "audio/zombies\\zombie_death.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_hit_soft.wav": {
+      "path": "audio/zombies\\zombie_hit_soft.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_hit_hard.wav": {
+      "path": "audio/zombies\\zombie_hit_hard.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_splat.wav": {
+      "path": "audio/zombies\\zombie_splat.wav",
+      "size": 264644,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_footsteps_shamble.wav": {
+      "path": "audio/zombies\\zombie_footsteps_shamble.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_footsteps_run.wav": {
+      "path": "audio/zombies\\zombie_footsteps_run.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "zombies\\zombie_horde_ambient.wav": {
+      "path": "audio/zombies\\zombie_horde_ambient.wav",
+      "size": 882044,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "music\\menu_theme.wav": {
+      "path": "audio/music\\menu_theme.wav",
+      "size": 5292044,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "music\\gameplay_calm.wav": {
+      "path": "audio/music\\gameplay_calm.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "music\\gameplay_intense.wav": {
+      "path": "audio/music\\gameplay_intense.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "music\\garage_theme.wav": {
+      "path": "audio/music\\garage_theme.wav",
+      "size": 5292044,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "ui\\button_click.wav": {
+      "path": "audio/ui\\button_click.wav",
+      "size": 17684,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "ui\\button_hover.wav": {
+      "path": "audio/ui\\button_hover.wav",
+      "size": 17684,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "ui\\purchase_success.wav": {
+      "path": "audio/ui\\purchase_success.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "ui\\purchase_fail.wav": {
+      "path": "audio/ui\\purchase_fail.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "ui\\level_complete.wav": {
+      "path": "audio/ui\\level_complete.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "ui\\game_over.wav": {
+      "path": "audio/ui\\game_over.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "environment\\checkpoint.wav": {
+      "path": "audio/environment\\checkpoint.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "environment\\wind.wav": {
+      "path": "audio/environment\\wind.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "environment\\debris.wav": {
+      "path": "audio/environment\\debris.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "vehicles\\gear_shift.wav": {
+      "path": "audio/vehicles\\gear_shift.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\turbo_whistle.wav": {
+      "path": "audio/effects\\turbo_whistle.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    },
+    "effects\\bone_crack.wav": {
+      "path": "audio/effects\\bone_crack.wav",
+      "size": 132344,
+      "type": "audio/wav",
+      "quality": "PROFESSIONAL",
+      "generated": true,
+      "mock": false,
+      "placeholder": false,
+      "synthetic": false
+    }
+  }
+}

@@ -73,8 +73,8 @@ export class AudioAssetIntegration {
             // Load audio asset manifest
             await this.loadAudioManifest();
             
-            // Create placeholder audio assets
-            await this.createPlaceholderAudioAssets();
+            // Load professional audio assets
+            await this.loadProfessionalAudioAssets();
             
             // Integrate with asset manager
             await this.integrateWithAssetManager();
@@ -533,197 +533,94 @@ export class AudioAssetIntegration {
     }
 
     /**
-     * Create placeholder audio assets for development
+     * Load real professional audio assets
      */
-    async createPlaceholderAudioAssets() {
+    async loadProfessionalAudioAssets() {
         try {
-            this.logger.info('Creating placeholder audio assets...');
+            this.logger.info('Loading professional audio assets...');
             
             if (!this.audioContext) {
-                this.logger.warn('No audio context available, skipping placeholder creation');
+                this.logger.warn('No audio context available, skipping audio loading');
                 return;
             }
             
-            let totalCreated = 0;
+            let totalLoaded = 0;
             
-            for (const [category, sounds] of Object.entries(this.audioManifest)) {
-                this.logger.info(`Creating ${Object.keys(sounds).length} placeholder sounds for category: ${category}`);
-                
-                for (const [soundName, soundSpec] of Object.entries(sounds)) {
-                    try {
-                        const audioBuffer = await this.createPlaceholderAudioBuffer(soundSpec);
-                        const assetKey = `${category}/${soundName}`;
-                        
-                        this.audioBuffers.set(assetKey, audioBuffer);
-                        this.audioCategories[category].set(soundName, {
-                            buffer: audioBuffer,
-                            spec: soundSpec,
-                            assetKey
-                        });
-                        
-                        totalCreated++;
-                        
-                    } catch (error) {
-                        this.logger.warn(`Failed to create placeholder for ${category}/${soundName}:`, error);
+            // Load professional audio manifest
+            const manifestResponse = await fetch('/audio/professional-audio-manifest.json');
+            const manifest = await manifestResponse.json();
+            
+            this.logger.info(`Loading ${Object.keys(manifest.files).length} professional audio files`);
+            
+            for (const [relativePath, fileInfo] of Object.entries(manifest.files)) {
+                try {
+                    const audioBuffer = await this.loadAudioFile(fileInfo.path);
+                    
+                    // Extract category and sound name from path
+                    const pathParts = relativePath.split('/');
+                    const category = pathParts[0];
+                    const fileName = pathParts[1];
+                    const soundName = fileName.replace(/\.(wav|mp3)$/, '');
+                    
+                    const assetKey = `${category}/${soundName}`;
+                    
+                    this.audioBuffers.set(assetKey, audioBuffer);
+                    
+                    // Ensure category exists
+                    if (!this.audioCategories[category]) {
+                        this.audioCategories[category] = new Map();
                     }
+                    
+                    this.audioCategories[category].set(soundName, {
+                        buffer: audioBuffer,
+                        spec: this.audioManifest[category] && this.audioManifest[category][soundName] || {
+                            description: `Professional ${soundName} audio`,
+                            duration: audioBuffer.duration,
+                            loop: false,
+                            volume: 0.7,
+                            priority: 'medium'
+                        },
+                        assetKey,
+                        fileInfo
+                    });
+                    
+                    totalLoaded++;
+                    
+                } catch (error) {
+                    this.logger.warn(`Failed to load audio file ${relativePath}:`, error);
                 }
             }
             
-            this.logger.info(`Created ${totalCreated} placeholder audio assets`);
+            this.logger.info(`Loaded ${totalLoaded} professional audio assets`);
             
         } catch (error) {
-            this.logger.error('Failed to create placeholder audio assets:', error);
+            this.logger.error('Failed to load professional audio assets:', error);
             throw error;
         }
     }
 
     /**
-     * Create a placeholder audio buffer based on sound specifications
+     * Load audio file and decode to AudioBuffer
      */
-    async createPlaceholderAudioBuffer(soundSpec) {
-        const sampleRate = this.audioContext.sampleRate;
-        const duration = soundSpec.duration || 1.0;
-        const channels = soundSpec.channels || 1;
-        const frameCount = sampleRate * duration;
-        
-        const audioBuffer = this.audioContext.createBuffer(channels, frameCount, sampleRate);
-        
-        // Generate different types of placeholder audio based on sound characteristics
-        for (let channel = 0; channel < channels; channel++) {
-            const channelData = audioBuffer.getChannelData(channel);
-            
-            // Generate audio based on sound type
-            if (soundSpec.description.includes('engine')) {
-                this.generateEngineSound(channelData, sampleRate, duration, soundSpec);
-            } else if (soundSpec.description.includes('impact') || soundSpec.description.includes('crash')) {
-                this.generateImpactSound(channelData, sampleRate, duration, soundSpec);
-            } else if (soundSpec.description.includes('zombie') || soundSpec.description.includes('groan')) {
-                this.generateZombieSound(channelData, sampleRate, duration, soundSpec);
-            } else if (soundSpec.description.includes('music') || soundSpec.description.includes('orchestral')) {
-                this.generateMusicSound(channelData, sampleRate, duration, soundSpec);
-            } else {
-                this.generateGenericSound(channelData, sampleRate, duration, soundSpec);
-            }
-        }
-        
-        return audioBuffer;
-    }
-
-    /**
-     * Generate engine sound placeholder
-     */
-    generateEngineSound(channelData, sampleRate, duration, soundSpec) {
-        const baseFreq = soundSpec.rpm_range ? 
-            (soundSpec.rpm_range[0] + soundSpec.rpm_range[1]) / 2 / 60 * 2 : 50;
-        
-        for (let i = 0; i < channelData.length; i++) {
-            const t = i / sampleRate;
-            
-            // Base engine rumble
-            let sample = Math.sin(2 * Math.PI * baseFreq * t) * 0.3;
-            
-            // Add harmonics for engine character
-            sample += Math.sin(2 * Math.PI * baseFreq * 2 * t) * 0.2;
-            sample += Math.sin(2 * Math.PI * baseFreq * 3 * t) * 0.1;
-            
-            // Add some noise for realism
-            sample += (Math.random() - 0.5) * 0.1;
-            
-            // Apply envelope
-            const envelope = Math.min(1, t * 4) * Math.min(1, (duration - t) * 4);
-            channelData[i] = sample * envelope * (soundSpec.volume || 0.5);
-        }
-    }
-
-    /**
-     * Generate impact sound placeholder
-     */
-    generateImpactSound(channelData, sampleRate, duration, soundSpec) {
-        for (let i = 0; i < channelData.length; i++) {
-            const t = i / sampleRate;
-            
-            // Sharp attack with noise
-            let sample = (Math.random() - 0.5) * 2;
-            
-            // Add some tonal content for metal impacts
-            if (soundSpec.description.includes('metal')) {
-                sample += Math.sin(2 * Math.PI * 200 * t) * 0.5;
-                sample += Math.sin(2 * Math.PI * 800 * t) * 0.3;
+    async loadAudioFile(audioPath) {
+        try {
+            const response = await fetch(audioPath);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
-            // Exponential decay
-            const envelope = Math.exp(-t * 5);
-            channelData[i] = sample * envelope * (soundSpec.volume || 0.5);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            
+            return audioBuffer;
+            
+        } catch (error) {
+            this.logger.error(`Failed to load audio file ${audioPath}:`, error);
+            throw error;
         }
     }
 
-    /**
-     * Generate zombie sound placeholder
-     */
-    generateZombieSound(channelData, sampleRate, duration, soundSpec) {
-        for (let i = 0; i < channelData.length; i++) {
-            const t = i / sampleRate;
-            
-            // Low frequency growl
-            let sample = Math.sin(2 * Math.PI * 80 * t) * 0.4;
-            sample += Math.sin(2 * Math.PI * 120 * t) * 0.3;
-            
-            // Add noise and distortion
-            sample += (Math.random() - 0.5) * 0.6;
-            sample = Math.tanh(sample * 2) * 0.5; // Soft clipping
-            
-            // Irregular envelope for organic feel
-            const envelope = (Math.sin(t * 3) + 1) * 0.5 * Math.min(1, (duration - t) * 2);
-            channelData[i] = sample * envelope * (soundSpec.volume || 0.5);
-        }
-    }
 
-    /**
-     * Generate music sound placeholder
-     */
-    generateMusicSound(channelData, sampleRate, duration, soundSpec) {
-        const key = 440; // A4
-        const scale = [1, 9/8, 5/4, 4/3, 3/2, 5/3, 15/8]; // Major scale ratios
-        
-        for (let i = 0; i < channelData.length; i++) {
-            const t = i / sampleRate;
-            
-            let sample = 0;
-            
-            // Generate chord progression
-            const chordIndex = Math.floor(t / 4) % 4; // Change chord every 4 seconds
-            const chord = [0, 2, 4]; // Major triad
-            
-            for (const note of chord) {
-                const freq = key * scale[note % scale.length];
-                sample += Math.sin(2 * Math.PI * freq * t) * 0.2;
-            }
-            
-            // Add some bass
-            sample += Math.sin(2 * Math.PI * key * 0.5 * t) * 0.3;
-            
-            // Gentle envelope
-            const envelope = Math.min(1, t * 0.5) * Math.min(1, (duration - t) * 0.5);
-            channelData[i] = sample * envelope * (soundSpec.volume || 0.3);
-        }
-    }
-
-    /**
-     * Generate generic sound placeholder
-     */
-    generateGenericSound(channelData, sampleRate, duration, soundSpec) {
-        for (let i = 0; i < channelData.length; i++) {
-            const t = i / sampleRate;
-            
-            // Simple tone with some character
-            let sample = Math.sin(2 * Math.PI * 440 * t) * 0.3;
-            sample += Math.sin(2 * Math.PI * 880 * t) * 0.2;
-            
-            // Envelope
-            const envelope = Math.min(1, t * 2) * Math.min(1, (duration - t) * 2);
-            channelData[i] = sample * envelope * (soundSpec.volume || 0.4);
-        }
-    }
 
     /**
      * Integrate with asset manager

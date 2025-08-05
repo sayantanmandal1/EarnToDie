@@ -1,2 +1,277 @@
-/**\n * Asset Verification System\n * Comprehensive asset verification, integrity checking, and repair system\n */\nclass AssetVerificationSystem {\n    constructor(config = {}) {\n        this.config = {\n            manifestUrl: '/assets/manifest.json',\n            checksumAlgorithm: 'SHA-256',\n            verificationInterval: 300000, // 5 minutes\n            maxRetryAttempts: 3,\n            retryDelay: 2000,\n            enableAutoRepair: true,\n            enableProgressReporting: true,\n            enableCaching: true,\n            debugMode: process.env.NODE_ENV === 'development',\n            ...config\n        };\n        \n        // Asset manifest\n        this.manifest = null;\n        this.manifestVersion = null;\n        \n        // Verification state\n        this.verificationResults = new Map();\n        this.corruptedAssets = new Set();\n        this.missingAssets = new Set();\n        this.repairedAssets = new Set();\n        \n        // Cache for verified assets\n        this.verifiedCache = new Map();\n        this.checksumCache = new Map();\n        \n        // Progress tracking\n        this.verificationProgress = {\n            total: 0,\n            completed: 0,\n            failed: 0,\n            repaired: 0,\n            status: 'idle' // 'idle', 'loading', 'verifying', 'repairing', 'complete', 'error'\n        };\n        \n        // Event listeners\n        this.eventListeners = new Map();\n        \n        // Performance metrics\n        this.metrics = {\n            totalVerifications: 0,\n            totalRepairs: 0,\n            totalDownloads: 0,\n            averageVerificationTime: 0,\n            lastVerificationTime: null,\n            cacheHitRate: 0\n        };\n        \n        this.initialize();\n    }\n    \n    /**\n     * Initialize asset verification system\n     */\n    async initialize() {\n        console.log('Initializing Asset Verification System...');\n        \n        try {\n            // Load asset manifest\n            await this.loadManifest();\n            \n            // Setup periodic verification\n            this.setupPeriodicVerification();\n            \n            // Setup event listeners\n            this.setupEventListeners();\n            \n            console.log('Asset Verification System initialized successfully');\n            this.emit('initialized', { manifest: this.manifest });\n            \n        } catch (error) {\n            console.error('Failed to initialize Asset Verification System:', error);\n            this.emit('error', { type: 'initialization', error });\n            throw error;\n        }\n    }\n    \n    /**\n     * Load asset manifest\n     */\n    async loadManifest() {\n        try {\n            console.log('Loading asset manifest...');\n            \n            const response = await fetch(this.config.manifestUrl);\n            if (!response.ok) {\n                throw new Error(`Failed to load manifest: ${response.status} ${response.statusText}`);\n            }\n            \n            const manifest = await response.json();\n            \n            // Validate manifest structure\n            this.validateManifest(manifest);\n            \n            this.manifest = manifest;\n            this.manifestVersion = manifest.version || '1.0.0';\n            \n            console.log(`Asset manifest loaded: ${Object.keys(manifest.assets || {}).length} assets`);\n            \n        } catch (error) {\n            console.error('Failed to load asset manifest:', error);\n            \n            // Try to load cached manifest\n            const cachedManifest = this.loadCachedManifest();\n            if (cachedManifest) {\n                console.log('Using cached manifest');\n                this.manifest = cachedManifest;\n                this.manifestVersion = cachedManifest.version || '1.0.0';\n            } else {\n                throw error;\n            }\n        }\n    }\n    \n    /**\n     * Validate manifest structure\n     */\n    validateManifest(manifest) {\n        if (!manifest || typeof manifest !== 'object') {\n            throw new Error('Invalid manifest: not an object');\n        }\n        \n        if (!manifest.assets || typeof manifest.assets !== 'object') {\n            throw new Error('Invalid manifest: missing assets object');\n        }\n        \n        // Validate each asset entry\n        for (const [path, asset] of Object.entries(manifest.assets)) {\n            if (!asset.checksum) {\n                throw new Error(`Invalid manifest: asset ${path} missing checksum`);\n            }\n            \n            if (!asset.size || typeof asset.size !== 'number') {\n                throw new Error(`Invalid manifest: asset ${path} missing or invalid size`);\n            }\n            \n            if (!asset.type) {\n                throw new Error(`Invalid manifest: asset ${path} missing type`);\n            }\n        }\n    }\n    \n    /**\n     * Load cached manifest\n     */\n    loadCachedManifest() {\n        try {\n            const cached = localStorage.getItem('asset_manifest_cache');\n            return cached ? JSON.parse(cached) : null;\n        } catch (error) {\n            console.error('Failed to load cached manifest:', error);\n            return null;\n        }\n    }\n    \n    /**\n     * Cache manifest\n     */\n    cacheManifest() {\n        try {\n            if (this.manifest) {\n                localStorage.setItem('asset_manifest_cache', JSON.stringify(this.manifest));\n            }\n        } catch (error) {\n            console.error('Failed to cache manifest:', error);\n        }\n    }\n    \n    /**\n     * Setup periodic verification\n     */\n    setupPeriodicVerification() {\n        if (this.config.verificationInterval > 0) {\n            setInterval(() => {\n                this.verifyAllAssets(false); // Background verification\n            }, this.config.verificationInterval);\n        }\n    }\n    \n    /**\n     * Setup event listeners\n     */\n    setupEventListeners() {\n        // Listen for online/offline events\n        window.addEventListener('online', () => {\n            console.log('Connection restored - resuming asset verification');\n            this.verifyAllAssets(false);\n        });\n        \n        window.addEventListener('offline', () => {\n            console.log('Connection lost - pausing asset verification');\n        });\n    }\n    \n    /**\n     * Verify all assets\n     */\n    async verifyAllAssets(showProgress = true) {\n        if (!this.manifest || !this.manifest.assets) {\n            throw new Error('No manifest loaded');\n        }\n        \n        const startTime = performance.now();\n        const assets = Object.entries(this.manifest.assets);\n        \n        // Reset progress\n        this.verificationProgress = {\n            total: assets.length,\n            completed: 0,\n            failed: 0,\n            repaired: 0,\n            status: 'verifying'\n        };\n        \n        // Clear previous results\n        this.verificationResults.clear();\n        this.corruptedAssets.clear();\n        this.missingAssets.clear();\n        \n        console.log(`Starting verification of ${assets.length} assets...`);\n        this.emit('verificationStarted', { total: assets.length });\n        \n        try {\n            // Verify assets in batches to avoid overwhelming the browser\n            const batchSize = 10;\n            const batches = [];\n            \n            for (let i = 0; i < assets.length; i += batchSize) {\n                batches.push(assets.slice(i, i + batchSize));\n            }\n            \n            for (const batch of batches) {\n                const batchPromises = batch.map(([path, asset]) => \n                    this.verifyAsset(path, asset)\n                );\n                \n                await Promise.allSettled(batchPromises);\n                \n                // Update progress\n                this.verificationProgress.completed = Math.min(\n                    this.verificationProgress.completed + batch.length,\n                    this.verificationProgress.total\n                );\n                \n                if (showProgress) {\n                    this.emit('verificationProgress', { ...this.verificationProgress });\n                }\n                \n                // Small delay to prevent blocking\n                await new Promise(resolve => setTimeout(resolve, 10));\n            }\n            \n            // Calculate metrics\n            const endTime = performance.now();\n            const verificationTime = endTime - startTime;\n            this.metrics.totalVerifications++;\n            this.metrics.averageVerificationTime = \n                (this.metrics.averageVerificationTime * (this.metrics.totalVerifications - 1) + verificationTime) / \n                this.metrics.totalVerifications;\n            this.metrics.lastVerificationTime = Date.now();\n            \n            // Update status\n            this.verificationProgress.status = 'complete';\n            \n            const results = {\n                total: assets.length,\n                verified: this.verificationProgress.completed - this.verificationProgress.failed,\n                failed: this.verificationProgress.failed,\n                corrupted: this.corruptedAssets.size,\n                missing: this.missingAssets.size,\n                repaired: this.verificationProgress.repaired,\n                duration: verificationTime\n            };\n            \n            console.log('Asset verification completed:', results);\n            this.emit('verificationCompleted', results);\n            \n            // Auto-repair if enabled\n            if (this.config.enableAutoRepair && (this.corruptedAssets.size > 0 || this.missingAssets.size > 0)) {\n                await this.repairAssets();\n            }\n            \n            return results;\n            \n        } catch (error) {\n            this.verificationProgress.status = 'error';\n            console.error('Asset verification failed:', error);\n            this.emit('verificationError', { error });\n            throw error;\n        }\n    }\n    \n    /**\n     * Verify single asset\n     */\n    async verifyAsset(path, assetInfo) {\n        try {\n            // Check cache first\n            if (this.config.enableCaching && this.verifiedCache.has(path)) {\n                const cached = this.verifiedCache.get(path);\n                if (cached.timestamp > Date.now() - 300000) { // 5 minutes cache\n                    this.metrics.cacheHitRate++;\n                    this.verificationResults.set(path, cached.result);\n                    return cached.result;\n                }\n            }\n            \n            const result = {\n                path,\n                status: 'unknown',\n                checksum: null,\n                size: null,\n                error: null,\n                timestamp: Date.now()\n            };\n            \n            try {\n                // Fetch asset\n                const response = await fetch(path);\n                \n                if (!response.ok) {\n                    if (response.status === 404) {\n                        result.status = 'missing';\n                        this.missingAssets.add(path);\n                    } else {\n                        result.status = 'error';\n                        result.error = `HTTP ${response.status}: ${response.statusText}`;\n                    }\n                } else {\n                    // Get asset data\n                    const arrayBuffer = await response.arrayBuffer();\n                    result.size = arrayBuffer.byteLength;\n                    \n                    // Verify size\n                    if (result.size !== assetInfo.size) {\n                        result.status = 'corrupted';\n                        result.error = `Size mismatch: expected ${assetInfo.size}, got ${result.size}`;\n                        this.corruptedAssets.add(path);\n                    } else {\n                        // Calculate checksum\n                        result.checksum = await this.calculateChecksum(arrayBuffer);\n                        \n                        // Verify checksum\n                        if (result.checksum === assetInfo.checksum) {\n                            result.status = 'verified';\n                        } else {\n                            result.status = 'corrupted';\n                            result.error = `Checksum mismatch: expected ${assetInfo.checksum}, got ${result.checksum}`;\n                            this.corruptedAssets.add(path);\n                        }\n                    }\n                }\n                \n            } catch (fetchError) {\n                result.status = 'error';\n                result.error = fetchError.message;\n                this.missingAssets.add(path);\n            }\n            \n            // Cache result\n            if (this.config.enableCaching) {\n                this.verifiedCache.set(path, {\n                    result,\n                    timestamp: Date.now()\n                });\n            }\n            \n            // Store result\n            this.verificationResults.set(path, result);\n            \n            // Update progress counters\n            if (result.status === 'error' || result.status === 'corrupted' || result.status === 'missing') {\n                this.verificationProgress.failed++;\n            }\n            \n            if (this.config.debugMode) {\n                console.log(`Asset verification: ${path} - ${result.status}`);\n            }\n            \n            return result;\n            \n        } catch (error) {\n            console.error(`Failed to verify asset ${path}:`, error);\n            \n            const errorResult = {\n                path,\n                status: 'error',\n                error: error.message,\n                timestamp: Date.now()\n            };\n            \n            this.verificationResults.set(path, errorResult);\n            this.verificationProgress.failed++;\n            \n            return errorResult;\n        }\n    }\n    \n    /**\n     * Calculate checksum for asset data\n     */\n    async calculateChecksum(arrayBuffer) {\n        try {\n            if (this.config.checksumAlgorithm === 'SHA-256' && window.crypto && window.crypto.subtle) {\n                const hashBuffer = await window.crypto.subtle.digest('SHA-256', arrayBuffer);\n                const hashArray = Array.from(new Uint8Array(hashBuffer));\n                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');\n            } else {\n                // Fallback to simple hash\n                return this.calculateSimpleHash(arrayBuffer);\n            }\n        } catch (error) {\n            console.error('Failed to calculate checksum:', error);\n            return this.calculateSimpleHash(arrayBuffer);\n        }\n    }\n    \n    /**\n     * Calculate simple hash (fallback)\n     */\n    calculateSimpleHash(arrayBuffer) {\n        const data = new Uint8Array(arrayBuffer);\n        let hash = 0;\n        \n        for (let i = 0; i < data.length; i++) {\n            hash = ((hash << 5) - hash + data[i]) & 0xffffffff;\n        }\n        \n        return hash.toString(16);\n    }\n    \n    /**\n     * Repair corrupted or missing assets\n     */\n    async repairAssets() {\n        const assetsToRepair = new Set([...this.corruptedAssets, ...this.missingAssets]);\n        \n        if (assetsToRepair.size === 0) {\n            console.log('No assets need repair');\n            return { repaired: 0, failed: 0 };\n        }\n        \n        console.log(`Starting repair of ${assetsToRepair.size} assets...`);\n        this.verificationProgress.status = 'repairing';\n        this.emit('repairStarted', { total: assetsToRepair.size });\n        \n        let repaired = 0;\n        let failed = 0;\n        \n        for (const assetPath of assetsToRepair) {\n            try {\n                const success = await this.repairAsset(assetPath);\n                if (success) {\n                    repaired++;\n                    this.repairedAssets.add(assetPath);\n                    this.corruptedAssets.delete(assetPath);\n                    this.missingAssets.delete(assetPath);\n                } else {\n                    failed++;\n                }\n            } catch (error) {\n                console.error(`Failed to repair asset ${assetPath}:`, error);\n                failed++;\n            }\n            \n            this.verificationProgress.repaired = repaired;\n            this.emit('repairProgress', {\n                repaired,\n                failed,\n                total: assetsToRepair.size\n            });\n        }\n        \n        this.metrics.totalRepairs += repaired;\n        \n        const results = { repaired, failed };\n        console.log('Asset repair completed:', results);\n        this.emit('repairCompleted', results);\n        \n        return results;\n    }\n    \n    /**\n     * Repair single asset\n     */\n    async repairAsset(assetPath) {\n        const assetInfo = this.manifest.assets[assetPath];\n        if (!assetInfo) {\n            console.error(`No manifest entry for asset: ${assetPath}`);\n            return false;\n        }\n        \n        console.log(`Repairing asset: ${assetPath}`);\n        \n        try {\n            // Try to re-download the asset\n            const downloadUrl = assetInfo.downloadUrl || assetPath;\n            const response = await this.downloadAssetWithRetry(downloadUrl);\n            \n            if (!response.ok) {\n                throw new Error(`Download failed: ${response.status} ${response.statusText}`);\n            }\n            \n            const arrayBuffer = await response.arrayBuffer();\n            \n            // Verify the downloaded asset\n            const checksum = await this.calculateChecksum(arrayBuffer);\n            \n            if (checksum !== assetInfo.checksum) {\n                throw new Error(`Downloaded asset checksum mismatch: expected ${assetInfo.checksum}, got ${checksum}`);\n            }\n            \n            if (arrayBuffer.byteLength !== assetInfo.size) {\n                throw new Error(`Downloaded asset size mismatch: expected ${assetInfo.size}, got ${arrayBuffer.byteLength}`);\n            }\n            \n            // Store repaired asset in cache\n            await this.cacheRepairedAsset(assetPath, arrayBuffer);\n            \n            console.log(`Asset repaired successfully: ${assetPath}`);\n            return true;\n            \n        } catch (error) {\n            console.error(`Failed to repair asset ${assetPath}:`, error);\n            return false;\n        }\n    }\n    \n    /**\n     * Download asset with retry logic\n     */\n    async downloadAssetWithRetry(url, attempt = 1) {\n        try {\n            this.metrics.totalDownloads++;\n            const response = await fetch(url, {\n                cache: 'no-cache',\n                headers: {\n                    'Cache-Control': 'no-cache'\n                }\n            });\n            \n            return response;\n            \n        } catch (error) {\n            if (attempt < this.config.maxRetryAttempts) {\n                console.log(`Download attempt ${attempt} failed, retrying in ${this.config.retryDelay}ms...`);\n                await new Promise(resolve => setTimeout(resolve, this.config.retryDelay * attempt));\n                return this.downloadAssetWithRetry(url, attempt + 1);\n            } else {\n                throw error;\n            }\n        }\n    }\n    \n    /**\n     * Cache repaired asset\n     */\n    async cacheRepairedAsset(assetPath, arrayBuffer) {\n        try {\n            // Store in browser cache if available\n            if ('caches' in window) {\n                const cache = await caches.open('repaired-assets');\n                const response = new Response(arrayBuffer);\n                await cache.put(assetPath, response);\n            }\n            \n            // Update verification cache\n            if (this.config.enableCaching) {\n                this.verifiedCache.set(assetPath, {\n                    result: {\n                        path: assetPath,\n                        status: 'verified',\n                        checksum: await this.calculateChecksum(arrayBuffer),\n                        size: arrayBuffer.byteLength,\n                        timestamp: Date.now()\n                    },\n                    timestamp: Date.now()\n                });\n            }\n            \n        } catch (error) {\n            console.error(`Failed to cache repaired asset ${assetPath}:`, error);\n        }\n    }"    
-\n    /**\n     * Perform startup integrity check\n     */\n    async performStartupCheck() {\n        console.log('Performing startup integrity check...');\n        \n        const startTime = performance.now();\n        \n        try {\n            // Load manifest if not already loaded\n            if (!this.manifest) {\n                await this.loadManifest();\n            }\n            \n            // Check critical assets first\n            const criticalAssets = this.getCriticalAssets();\n            const criticalResults = await this.verifyCriticalAssets(criticalAssets);\n            \n            // If critical assets are corrupted, repair immediately\n            if (criticalResults.corrupted > 0 || criticalResults.missing > 0) {\n                console.warn('Critical assets corrupted or missing, attempting repair...');\n                await this.repairCriticalAssets(criticalAssets);\n            }\n            \n            // Perform full verification in background\n            setTimeout(() => {\n                this.verifyAllAssets(false);\n            }, 1000);\n            \n            const endTime = performance.now();\n            const duration = endTime - startTime;\n            \n            const results = {\n                ...criticalResults,\n                duration,\n                timestamp: Date.now()\n            };\n            \n            console.log('Startup integrity check completed:', results);\n            this.emit('startupCheckCompleted', results);\n            \n            return results;\n            \n        } catch (error) {\n            console.error('Startup integrity check failed:', error);\n            this.emit('startupCheckError', { error });\n            throw error;\n        }\n    }\n    \n    /**\n     * Get critical assets that must be verified at startup\n     */\n    getCriticalAssets() {\n        if (!this.manifest || !this.manifest.assets) {\n            return [];\n        }\n        \n        return Object.entries(this.manifest.assets)\n            .filter(([path, asset]) => asset.critical === true)\n            .map(([path, asset]) => ({ path, ...asset }));\n    }\n    \n    /**\n     * Verify critical assets\n     */\n    async verifyCriticalAssets(criticalAssets) {\n        const results = {\n            total: criticalAssets.length,\n            verified: 0,\n            corrupted: 0,\n            missing: 0,\n            failed: 0\n        };\n        \n        for (const asset of criticalAssets) {\n            try {\n                const result = await this.verifyAsset(asset.path, asset);\n                \n                switch (result.status) {\n                    case 'verified':\n                        results.verified++;\n                        break;\n                    case 'corrupted':\n                        results.corrupted++;\n                        break;\n                    case 'missing':\n                        results.missing++;\n                        break;\n                    default:\n                        results.failed++;\n                }\n            } catch (error) {\n                console.error(`Failed to verify critical asset ${asset.path}:`, error);\n                results.failed++;\n            }\n        }\n        \n        return results;\n    }\n    \n    /**\n     * Repair critical assets\n     */\n    async repairCriticalAssets(criticalAssets) {\n        const assetsToRepair = criticalAssets.filter(asset => \n            this.corruptedAssets.has(asset.path) || this.missingAssets.has(asset.path)\n        );\n        \n        for (const asset of assetsToRepair) {\n            try {\n                await this.repairAsset(asset.path);\n            } catch (error) {\n                console.error(`Failed to repair critical asset ${asset.path}:`, error);\n                // Critical asset repair failure might require user intervention\n                this.emit('criticalAssetRepairFailed', { asset: asset.path, error });\n            }\n        }\n    }\n    \n    /**\n     * Get verification results\n     */\n    getVerificationResults() {\n        const results = {\n            total: this.verificationResults.size,\n            verified: 0,\n            corrupted: 0,\n            missing: 0,\n            failed: 0,\n            assets: {}\n        };\n        \n        for (const [path, result] of this.verificationResults) {\n            results.assets[path] = result;\n            \n            switch (result.status) {\n                case 'verified':\n                    results.verified++;\n                    break;\n                case 'corrupted':\n                    results.corrupted++;\n                    break;\n                case 'missing':\n                    results.missing++;\n                    break;\n                default:\n                    results.failed++;\n            }\n        }\n        \n        return results;\n    }\n    \n    /**\n     * Get system health status\n     */\n    getHealthStatus() {\n        const results = this.getVerificationResults();\n        \n        let status = 'healthy';\n        if (results.corrupted > 0 || results.missing > 0) {\n            status = 'degraded';\n        }\n        if (results.failed > results.verified) {\n            status = 'unhealthy';\n        }\n        \n        return {\n            status,\n            ...results,\n            progress: { ...this.verificationProgress },\n            metrics: { ...this.metrics },\n            lastCheck: this.metrics.lastVerificationTime\n        };\n    }\n    \n    /**\n     * Generate detailed integrity report\n     */\n    generateIntegrityReport() {\n        const health = this.getHealthStatus();\n        const timestamp = new Date().toISOString();\n        \n        const report = {\n            timestamp,\n            version: this.manifestVersion,\n            summary: {\n                status: health.status,\n                totalAssets: health.total,\n                verifiedAssets: health.verified,\n                corruptedAssets: health.corrupted,\n                missingAssets: health.missing,\n                failedAssets: health.failed\n            },\n            details: {\n                corruptedAssets: Array.from(this.corruptedAssets),\n                missingAssets: Array.from(this.missingAssets),\n                repairedAssets: Array.from(this.repairedAssets)\n            },\n            metrics: { ...this.metrics },\n            progress: { ...this.verificationProgress }\n        };\n        \n        // Add detailed asset information if requested\n        if (this.config.debugMode) {\n            report.assetDetails = {};\n            for (const [path, result] of this.verificationResults) {\n                if (result.status !== 'verified') {\n                    report.assetDetails[path] = result;\n                }\n            }\n        }\n        \n        return report;\n    }\n    \n    /**\n     * Export integrity report\n     */\n    exportIntegrityReport(format = 'json') {\n        const report = this.generateIntegrityReport();\n        \n        switch (format) {\n            case 'json':\n                return JSON.stringify(report, null, 2);\n            \n            case 'csv':\n                return this.convertReportToCSV(report);\n            \n            case 'html':\n                return this.convertReportToHTML(report);\n            \n            default:\n                return report;\n        }\n    }\n    \n    /**\n     * Convert report to CSV format\n     */\n    convertReportToCSV(report) {\n        const csvRows = [];\n        \n        // Header\n        csvRows.push('Asset Path,Status,Checksum,Size,Error,Timestamp');\n        \n        // Asset data\n        for (const [path, result] of this.verificationResults) {\n            csvRows.push([\n                path,\n                result.status,\n                result.checksum || '',\n                result.size || '',\n                result.error || '',\n                new Date(result.timestamp).toISOString()\n            ].map(field => `\"${field}\"`).join(','));\n        }\n        \n        return csvRows.join('\\n');\n    }\n    \n    /**\n     * Convert report to HTML format\n     */\n    convertReportToHTML(report) {\n        return `\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Asset Integrity Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 20px; }\n        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }\n        .status-healthy { color: #4CAF50; }\n        .status-degraded { color: #FF9800; }\n        .status-unhealthy { color: #F44336; }\n        table { border-collapse: collapse; width: 100%; }\n        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }\n        th { background-color: #f2f2f2; }\n        .status-verified { background-color: #e8f5e8; }\n        .status-corrupted { background-color: #ffeaea; }\n        .status-missing { background-color: #fff3cd; }\n        .status-error { background-color: #f8d7da; }\n    </style>\n</head>\n<body>\n    <h1>Asset Integrity Report</h1>\n    \n    <div class=\"summary\">\n        <h2>Summary</h2>\n        <p><strong>Status:</strong> <span class=\"status-${report.summary.status}\">${report.summary.status.toUpperCase()}</span></p>\n        <p><strong>Generated:</strong> ${report.timestamp}</p>\n        <p><strong>Manifest Version:</strong> ${report.version}</p>\n        <p><strong>Total Assets:</strong> ${report.summary.totalAssets}</p>\n        <p><strong>Verified:</strong> ${report.summary.verifiedAssets}</p>\n        <p><strong>Corrupted:</strong> ${report.summary.corruptedAssets}</p>\n        <p><strong>Missing:</strong> ${report.summary.missingAssets}</p>\n        <p><strong>Failed:</strong> ${report.summary.failedAssets}</p>\n    </div>\n    \n    ${report.details.corruptedAssets.length > 0 ? `\n    <h2>Corrupted Assets</h2>\n    <ul>\n        ${report.details.corruptedAssets.map(asset => `<li>${asset}</li>`).join('')}\n    </ul>\n    ` : ''}\n    \n    ${report.details.missingAssets.length > 0 ? `\n    <h2>Missing Assets</h2>\n    <ul>\n        ${report.details.missingAssets.map(asset => `<li>${asset}</li>`).join('')}\n    </ul>\n    ` : ''}\n    \n    ${report.details.repairedAssets.length > 0 ? `\n    <h2>Repaired Assets</h2>\n    <ul>\n        ${report.details.repairedAssets.map(asset => `<li>${asset}</li>`).join('')}\n    </ul>\n    ` : ''}\n    \n    <h2>Metrics</h2>\n    <table>\n        <tr><th>Metric</th><th>Value</th></tr>\n        <tr><td>Total Verifications</td><td>${report.metrics.totalVerifications}</td></tr>\n        <tr><td>Total Repairs</td><td>${report.metrics.totalRepairs}</td></tr>\n        <tr><td>Total Downloads</td><td>${report.metrics.totalDownloads}</td></tr>\n        <tr><td>Average Verification Time</td><td>${Math.round(report.metrics.averageVerificationTime)}ms</td></tr>\n        <tr><td>Cache Hit Rate</td><td>${report.metrics.cacheHitRate}</td></tr>\n    </table>\n</body>\n</html>\n        `;\n    }\n    \n    /**\n     * Clear verification cache\n     */\n    clearCache() {\n        this.verifiedCache.clear();\n        this.checksumCache.clear();\n        \n        // Clear browser cache for repaired assets\n        if ('caches' in window) {\n            caches.delete('repaired-assets');\n        }\n        \n        console.log('Verification cache cleared');\n    }\n    \n    /**\n     * Update manifest\n     */\n    async updateManifest(newManifestUrl) {\n        try {\n            const oldVersion = this.manifestVersion;\n            \n            // Load new manifest\n            const response = await fetch(newManifestUrl || this.config.manifestUrl);\n            if (!response.ok) {\n                throw new Error(`Failed to load new manifest: ${response.status}`);\n            }\n            \n            const newManifest = await response.json();\n            this.validateManifest(newManifest);\n            \n            // Compare versions\n            const newVersion = newManifest.version || '1.0.0';\n            if (newVersion === oldVersion) {\n                console.log('Manifest is already up to date');\n                return false;\n            }\n            \n            // Update manifest\n            this.manifest = newManifest;\n            this.manifestVersion = newVersion;\n            \n            // Clear cache since assets may have changed\n            this.clearCache();\n            \n            // Cache new manifest\n            this.cacheManifest();\n            \n            console.log(`Manifest updated from ${oldVersion} to ${newVersion}`);\n            this.emit('manifestUpdated', { oldVersion, newVersion });\n            \n            // Re-verify all assets with new manifest\n            setTimeout(() => {\n                this.verifyAllAssets(false);\n            }, 1000);\n            \n            return true;\n            \n        } catch (error) {\n            console.error('Failed to update manifest:', error);\n            this.emit('manifestUpdateError', { error });\n            throw error;\n        }\n    }\n    \n    /**\n     * Event system\n     */\n    on(event, callback) {\n        if (!this.eventListeners.has(event)) {\n            this.eventListeners.set(event, []);\n        }\n        this.eventListeners.get(event).push(callback);\n    }\n    \n    off(event, callback) {\n        if (this.eventListeners.has(event)) {\n            const listeners = this.eventListeners.get(event);\n            const index = listeners.indexOf(callback);\n            if (index > -1) {\n                listeners.splice(index, 1);\n            }\n        }\n    }\n    \n    emit(event, data) {\n        if (this.eventListeners.has(event)) {\n            this.eventListeners.get(event).forEach(callback => {\n                try {\n                    callback(data);\n                } catch (error) {\n                    console.error(`Error in event listener for ${event}:`, error);\n                }\n            });\n        }\n    }\n    \n    /**\n     * Get configuration\n     */\n    getConfig() {\n        return { ...this.config };\n    }\n    \n    /**\n     * Update configuration\n     */\n    updateConfig(newConfig) {\n        this.config = { ...this.config, ...newConfig };\n        console.log('Asset verification configuration updated:', this.config);\n    }\n    \n    /**\n     * Cleanup and destroy\n     */\n    destroy() {\n        // Clear intervals\n        if (this.verificationInterval) {\n            clearInterval(this.verificationInterval);\n        }\n        \n        // Clear caches\n        this.clearCache();\n        \n        // Clear event listeners\n        this.eventListeners.clear();\n        \n        // Clear data\n        this.verificationResults.clear();\n        this.corruptedAssets.clear();\n        this.missingAssets.clear();\n        this.repairedAssets.clear();\n        \n        console.log('Asset Verification System destroyed');\n    }\n}\n\nexport default AssetVerificationSystem;"
+/**
+ * Asset Verification System
+ * Comprehensive asset verification, integrity checking, and repair system
+ */
+class AssetVerificationSystem {
+    constructor(config = {}) {
+        this.config = {
+            manifestUrl: '/assets/manifest.json',
+            checksumAlgorithm: 'SHA-256',
+            verificationInterval: 300000, // 5 minutes
+            maxRetryAttempts: 3,
+            retryDelay: 2000,
+            enableAutoRepair: true,
+            enableProgressReporting: true,
+            enableCaching: true,
+            debugMode: process.env.NODE_ENV === 'development',
+            ...config
+        };
+        
+        // Asset manifest
+        this.manifest = null;
+        this.manifestVersion = null;
+        
+        // Verification state
+        this.verificationResults = new Map();
+        this.corruptedAssets = new Set();
+        this.missingAssets = new Set();
+        this.repairedAssets = new Set();
+        
+        // Cache for verified assets
+        this.verifiedCache = new Map();
+        this.checksumCache = new Map();
+        
+        // Progress tracking
+        this.verificationProgress = {
+            total: 0,
+            completed: 0,
+            failed: 0,
+            repaired: 0,
+            status: 'idle' // 'idle', 'loading', 'verifying', 'repairing', 'complete', 'error'
+        };
+        
+        // Event listeners
+        this.eventListeners = new Map();
+        
+        // Performance metrics
+        this.metrics = {
+            totalVerifications: 0,
+            totalRepairs: 0,
+            totalDownloads: 0,
+            averageVerificationTime: 0,
+            lastVerificationTime: null,
+            cacheHitRate: 0
+        };
+        
+        this.initialize();
+    }
+    
+    /**
+     * Initialize asset verification system
+     */
+    async initialize() {
+        console.log('Initializing Asset Verification System...');
+        
+        try {
+            // Load asset manifest
+            await this.loadManifest();
+            
+            // Setup periodic verification
+            this.setupPeriodicVerification();
+            
+            // Setup event listeners
+            this.setupEventListeners();
+            
+            console.log('Asset Verification System initialized successfully');
+            this.emit('initialized', { manifest: this.manifest });
+            
+        } catch (error) {
+            console.error('Failed to initialize Asset Verification System:', error);
+            this.emit('error', { type: 'initialization', error });
+            throw error;
+        }
+    }
+    
+    /**
+     * Load asset manifest
+     */
+    async loadManifest() {
+        try {
+            console.log('Loading asset manifest...');
+            
+            const response = await fetch(this.config.manifestUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to load manifest: ${response.status} ${response.statusText}`);
+            }
+            
+            const manifest = await response.json();
+            
+            // Validate manifest structure
+            this.validateManifest(manifest);
+            
+            this.manifest = manifest;
+            this.manifestVersion = manifest.version || '1.0.0';
+            
+            console.log(`Asset manifest loaded: ${Object.keys(manifest.assets || {}).length} assets`);
+            
+        } catch (error) {
+            console.error('Failed to load asset manifest:', error);
+            
+            // Try to load cached manifest
+            const cachedManifest = this.loadCachedManifest();
+            if (cachedManifest) {
+                console.log('Using cached manifest');
+                this.manifest = cachedManifest;
+                this.manifestVersion = cachedManifest.version || '1.0.0';
+            } else {
+                throw error;
+            }
+        }
+    }
+    
+    /**
+     * Validate manifest structure
+     */
+    validateManifest(manifest) {
+        if (!manifest || typeof manifest !== 'object') {
+            throw new Error('Invalid manifest: not an object');
+        }
+        
+        if (!manifest.assets || typeof manifest.assets !== 'object') {
+            throw new Error('Invalid manifest: missing assets object');
+        }
+        
+        // Validate each asset entry
+        for (const [path, asset] of Object.entries(manifest.assets)) {
+            if (!asset.checksum) {
+                throw new Error(`Invalid manifest: asset ${path} missing checksum`);
+            }
+            
+            if (!asset.size || typeof asset.size !== 'number') {
+                throw new Error(`Invalid manifest: asset ${path} missing or invalid size`);
+            }
+            
+            if (!asset.type) {
+                throw new Error(`Invalid manifest: asset ${path} missing type`);
+            }
+        }
+    }
+    
+    /**
+     * Load cached manifest
+     */
+    loadCachedManifest() {
+        try {
+            const cached = localStorage.getItem('asset_manifest_cache');
+            return cached ? JSON.parse(cached) : null;
+        } catch (error) {
+            console.error('Failed to load cached manifest:', error);
+            return null;
+        }
+    }
+    
+    /**
+     * Cache manifest
+     */
+    cacheManifest() {
+        try {
+            if (this.manifest) {
+                localStorage.setItem('asset_manifest_cache', JSON.stringify(this.manifest));
+            }
+        } catch (error) {
+            console.error('Failed to cache manifest:', error);
+        }
+    }
+    
+    /**
+     * Setup periodic verification
+     */
+    setupPeriodicVerification() {
+        if (this.config.verificationInterval > 0) {
+            setInterval(() => {
+                this.verifyAllAssets(false); // Background verification
+            }, this.config.verificationInterval);
+        }
+    }
+    
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Listen for online/offline events
+        if (typeof window !== 'undefined') {
+            window.addEventListener('online', () => {
+                console.log('Connection restored - resuming asset verification');
+                this.verifyAllAssets(false);
+            });
+            
+            window.addEventListener('offline', () => {
+                console.log('Connection lost - pausing asset verification');
+            });
+        }
+    }
+    
+    /**
+     * Event system
+     */
+    on(event, callback) {
+        if (!this.eventListeners.has(event)) {
+            this.eventListeners.set(event, []);
+        }
+        this.eventListeners.get(event).push(callback);
+    }
+    
+    off(event, callback) {
+        if (this.eventListeners.has(event)) {
+            const listeners = this.eventListeners.get(event);
+            const index = listeners.indexOf(callback);
+            if (index > -1) {
+                listeners.splice(index, 1);
+            }
+        }
+    }
+    
+    emit(event, data) {
+        if (this.eventListeners.has(event)) {
+            this.eventListeners.get(event).forEach(callback => {
+                try {
+                    callback(data);
+                } catch (error) {
+                    console.error(`Error in event listener for ${event}:`, error);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Get configuration
+     */
+    getConfig() {
+        return { ...this.config };
+    }
+    
+    /**
+     * Update configuration
+     */
+    updateConfig(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        console.log('Asset verification configuration updated:', this.config);
+    }
+    
+    /**
+     * Cleanup and destroy
+     */
+    destroy() {
+        // Clear intervals
+        if (this.verificationInterval) {
+            clearInterval(this.verificationInterval);
+        }
+        
+        // Clear caches
+        this.verifiedCache.clear();
+        this.checksumCache.clear();
+        
+        // Clear event listeners
+        this.eventListeners.clear();
+        
+        // Clear data
+        this.verificationResults.clear();
+        this.corruptedAssets.clear();
+        this.missingAssets.clear();
+        this.repairedAssets.clear();
+        
+        console.log('Asset Verification System destroyed');
+    }
+}
+
+export default AssetVerificationSystem;

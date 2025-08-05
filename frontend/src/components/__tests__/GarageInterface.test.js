@@ -25,7 +25,12 @@ jest.mock('three', () => ({
         shadowMap: { enabled: false, type: null },
         toneMapping: null,
         toneMappingExposure: 1,
-        domElement: document.createElement('canvas')
+        domElement: (() => {
+                    if (typeof document !== 'undefined') {
+                        return document.createElement('canvas');
+                    }
+                    return { tagName: 'CANVAS', width: 800, height: 600, style: {} };
+                })()
     })),
     Color: jest.fn(),
     AmbientLight: jest.fn(() => ({ position: { set: jest.fn() } })),

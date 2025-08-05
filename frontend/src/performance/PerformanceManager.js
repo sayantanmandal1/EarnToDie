@@ -56,9 +56,9 @@ export class PerformanceManager {
         this.lodUpdateInterval = 0.1; // Update LOD every 100ms
         this.lastLodUpdate = 0;
 
-        // Frustum culling
-        this.frustum = new THREE.Frustum();
-        this.cameraMatrix = new THREE.Matrix4();
+        // Frustum culling (initialized in initialize method)
+        this.frustum = null;
+        this.cameraMatrix = null;
         this.culledObjects = new Set();
 
         // Auto-adjustment settings
@@ -74,6 +74,30 @@ export class PerformanceManager {
      * Initialize performance manager
      */
     initialize() {
+        // Initialize THREE.js objects (deferred to ensure THREE is available)
+        if (typeof THREE !== 'undefined') {
+            console.log('THREE is defined, checking Frustum:', typeof THREE.Frustum);
+            console.log('THREE keys:', Object.keys(THREE));
+            
+            if (typeof THREE.Frustum === 'function') {
+                this.frustum = new THREE.Frustum();
+            } else {
+                console.warn('THREE.Frustum is not a constructor, disabling frustum culling');
+                this.frustum = null;
+            }
+            
+            if (typeof THREE.Matrix4 === 'function') {
+                this.cameraMatrix = new THREE.Matrix4();
+            } else {
+                console.warn('THREE.Matrix4 is not a constructor, disabling matrix operations');
+                this.cameraMatrix = null;
+            }
+        } else {
+            console.warn('THREE.js not available, frustum culling disabled');
+            this.frustum = null;
+            this.cameraMatrix = null;
+        }
+        
         this.applyQualitySettings(this.performanceLevel);
         console.log(`PerformanceManager initialized with ${this.performanceLevel} quality`);
     }
@@ -287,7 +311,7 @@ export class PerformanceManager {
      * Update frustum culling
      */
     _updateFrustumCulling() {
-        if (!this.getCurrentSettings().frustumCulling) return;
+        if (!this.getCurrentSettings().frustumCulling || !this.frustum || !this.cameraMatrix) return;
 
         this.cameraMatrix.multiplyMatrices(
             this.camera.projectionMatrix,

@@ -448,12 +448,12 @@ describe('RewardSystem', () => {
     
     describe('Reward Package Generation', () => {
         test('should generate reward packages with appropriate distribution', () => {
-            const package = rewardSystem.generateRewardPackage(500, 5);
+            const rewardPackage = rewardSystem.generateRewardPackage(500, 5);
             
-            expect(package).toHaveProperty('currency');
-            expect(package).toHaveProperty('experience');
-            expect(package).toHaveProperty('items');
-            expect(package).toHaveProperty('upgrades');
+            expect(rewardPackage).toHaveProperty('currency');
+            expect(rewardPackage).toHaveProperty('experience');
+            expect(rewardPackage).toHaveProperty('items');
+            expect(rewardPackage).toHaveProperty('upgrades');
             
             expect(package.currency).toBeGreaterThan(0);
             expect(package.experience).toBeGreaterThan(0);

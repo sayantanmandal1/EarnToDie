@@ -22,7 +22,12 @@ const localStorageMock = {
     removeItem: jest.fn(),
     clear: jest.fn()
 };
-global.localStorage = localStorageMock;
+// Fix localStorage assignment issue
+Object.defineProperty(global, 'localStorage', {
+    value: localStorageMock,
+    writable: true,
+    configurable: true
+});
 
 describe('ErrorHandler', () => {
     let errorHandler;

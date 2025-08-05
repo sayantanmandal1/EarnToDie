@@ -59,7 +59,7 @@ export class AssetManager extends EventEmitter {
 
     /**
      * Initialize the asset manager
-     */
+
     async initialize() {
         try {
             this.logger.info('Initializing AssetManager...');
@@ -758,17 +758,7 @@ export class AssetManager extends EventEmitter {
 
 // Export singleton instance
 export const assetManager = new AssetManager();
-            fonts: new Map()
-        };
 
-        this.logger = electronIntegration.getLogger();
-        
-        console.log('AssetManager initialized with options:', this.options);
-    }
-
-    /**
-     * Initialize the asset management system
-     */
     async initialize() {
         try {
             // Load asset manifest
