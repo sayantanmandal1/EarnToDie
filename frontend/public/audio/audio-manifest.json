@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "generated": "2025-08-04T22:04:16.783Z",
-  "description": "Zombie Car Game Audio Asset Manifest - Complete Generated Files",
+  "generated": "2025-08-05T17:32:17.677Z",
+  "description": "Zombie Car Game Audio Asset Manifest - Real Audio Files",
   "totalFiles": 43,
   "files": {
     "effects\\engine_start.mp3": {
@@ -54,19 +54,19 @@
     },
     "effects\\metal_crunch_light.mp3": {
       "path": "audio/effects\\metal_crunch_light.mp3",
-      "size": 26504,
+      "size": 70604,
       "type": "audio/wav",
       "generated": true
     },
     "effects\\metal_crunch_heavy.mp3": {
       "path": "audio/effects\\metal_crunch_heavy.mp3",
-      "size": 70604,
+      "size": 105884,
       "type": "audio/wav",
       "generated": true
     },
     "effects\\glass_break.mp3": {
       "path": "audio/effects\\glass_break.mp3",
-      "size": 70604,
+      "size": 52964,
       "type": "audio/wav",
       "generated": true
     },
@@ -166,36 +166,6 @@
       "type": "audio/wav",
       "generated": true
     },
-    "effects\\wind.mp3": {
-      "path": "audio/effects\\wind.mp3",
-      "size": 882044,
-      "type": "audio/wav",
-      "generated": true
-    },
-    "effects\\debris.mp3": {
-      "path": "audio/effects\\debris.mp3",
-      "size": 176444,
-      "type": "audio/wav",
-      "generated": true
-    },
-    "effects\\gear_shift.mp3": {
-      "path": "audio/effects\\gear_shift.mp3",
-      "size": 26504,
-      "type": "audio/wav",
-      "generated": true
-    },
-    "effects\\turbo_whistle.mp3": {
-      "path": "audio/effects\\turbo_whistle.mp3",
-      "size": 88244,
-      "type": "audio/wav",
-      "generated": true
-    },
-    "effects\\bone_crack.mp3": {
-      "path": "audio/effects\\bone_crack.mp3",
-      "size": 35324,
-      "type": "audio/wav",
-      "generated": true
-    },
     "music\\menu_theme.mp3": {
       "path": "audio/music\\menu_theme.mp3",
       "size": 2646044,
@@ -259,6 +229,36 @@
     "ui\\checkpoint.mp3": {
       "path": "audio/ui\\checkpoint.mp3",
       "size": 88244,
+      "type": "audio/wav",
+      "generated": true
+    },
+    "effects\\wind.mp3": {
+      "path": "audio/effects\\wind.mp3",
+      "size": 882044,
+      "type": "audio/wav",
+      "generated": true
+    },
+    "effects\\debris.mp3": {
+      "path": "audio/effects\\debris.mp3",
+      "size": 176444,
+      "type": "audio/wav",
+      "generated": true
+    },
+    "effects\\gear_shift.mp3": {
+      "path": "audio/effects\\gear_shift.mp3",
+      "size": 26504,
+      "type": "audio/wav",
+      "generated": true
+    },
+    "effects\\turbo_whistle.mp3": {
+      "path": "audio/effects\\turbo_whistle.mp3",
+      "size": 88244,
+      "type": "audio/wav",
+      "generated": true
+    },
+    "effects\\bone_crack.mp3": {
+      "path": "audio/effects\\bone_crack.mp3",
+      "size": 35324,
       "type": "audio/wav",
       "generated": true
     }

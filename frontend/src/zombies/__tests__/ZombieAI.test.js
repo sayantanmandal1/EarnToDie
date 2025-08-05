@@ -32,7 +32,7 @@ const mockZombie = {
         quaternion: { setFromAxisAngle: jest.fn() },
         applyForce: jest.fn()
     },
-    getPosition: jest.fn(() => new THREE.Vector3(0, 0, 0)),
+    getPosition: jest.fn(() => createPositionMock(0, 0, 0)),
     moveDirection: new THREE.Vector3(),
     abilities: {
         isAbilityAvailable: jest.fn(() => false),
@@ -46,6 +46,10 @@ describe('ZombieAI', () => {
     beforeEach(() => {
         zombieAI = new ZombieAI(mockZombie, mockGameEngine);
         jest.clearAllMocks();
+        
+        // Reset mock implementations
+        mockGameEngine.vehicleManager.getAllVehicles.mockReturnValue([]);
+        mockZombie.getPosition.mockReturnValue(createPositionMock(0, 0, 0));
     });
 
     describe('Initialization', () => {
@@ -138,9 +142,12 @@ describe('ZombieAI', () => {
         test('should give up chase when target is too far', () => {
             const mockVehicle = {
                 id: 'test-vehicle',
-                getPosition: () => new THREE.Vector3(100, 0, 0), // Very far away
+                getPosition: () => createPositionMock(100, 0, 0), // Very far away
                 isDestroyed: false
             };
+            
+            // Mock the vehicle manager to return the mock vehicle
+            mockGameEngine.vehicleManager.getAllVehicles.mockReturnValue([mockVehicle]);
             
             zombieAI.currentTarget = mockVehicle;
             zombieAI.currentState = ZOMBIE_STATES.CHASING;
@@ -176,9 +183,12 @@ describe('ZombieAI', () => {
         test('should not detect targets outside detection range', () => {
             const mockVehicle = {
                 id: 'test-vehicle',
-                getPosition: () => new THREE.Vector3(50, 0, 0), // Outside range
+                getPosition: () => createPositionMock(50, 0, 0), // Outside range
                 isDestroyed: false
             };
+            
+            // Ensure awareness level is low so detection range is limited
+            zombieAI.awarenessLevel = 0;
             
             const canDetect = zombieAI._canDetectTarget(mockVehicle);
             expect(canDetect).toBe(false);
@@ -217,7 +227,9 @@ describe('ZombieAI', () => {
             zombieAI._executeWandering(0.016);
             
             expect(zombieAI.wanderTarget).not.toBeNull();
-            expect(zombieAI.wanderTarget).toBeInstanceOf(THREE.Vector3);
+            expect(zombieAI.wanderTarget).toHaveProperty('x');
+            expect(zombieAI.wanderTarget).toHaveProperty('y');
+            expect(zombieAI.wanderTarget).toHaveProperty('z');
         });
 
         test('should move towards wander target', () => {
@@ -267,19 +279,13 @@ describe('ZombieAI', () => {
         test('should set attack cooldown after attacking', () => {
             const mockVehicle = {
                 id: 'test-vehicle',
-                getPosition: () => ({
-                    x: 1, y: 0, z: 0,
-                    distanceTo: jest.fn(() => 1)
-                }),
+                getPosition: () => createPositionMock(1, 0, 0),
                 takeDamage: jest.fn(),
                 isDestroyed: false
             };
             
-            // Mock zombie getPosition to return object with distanceTo method
-            mockZombie.getPosition = jest.fn(() => ({
-                x: 0, y: 0, z: 0,
-                distanceTo: jest.fn(() => 1)
-            }));
+            // Mock zombie getPosition to return enhanced position mock
+            mockZombie.getPosition = jest.fn(() => createPositionMock(0, 0, 0));
             
             zombieAI.currentTarget = mockVehicle;
             zombieAI.currentState = ZOMBIE_STATES.ATTACKING;

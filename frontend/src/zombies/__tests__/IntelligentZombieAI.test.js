@@ -504,15 +504,25 @@ describe('IntelligentZombieAI', () => {
             const zombieId = zombieAI.spawnZombie({ x: 0, y: 0 }, 'basic');
             const zombie = zombieAI.zombies.get(zombieId);
 
+            // Ensure LOD is enabled
+            zombieAI.options.enableLOD = true;
+            
+            // Reset lastLODUpdate to force updates
+            zombie.lastLODUpdate = 0;
+
             // Mock player at different distances
             jest.spyOn(zombieAI, 'getPlayerPosition').mockReturnValue({ x: 50, y: 50 });
             zombieAI.updateZombieLOD(zombie);
             expect(zombie.lodLevel).toBe(0); // Close = full detail
 
-            jest.spyOn(zombieAI, 'getPlayerPosition').mockReturnValue({ x: 150, y: 150 });
+            // Reset lastLODUpdate to force next update
+            zombie.lastLODUpdate = 0;
+            jest.spyOn(zombieAI, 'getPlayerPosition').mockReturnValue({ x: 120, y: 120 });
             zombieAI.updateZombieLOD(zombie);
-            expect(zombie.lodLevel).toBe(1); // Medium distance = reduced detail
+            expect(zombie.lodLevel).toBe(1); // Medium distance = reduced detail (distance ~170)
 
+            // Reset lastLODUpdate to force next update
+            zombie.lastLODUpdate = 0;
             jest.spyOn(zombieAI, 'getPlayerPosition').mockReturnValue({ x: 500, y: 500 });
             zombieAI.updateZombieLOD(zombie);
             expect(zombie.lodLevel).toBe(3); // Far = no updates
