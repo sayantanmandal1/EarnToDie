@@ -276,7 +276,52 @@ global.THREE = {
     setFromCamera: jest.fn(),
     intersectObjects: jest.fn(() => [])
   })),
-  PCFSoftShadowMap: 'PCFSoftShadowMap'
+  PCFSoftShadowMap: 'PCFSoftShadowMap',
+  
+  // Add missing Frustum constructor
+  Frustum: jest.fn(function() {
+    this.planes = new Array(6).fill(null).map(() => ({
+      normal: { x: 0, y: 0, z: 0 },
+      constant: 0,
+      distanceToPoint: jest.fn(() => 0),
+      setFromProjectionMatrix: jest.fn()
+    }));
+    
+    this.setFromProjectionMatrix = jest.fn().mockReturnValue(this);
+    this.intersectsObject = jest.fn(() => true);
+    this.intersectsBox = jest.fn(() => true);
+    this.intersectsSphere = jest.fn(() => true);
+    this.containsPoint = jest.fn(() => true);
+  }),
+
+  // Enhanced Matrix4 with more methods
+  Matrix4: jest.fn(function() {
+    this.elements = new Array(16).fill(0);
+    this.elements[0] = this.elements[5] = this.elements[10] = this.elements[15] = 1;
+    
+    this.multiplyMatrices = jest.fn().mockReturnValue(this);
+    this.multiply = jest.fn().mockReturnValue(this);
+    this.makeRotationFromEuler = jest.fn().mockReturnValue(this);
+    this.makeTranslation = jest.fn().mockReturnValue(this);
+    this.makeScale = jest.fn().mockReturnValue(this);
+    this.setPosition = jest.fn().mockReturnValue(this);
+    this.lookAt = jest.fn().mockReturnValue(this);
+    this.copy = jest.fn().mockReturnValue(this);
+    this.clone = jest.fn(() => new global.THREE.Matrix4());
+    this.invert = jest.fn().mockReturnValue(this);
+    this.transpose = jest.fn().mockReturnValue(this);
+    this.determinant = jest.fn(() => 1);
+  }),
+
+  // Enhanced Plane class
+  Plane: jest.fn(function(normal = { x: 0, y: 1, z: 0 }, constant = 0) {
+    this.normal = normal;
+    this.constant = constant;
+    
+    this.setFromNormalAndCoplanarPoint = jest.fn().mockReturnValue(this);
+    this.distanceToPoint = jest.fn(() => 0);
+    this.projectPoint = jest.fn((point, target) => target || point);
+  })
 };
 
 // Mock Cannon.js
@@ -445,12 +490,18 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
     }
 }
 
+// Import and apply final test completion fixes
+const { applyAllFixes } = require('./final-test-completion-fixes.js');
+
 // Apply comprehensive test mocks
 applyTestMocks();
 applyComprehensiveMocks();
 applyUltimateTestFixes();
 applyEnhancedThreeJSMocks();
 applyZombieTestFixes();
+
+// Apply final completion fixes
+applyAllFixes();
 
 // Set test timeout
 jest.setTimeout(60000);
