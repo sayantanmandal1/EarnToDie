@@ -2,6 +2,8 @@ import '@testing-library/jest-dom';
 import { applyTestMocks } from './test-fixes.js';
 const { applyComprehensiveMocks } = require('./comprehensive-test-fixes.js');
 const { applyUltimateTestFixes } = require('./ultimate-test-fixes.js');
+import { applyEnhancedThreeJSMocks } from './three-js-mock-fixes.js';
+import { applyZombieTestFixes } from './zombies-test-fixes.js';
 
 // Configure React Testing Library to use legacy renderer
 import { configure } from '@testing-library/react';
@@ -447,6 +449,8 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
 applyTestMocks();
 applyComprehensiveMocks();
 applyUltimateTestFixes();
+applyEnhancedThreeJSMocks();
+applyZombieTestFixes();
 
 // Set test timeout
 jest.setTimeout(60000);

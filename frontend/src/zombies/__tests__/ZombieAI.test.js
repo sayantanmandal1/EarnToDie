@@ -1,6 +1,7 @@
 import { ZombieAI } from '../ZombieAI';
 import { ZOMBIE_STATES, ZOMBIE_BEHAVIORS } from '../ZombieConfig';
 import * as THREE from 'three';
+import { createPositionMock } from '../../zombies-test-fixes.js';
 
 // Mock dependencies
 const mockGameEngine = {
@@ -121,6 +122,9 @@ describe('ZombieAI', () => {
                 getPosition: () => new THREE.Vector3(1, 0, 0), // Within attack range
                 isDestroyed: false
             };
+            
+            // Mock the vehicle manager to return the mock vehicle
+            mockGameEngine.vehicleManager.getAllVehicles.mockReturnValue([mockVehicle]);
             
             zombieAI.currentTarget = mockVehicle;
             zombieAI.currentState = ZOMBIE_STATES.CHASING;

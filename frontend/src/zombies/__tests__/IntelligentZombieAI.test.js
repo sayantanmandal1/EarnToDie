@@ -6,7 +6,7 @@
 import { IntelligentZombieAI } from '../IntelligentZombieAI.js';
 
 // Mock electron integration
-jest.mock('../electron/ElectronIntegration.js', () => ({
+jest.mock('../../electron/ElectronIntegration.js', () => ({
     electronIntegration: {
         getLogger: () => ({
             info: jest.fn(),
@@ -66,8 +66,8 @@ describe('IntelligentZombieAI', () => {
             expect(zombieTypes).toContain('boss');
         });
     });
-});   
- describe('Zombie Spawning', () => {
+
+    describe('Zombie Spawning', () => {
         test('should spawn zombie with correct properties', () => {
             const spawnSpy = jest.fn();
             zombieAI.on('zombieSpawned', spawnSpy);
