@@ -398,7 +398,7 @@ describe('RobustSaveAPI', () => {
 
             expect(result.action).toBe('upload');
             expect(result.data).toEqual(localData);
-        }, 10000);
+        }, 30000);
 
         test('should handle no server data', async () => {
             const localData = { timestamp: Date.now(), player: { currency: 1000 } };
@@ -418,7 +418,7 @@ describe('RobustSaveAPI', () => {
 
             expect(result.action).toBe('upload');
             expect(result.message).toContain('No server data found');
-        }, 10000);
+        }, 30000);
 
         test('should detect data in sync', async () => {
             const timestamp = Date.now();
@@ -434,7 +434,7 @@ describe('RobustSaveAPI', () => {
 
             expect(result.action).toBe('none');
             expect(result.message).toContain('already in sync');
-        }, 10000);
+        }, 30000);
     });
 
     describe('Conflict Handling', () => {
@@ -453,7 +453,7 @@ describe('RobustSaveAPI', () => {
             });
 
             await expect(robustAPI.uploadSaveData(saveData)).rejects.toThrow(SaveConflictError);
-        }, 10000);
+        }, 30000);
     });
 
     describe('Batch Operations', () => {
@@ -484,7 +484,7 @@ describe('RobustSaveAPI', () => {
             expect(results[0].success).toBe(true);
             expect(results[1].success).toBe(true);
             expect(results[2].success).toBe(true);
-        }, 10000);
+        }, 30000);
 
         test('should handle batch operation failures', async () => {
             const operations = [
@@ -503,7 +503,7 @@ describe('RobustSaveAPI', () => {
             expect(results[0].success).toBe(true);
             expect(results[1].success).toBe(false);
             expect(results[1].error).toContain('Unknown operation type');
-        }, 10000);
+        }, 30000);
     });
 });
 

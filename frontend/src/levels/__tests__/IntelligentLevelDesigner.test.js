@@ -455,10 +455,10 @@ describe('RewardSystem', () => {
             expect(rewardPackage).toHaveProperty('items');
             expect(rewardPackage).toHaveProperty('upgrades');
             
-            expect(package.currency).toBeGreaterThan(0);
-            expect(package.experience).toBeGreaterThan(0);
-            expect(Array.isArray(package.items)).toBe(true);
-            expect(Array.isArray(package.upgrades)).toBe(true);
+            expect(rewardPackage.currency).toBeGreaterThan(0);
+            expect(rewardPackage.experience).toBeGreaterThan(0);
+            expect(Array.isArray(rewardPackage.items)).toBe(true);
+            expect(Array.isArray(rewardPackage.upgrades)).toBe(true);
         });
         
         test('should include items for high value rewards', () => {

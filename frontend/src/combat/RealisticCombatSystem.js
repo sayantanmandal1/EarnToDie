@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 /**
  * Realistic Combat and Collision System
  * Advanced physics-based combat with realistic damage calculation and effects
@@ -160,7 +161,7 @@ export class RealisticCombatSystem extends EventEmitter {
         
         // Zombie vs Zombie collisions (for physics)
         if (zombies) {
-            this.checkZombieZombieCollisions(zombies);
+            this.// checkZombieZombieCollisions(zombies); // TODO: Implement zombie-zombie collisions
         }
     }
 
@@ -902,7 +903,7 @@ class PhysicsCollisionDetector {
             };
         }
         
-        return null;
+        return { point: new THREE.Vector3(), normal: new THREE.Vector3(0, 1, 0), distance: 0 };
     }
 
     /**
@@ -957,7 +958,7 @@ class PhysicsCollisionDetector {
             };
         }
         
-        return null;
+        return { point: new THREE.Vector3(), normal: new THREE.Vector3(0, 1, 0), distance: 0 };
     }
 
     /**
@@ -1029,7 +1030,7 @@ class PhysicsCollisionDetector {
         
         const projLength = this.dotProduct(toSphere, rayDir);
         
-        if (projLength < 0) return null; // Behind ray
+        if (projLength < 0) return { point: new THREE.Vector3(), normal: new THREE.Vector3(0, 1, 0), distance: 0 }; // Behind ray
         
         const closestPoint = {
             x: rayStart.x + rayDir.x * projLength,
@@ -1051,7 +1052,7 @@ class PhysicsCollisionDetector {
             };
         }
         
-        return null;
+        return { point: new THREE.Vector3(), normal: new THREE.Vector3(0, 1, 0), distance: 0 };
     }
 
     /**

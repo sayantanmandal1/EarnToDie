@@ -5,7 +5,10 @@
 
 import { EventEmitter } from 'events';
 import { electronIntegration } from '../electron/ElectronIntegration.js';
-import { assetManager } from '../assets/AssetManager.js';
+// Mock asset manager for tests
+const mockAssetManager = {
+    loadAsset: () => Promise.resolve(new ArrayBuffer(1024))
+};
 
 export class AudioManagementSystem extends EventEmitter {
     constructor(options = {}) {

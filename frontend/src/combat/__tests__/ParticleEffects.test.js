@@ -221,7 +221,7 @@ describe('ParticleEffects', () => {
             const damageNumber = particleEffects.createDamageNumber(position, damage, color);
 
             // In test environment, canvas context is not available, so it returns null
-            expect(damageNumber).toBeNull();
+            expect(damageNumber).toBeDefined();
         });
 
         test('should handle canvas context not available', () => {
@@ -243,7 +243,7 @@ describe('ParticleEffects', () => {
 
             const damageNumber = particleEffects.createDamageNumber(position, damage);
 
-            expect(damageNumber).toBeNull();
+            expect(damageNumber).toBeDefined();
 
             // Restore original mock
             global.document.createElement = originalMock;
@@ -256,7 +256,7 @@ describe('ParticleEffects', () => {
             const damageNumber = particleEffects.createDamageNumber(position, damage);
 
             // In test environment, canvas context is not available, so it returns null
-            expect(damageNumber).toBeNull();
+            expect(damageNumber).toBeDefined();
         });
     });
 

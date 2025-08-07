@@ -26,10 +26,8 @@ jest.mock('three', () => ({
         toneMapping: null,
         toneMappingExposure: 1,
         domElement: (() => {
-                    if (typeof document !== 'undefined') {
-                        return document.createElement('canvas');
-                    }
-                    return { tagName: 'CANVAS', width: 800, height: 600, style: {} };
+                    const mockCanvas = { tagName: 'CANVAS', width: 800, height: 600, style: {} };
+                    return mockCanvas;
                 })()
     })),
     Color: jest.fn(),

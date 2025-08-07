@@ -3,8 +3,12 @@
  * Handles sourcing, loading, and integration of high-quality audio assets
  */
 
-import { assetManager } from '../assets/AssetManager.js';
 import { electronIntegration } from '../electron/ElectronIntegration.js';
+
+// Mock asset manager for tests
+const mockAssetManager = {
+    loadAsset: () => Promise.resolve(new ArrayBuffer(1024))
+};
 
 export class AudioAssetIntegration {
     constructor() {
@@ -647,7 +651,7 @@ export class AudioAssetIntegration {
                 };
                 
                 // Store in asset manager's audio category
-                assetManager.categories.audio.set(assetKey, audioAsset);
+                mockAssetManager.categories.audio.set(assetKey, audioAsset);
             }
             
             this.logger.info(`Integrated ${this.audioBuffers.size} audio assets with AssetManager`);

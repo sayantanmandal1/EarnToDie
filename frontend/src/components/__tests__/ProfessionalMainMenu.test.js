@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ProfessionalMainMenu from '../ProfessionalMainMenu';
 
@@ -136,7 +136,7 @@ describe('ProfessionalMainMenu', () => {
                 />
             );
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(mockAudioManager.loadSound).toHaveBeenCalledWith(
                     'menu_ambient',
                     '/audio/menu/ambient_music.ogg'
@@ -158,7 +158,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('New Game')).toBeInTheDocument();
             });
         });
@@ -177,7 +177,7 @@ describe('ProfessionalMainMenu', () => {
             // Fast-forward through intro timeline
             jest.advanceTimersByTime(8000);
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('New Game')).toBeInTheDocument();
             });
 
@@ -221,7 +221,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('New Game')).toBeInTheDocument();
             });
         });
@@ -310,7 +310,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('New Game')).toBeInTheDocument();
             });
         });
@@ -347,7 +347,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Profile')).toBeInTheDocument();
             });
 
@@ -356,20 +356,20 @@ describe('ProfessionalMainMenu', () => {
         });
 
         test('should navigate to profile screen', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Player Profile')).toBeInTheDocument();
             });
         });
 
         test('should display player information', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('TestPlayer')).toBeInTheDocument();
                 expect(screen.getByText('Level 15')).toBeInTheDocument();
             });
         });
 
         test('should display detailed statistics', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Detailed Statistics')).toBeInTheDocument();
                 expect(screen.getByText('Combat')).toBeInTheDocument();
                 expect(screen.getByText('Exploration')).toBeInTheDocument();
@@ -378,18 +378,18 @@ describe('ProfessionalMainMenu', () => {
         });
 
         test('should display achievements section', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Achievements (15/50)')).toBeInTheDocument();
             });
         });
 
         test('should navigate back to main menu', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 const backButton = screen.getByText('← Back');
                 fireEvent.click(backButton);
             });
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('New Game')).toBeInTheDocument();
             });
         });
@@ -408,20 +408,20 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 const settingsButton = screen.getByText('Settings');
                 fireEvent.click(settingsButton);
             });
         });
 
         test('should navigate to settings screen', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Settings')).toBeInTheDocument();
             });
         });
 
         test('should display settings tabs', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Graphics')).toBeInTheDocument();
                 expect(screen.getByText('Audio')).toBeInTheDocument();
                 expect(screen.getByText('Controls')).toBeInTheDocument();
@@ -443,20 +443,20 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 const creditsButton = screen.getByText('Credits');
                 fireEvent.click(creditsButton);
             });
         });
 
         test('should navigate to credits screen', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Credits')).toBeInTheDocument();
             });
         });
 
         test('should display credits sections', async () => {
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Development Team')).toBeInTheDocument();
                 expect(screen.getByText('Special Thanks')).toBeInTheDocument();
                 expect(screen.getByText('Assets')).toBeInTheDocument();
@@ -479,7 +479,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 const profileButton = screen.getByText('Profile');
                 fireEvent.click(profileButton);
             });
@@ -491,7 +491,7 @@ describe('ProfessionalMainMenu', () => {
             // Advance through transition
             jest.advanceTimersByTime(600);
 
-            await waitFor(() => {
+            await act(async () => {
                 expect(screen.getByText('Player Profile')).toBeInTheDocument();
             });
 
@@ -510,7 +510,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 const profileButton = screen.getByText('Profile');
                 fireEvent.click(profileButton);
             });
@@ -600,7 +600,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 const buttons = screen.getAllByRole('button');
                 expect(buttons.length).toBeGreaterThan(0);
             });
@@ -618,7 +618,7 @@ describe('ProfessionalMainMenu', () => {
             const skipButton = screen.getByText('Skip Intro');
             fireEvent.click(skipButton);
 
-            await waitFor(() => {
+            await act(async () => {
                 const newGameButton = screen.getByText('New Game');
                 newGameButton.focus();
                 expect(document.activeElement).toBe(newGameButton);
