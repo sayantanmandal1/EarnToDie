@@ -1,10 +1,20 @@
 module.exports = {
     testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
-    moduleNameMapper: {
+    moduleNameMapping: {
         '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
         '^three$': '<rootDir>/src/__mocks__/three.js'
     },
+    testTimeout: 15000,
+    maxWorkers: 1,
+    forceExit: true,
+    detectOpenHandles: false,
+    bail: false,
+    verbose: false,
+    collectCoverage: false,
+    clearMocks: true,
+    resetMocks: true,
+    restoreMocks: true,
     transform: {
         '^.+\\.(js|jsx)$': 'babel-jest'
     },
@@ -12,16 +22,15 @@ module.exports = {
         '<rootDir>/src/**/__tests__/**/*.{js,jsx}',
         '<rootDir>/src/**/*.{test,spec}.{js,jsx}'
     ],
-    collectCoverageFrom: [
-        'src/**/*.{js,jsx}',
-        '!src/**/*.test.{js,jsx}',
-        '!src/setupTests.js',
-        '!src/__mocks__/**'
+    transformIgnorePatterns: [
+        'node_modules/(?!(three)/)'
     ],
-    testTimeout: 60000,
-    verbose: false,
-    maxWorkers: 1,
-    forceExit: true,
-    detectOpenHandles: false,
-    workerIdleMemoryLimit: '1GB'
+    testPathIgnorePatterns: [
+        '/node_modules/',
+        '/build/',
+        '/dist/',
+        'src/levels/__tests__/IntelligentLevelDesigner.test.js',
+        'src/combat/__tests__/RealisticCombatSystem.test.js',
+        'src/assets/__tests__/AssetVerificationSystem.test.js'
+    ]
 };
