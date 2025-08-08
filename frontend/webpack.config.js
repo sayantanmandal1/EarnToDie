@@ -13,9 +13,9 @@ module.exports = (env, argv) => {
   
   return {
     entry: {
-      main: './src/index.js',
-      // Separate entry for Three.js and physics libraries
-      vendor: ['three', 'cannon-es']
+      main: './src/DesertSurvivalGame.js',
+      // Separate entry for Matter.js physics library
+      vendor: ['matter-js']
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -216,9 +216,9 @@ module.exports = (env, argv) => {
             priority: 10,
             chunks: 'all',
           },
-          three: {
-            test: /[\\/]node_modules[\\/](three|cannon-es)[\\/]/,
-            name: 'three-vendor',
+          matter: {
+            test: /[\\/]node_modules[\\/]matter-js[\\/]/,
+            name: 'matter-vendor',
             priority: 20,
             chunks: 'all',
           },

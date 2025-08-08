@@ -1,240 +1,212 @@
 # Implementation Plan
 
-- [x] 1. Project Setup and Core Infrastructure
+- [x] 1. Project Setup and Core 2D Game Infrastructure
 
-  - Initialize project structure with frontend (Three.js) and backend (Go) directories
-  - Set up package.json with Three.js, Cannon.js, React, and build tools dependencies
-  - Configure Go module with Gin, GORM, JWT, and Redis dependencies
-  - Create Docker configuration files for development and production environments
-  - Set up basic CI/CD pipeline configuration
-  - _Requirements: 10.1, 10.5_
 
-- [x] 2. Database Schema and Models Implementation
+  - Initialize project structure with HTML5 Canvas-based 2D game engine
+  - Set up package.json with Matter.js physics engine and build tools dependencies
+  - Create basic HTML structure with canvas element and game container
+  - Set up development server and build configuration for 2D game assets
+  - Initialize local storage save system and basic error handling
+  - _Requirements: 10.1, 10.4_
 
-  - Create PostgreSQL database schema with players, owned_vehicles, game_sessions, and level_progress tables
-  - Implement Go data models with GORM annotations for all database entities
-  - Create database migration scripts for schema versioning
-  - Set up Redis connection and caching utilities
-  - Write unit tests for database models and basic CRUD operations
-  - _Requirements: 8.1, 8.2, 8.3_
+- [-] 2. Local Storage Save System and Game Data Models
 
-- [x] 3. Backend Authentication and Player Services
 
-  - Implement JWT-based authentication system with login/register endpoints
-  - Create PlayerService with methods for player creation, retrieval, and currency management
-  - Implement middleware for request authentication and authorization
-  - Create API endpoints for player profile management and progress tracking
-  - Write comprehensive unit tests for authentication and player services
-  - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [x] 4. Game State Management Backend Services
+  - Create SaveManager class for local storage persistence of game progress
+  - Implement data models for vehicles, upgrades, player statistics, and stage progress
+  - Create default save data structure with starter car and initial game state
+  - Implement save/load functionality with error handling and data validation
+  - Write unit tests for save system reliability and data integrity
+  - _Requirements: 5.3, 5.4, 2.4_
 
-  - Implement GameStateService for managing game sessions and score tracking
-  - Create API endpoints for starting/ending game sessions and updating scores
-  - Implement server-side score validation and anti-cheat measures
-  - Create vehicle purchase and upgrade management endpoints
-  - Write unit tests for game state services and score validation logic
-  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 2.4_
+- [ ] 3. 2D Canvas Rendering Engine and Camera System
 
-- [x] 5. Three.js Game Engine Foundation
+  - Create GameEngine class with HTML5 Canvas rendering and game loop
+  - Implement Camera class with smooth following, zoom controls, and screen-to-world coordinate conversion
+  - Create sprite rendering system with support for animated sprites and visual effects
+  - Implement fixed side-view perspective with camera following vehicle horizontally
+  - Add camera zoom-out functionality when vehicle becomes airborne
+  - Write unit tests for camera movement and rendering coordinate calculations
+  - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-  - Set up Three.js scene, camera, renderer, and basic lighting system
-  - Implement Cannon.js physics world integration with Three.js scene
-  - Create GameEngine class with initialization, update loop, and render methods
-  - Implement basic input handling system for keyboard and mouse controls
-  - Create asset loading system with progress tracking and error handling
-  - Write tests for core engine functionality and asset loading
-  - _Requirements: 1.1, 1.2, 7.1, 7.4, 9.2_
+- [ ] 4. Matter.js Physics Integration and Vehicle Physics
 
-- [x] 6. Vehicle System Implementation
+  - Integrate Matter.js 2D physics engine with the game engine
+  - Create Vehicle class with physics body, semi-realistic movement, and momentum
+  - Implement wheel suspension simulation with bounce and realistic vehicle rotation
+  - Add vehicle tilting controls for mid-air maneuvering and landing adjustments
+  - Create collision detection system for vehicle interactions with terrain and obstacles
+  - Write unit tests for vehicle physics behavior and collision responses
+  - _Requirements: 6.1, 6.2, 6.3, 1.2_
 
-  - Create Vehicle class with physics body, 3D mesh, and stats properties
-  - Implement 12+ vehicle types with unique models, stats, and characteristics
-  - Create VehicleManager for spawning, updating, and managing vehicle instances
-  - Implement vehicle physics including acceleration, steering, and collision detection
-  - Create vehicle selection and customization UI components
-  - Write unit tests for vehicle physics and management systems
-  - _Requirements: 2.1, 2.2, 2.3, 1.2_
+- [ ] 5. Desert Terrain Generation and Obstacle System
 
-- [x] 7. Zombie System and AI Implementation
+  - Create TerrainGenerator class for procedural desert landscapes with hills, ramps, and dips
+  - Implement uneven terrain generation using noise functions and mathematical curves
+  - Create obstacle system with wrecked cars, debris, large rocks, and other desert hazards
+  - Add terrain collision detection that affects vehicle speed and movement
+  - Implement terrain chunking system for efficient rendering of long desert stretches
+  - Write unit tests for terrain generation algorithms and collision detection
+  - _Requirements: 6.4, 6.5, 8.2_
 
-  - Create Zombie base class with health, movement, and AI behavior properties
-  - Implement 20+ zombie types with unique models, stats, and behaviors
-  - Create ZombieAI system with pathfinding, attack patterns, and state machines
-  - Implement ZombieManager for spawning, updating, and managing zombie hordes
-  - Create special zombie abilities (boss attacks, swarm behavior, environmental interactions)
-  - Write unit tests for zombie AI behaviors and spawn management
-  - _Requirements: 3.1, 3.2, 3.3_
+- [ ] 6. Vehicle System and Progression Implementation
 
-- [x] 8. Collision Detection and Combat System
+  - Create Vehicle class with base stats, upgrade modifiers, and weathered visual appearance
+  - Implement multiple vehicle types starting with basic run-down car and progressing to better vehicles
+  - Create vehicle unlock system based on distance milestones and currency requirements
+  - Add visual representation of vehicle wear, rust, and post-apocalyptic modifications
+  - Implement fuel consumption system that ends runs when fuel is depleted
+  - Write unit tests for vehicle stats calculations and unlock progression
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - Implement collision detection between vehicles and zombies using Cannon.js
-  - Create damage calculation system based on vehicle stats and zombie types
-  - Implement zombie elimination mechanics with visual and audio feedback
-  - Create particle effects system for impacts, explosions, and destruction
-  - Implement vehicle damage system affecting performance and visual appearance
-  - Write unit tests for collision detection and damage calculation
-  - _Requirements: 1.3, 5.1, 7.2, 7.5_
+- [ ] 7. Zombie Obstacle System and Combat Mechanics
 
-- [x] 9. Points and Currency System
+  - Create Zombie class with green/grey coloring, ragged clothing, and flailing animations
+  - Implement zombie spawning along the track that slows vehicle progress on impact
+  - Create zombie destruction mechanics using vehicle-mounted weapons
+  - Add satisfying visual and audio feedback when zombies are hit and destroyed
+  - Implement zombie density scaling based on stage progression and difficulty
+  - Write unit tests for zombie collision detection and destruction mechanics
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - Implement scoring system with points awarded for zombie eliminations and achievements
-  - Create combo multiplier system for consecutive zombie kills
-  - Implement currency conversion from points with configurable exchange rates
-  - Create achievement system for bonus points (distance, time, destruction bonuses)
-  - Integrate scoring system with backend API for persistent storage
-  - Write unit tests for scoring calculations and currency conversion
-  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+- [ ] 8. Vehicle Upgrade Shop and Enhancement System
 
-- [x] 10. Vehicle Upgrade System
-
-  - Create UpgradeManager with categories for engine, armor, weapons, fuel, and tires
-  - Implement upgrade effects on vehicle performance and visual appearance
-  - Create upgrade purchase system integrated with currency and backend APIs
-  - Design and implement upgrade UI with visual previews and stat comparisons
-  - Implement upgrade persistence and loading from player save data
-  - Write unit tests for upgrade calculations and persistence
+  - Create UpgradeShop class with categories for engine power, fuel tank, wheels, weaponry, and armor
+  - Implement upgrade cost calculation with exponential pricing based on current level
+  - Add visual representation of upgrades on vehicles (roof-mounted guns, armor plating, etc.)
+  - Create upgrade effects that improve vehicle performance (speed, fuel capacity, weapon damage)
+  - Implement upgrade persistence tied to individual vehicle types
+  - Write unit tests for upgrade calculations and visual enhancement systems
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [x] 11. Level Design and Terrain System
+- [ ] 9. Distance-Based Progression and Currency System
 
-  - Create TerrainGenerator for procedural and designed level layouts
-  - Implement multiple level environments with unique visual themes and obstacles
-  - Create checkpoint system for level progression and respawn mechanics
-  - Implement level unlock system based on player progression and achievements
-  - Create level selection UI with progress indicators and requirements display
-  - Write unit tests for terrain generation and level progression logic
-  - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - Create DistanceTracker class to measure how far the vehicle travels in each run
+  - Implement money earning system that converts distance traveled into currency
+  - Add distance milestone bonuses for reaching specific checkpoints
+  - Create persistent currency storage that carries over between runs
+  - Implement run ending conditions when fuel depletes or vehicle is destroyed
+  - Write unit tests for distance calculation and currency conversion systems
+  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [x] 12. Audio System Implementation
+- [ ] 10. Post-Apocalyptic Visual Style and Desert Environment
 
-  - Create AudioManager class for centralized audio management using Web Audio API
-  - Implement spatial audio system for 3D positioned sounds in game world
-  - Create engine sound system with RPM-based audio modulation for vehicles
-  - Implement impact sound effects for zombie collisions and environmental interactions
-  - Add background music system with dynamic intensity based on gameplay state
-  - Create audio settings UI with volume controls for master, effects, and music
-  - Integrate audio system with existing combat, vehicle, and zombie systems
-  - Write unit tests for audio system functionality and performance
-  - _Requirements: 7.3, 9.1_
+  - Create VisualStyleManager for post-apocalyptic aesthetic with dusty desert backgrounds
+  - Implement orange-hued sky gradients and weathered vehicle textures
+  - Add dust particle effects and atmospheric visual elements
+  - Create rugged, minimal UI design with mechanical sound effects
+  - Implement different desert stage backdrops with increasing desolation
+  - Write unit tests for visual effect systems and style consistency
+  - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [x] 13. User Interface and HUD Development
+- [ ] 11. Stage Progression System and Desert Environments
 
-  - Create main menu system with game start, vehicle selection, and options
-  - Implement in-game HUD displaying health, fuel, score, and other vital metrics
-  - Create pause menu with resume, restart, and quit options
-  - Design and implement garage UI for vehicle selection and upgrades
-  - Create settings menu for graphics, audio, and control customization
-  - Write unit tests for UI components and user interaction flows
-  - _Requirements: 9.1, 9.3, 9.4, 9.5_
+  - Create multiple desert stages with different backdrops and increasing difficulty
+  - Implement stage unlock system requiring sufficient upgrades to reach the far end
+  - Add increasing obstacle density and zombie spawns as stages progress
+  - Create visual variety between stages while maintaining desert wasteland theme
+  - Implement stage completion detection and progression to next environment
+  - Write unit tests for stage progression logic and unlock requirements
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [x] 14. Performance Optimization and Quality Settings
+- [ ] 12. Immersive Audio System with Post-Apocalyptic Sound Design
 
-  - Implement Level-of-Detail (LOD) system for models based on distance
-  - Create object pooling system for zombies, particles, and projectiles
-  - Implement frustum culling to optimize rendering performance
-  - Create graphics quality settings with automatic performance adjustment
-  - Implement texture compression and asset optimization
-  - Write performance benchmarks and optimization tests
-  - _Requirements: 7.4, 7.5, 10.3_
+  - Create AudioManager class using Web Audio API for engine roars, zombie growls, and impact sounds
+  - Implement RPM-based engine sound modulation that changes with vehicle acceleration
+  - Add satisfying crunch sound effects when zombies are hit and destroyed
+  - Create mechanical clank sounds for upgrade purchases and UI interactions
+  - Implement tense, gritty background music appropriate for wasteland survival
+  - Write unit tests for audio system performance and sound effect triggering
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [x] 15. Game Loop and State Management
+- [ ] 13. Daily Run Game Loop and Input Controls
 
-  - Implement main game loop with fixed timestep physics and variable rendering
-  - Create GameStateManager for handling menu, gameplay, and pause states
-  - Implement level completion detection and results calculation
-  - Create game over conditions and restart functionality
-  - Integrate all systems into cohesive gameplay experience
-  - Write integration tests for complete gameplay scenarios
-  - _Requirements: 1.1, 1.4, 1.5, 6.3_
+  - Implement daily run mechanics where each attempt starts fresh with current vehicle
+  - Create input system for vehicle acceleration and mid-air tilting controls
+  - Add run ending logic when fuel depletes or vehicle health reaches zero
+  - Implement run results screen showing distance traveled and money earned
+  - Create smooth transition between runs and upgrade shop visits
+  - Write unit tests for game loop state management and input responsiveness
+  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [x] 16. Save System and Progress Persistence
+- [ ] 14. Win Condition and Evacuation Point Ending
 
-  - Implement comprehensive save state management for game progress using localStorage
-  - Create API integration for syncing save data with backend services
-  - Implement automatic save functionality during gameplay milestones and level completion
-  - Create save data validation and corruption recovery mechanisms
-  - Add import/export functionality for save data backup and transfer
-  - Integrate save system with existing level progress and upgrade persistence
-  - Write unit tests for save system reliability and data integrity
-  - _Requirements: 8.1, 8.2, 2.5, 4.5_
+  - Create evacuation point as the final destination that ends the game successfully
+  - Implement win condition detection when fully upgraded vehicle reaches the safe zone
+  - Create cinematic escape animation showing successful evacuation from wasteland
+  - Add victory screen with player statistics and completion celebration
+  - Implement game completion flag in save system for replay value
+  - Write unit tests for win condition detection and ending sequence triggers
+  - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [x] 17. Error Handling and Stability
+- [ ] 15. Performance Optimization and 2D Rendering Efficiency
 
-  - Implement comprehensive error handling for asset loading failures
-  - Create graceful degradation for performance issues and low-end devices
-  - Add network error handling with retry mechanisms for API calls
-  - Implement crash recovery and error reporting system
-  - Create fallback systems for missing assets or failed operations
-  - Write unit tests for error scenarios and recovery mechanisms
-  - _Requirements: 10.4, 7.4_
+  - Implement object pooling for zombies, particles, and visual effects
+  - Create sprite atlasing system to reduce texture loading and improve rendering performance
+  - Add performance monitoring with automatic quality adjustment for lower-end devices
+  - Implement efficient terrain chunking to only render visible sections
+  - Create memory management system to prevent leaks during long play sessions
+  - Write performance benchmarks and optimization tests for 60fps target
+  - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [x] 18. Production Build and Deployment Setup
+- [ ] 16. User Interface and Menu System
 
-  - Configure Webpack for production builds with code splitting and optimization
-  - Set up Docker containers for frontend and backend deployment
-  - Create production database setup with proper indexing and optimization
-  - Configure CDN integration for static asset delivery
-  - Set up monitoring and logging for production environment
-  - Write deployment scripts and documentation
-  - _Requirements: 10.1, 10.2, 10.5_
+  - Create main menu with post-apocalyptic styling and game start options
+  - Implement garage/upgrade shop interface with vehicle selection and enhancement options
+  - Add in-game HUD showing fuel gauge, speed meter, distance counter, and money display
+  - Create pause menu and settings screen with audio and performance options
+  - Design results screen showing run statistics and money earned
+  - Write unit tests for UI interactions and menu navigation flows
+  - _Requirements: 7.5, 4.1, 4.2, 5.1, 5.2_
 
-- [x] 19. Testing and Quality Assurance
+- [ ] 17. Error Handling and Game Stability
 
-  - Create comprehensive test suite covering all game systems and mechanics
-  - Implement automated gameplay testing for balance and progression
-  - Perform cross-browser compatibility testing
-  - Conduct performance testing on various device specifications
-  - Create load testing scenarios for backend services
-  - Write end-to-end tests for complete user workflows
-  - _Requirements: 10.2, 10.3, 10.4_
+  - Implement comprehensive error handling for asset loading failures with fallback graphics
+  - Create graceful degradation system for performance issues on low-end devices
+  - Add save system error recovery with backup save locations
+  - Implement physics simulation error handling to prevent game crashes
+  - Create user-friendly error messages and recovery options
+  - Write unit tests for error scenarios and stability under stress conditions
+  - _Requirements: 10.4, 2.3, 6.1_
 
-- [x] 20. Final Integration and Polish
+- [ ] 18. Asset Management and Loading System
 
-  - Integrate all game systems and ensure seamless interaction between components
-  - Implement final visual polish including particle effects and animations
-  - Add game balance adjustments based on testing feedback
-  - Create final UI polish and user experience improvements
-  - Perform final bug fixes and stability improvements
-  - Prepare production deployment and launch configuration
-  - _Requirements: 7.1, 7.2, 7.5, 10.1_
+  - Create efficient asset loading system for sprites, sounds, and configuration data
+  - Implement sprite compression and optimization for web delivery
+  - Add loading screens with progress indicators for better user experience
+  - Create asset caching system to improve subsequent load times
+  - Implement lazy loading for non-essential assets during gameplay
+  - Write unit tests for asset loading reliability and performance
+  - _Requirements: 7.1, 7.2, 10.1_
 
-- [x] 21. Test Case Pass and Final Deployment
+- [ ] 19. Game Balance and Progression Tuning
 
-  - Ensure every single test cases made till now pass without skipping or omitting any of them
-  - Ensure end to end functionality of the entire game and it should work seamlessly
-  - Ensure that every functionality is connected end to end properly to the backend ensuring no usage of mock or hard coded values
-  - Ensure game works complete end to end
-  - Push on github with repository name EarnToDie in main branch ensuring everything is end to end completed including every single file and ignore files etc
-  - _Requirements: All requirements fulfilled_
+  - Balance vehicle upgrade costs and effectiveness for satisfying progression
+  - Tune distance-to-money conversion rates for appropriate upgrade pacing
+  - Adjust zombie density and obstacle placement for challenging but fair gameplay
+  - Balance fuel consumption rates to create meaningful run length decisions
+  - Test stage unlock requirements to ensure smooth difficulty progression
+  - Write automated tests for game balance and progression curve validation
+  - _Requirements: 5.1, 5.5, 4.3, 8.4_
 
-## 🎯 Implementation Status Summary
+- [ ] 20. Final Integration and Polish
 
-**Project Status: COMPLETED** ✅
+  - Integrate all game systems ensuring seamless interaction between vehicle, terrain, zombies, and upgrades
+  - Add final visual polish with particle effects, screen shake, and impact animations
+  - Implement smooth transitions between game states and menu screens
+  - Create final audio polish with proper mixing and atmospheric sound layers
+  - Perform comprehensive bug testing and stability improvements
+  - Write end-to-end integration tests covering complete gameplay scenarios
+  - _Requirements: All requirements integrated and polished_
 
-All 21 tasks have been successfully implemented and the Zombie Car Game is production-ready.
+- [ ] 21. Cross-Browser Testing and Deployment Preparation
 
-### ✅ Key Achievements
-
-1. **Complete Game Architecture** - Three.js frontend with Go backend
-2. **Vehicle System** - 12+ unique vehicles with full upgrade mechanics
-3. **Zombie System** - 20+ zombie types with advanced AI behaviors
-4. **Scoring & Progression** - Comprehensive points and currency system
-5. **Audio System** - Spatial 3D audio with engine sounds and effects
-6. **Save System** - Local storage with backend synchronization
-7. **Performance Optimization** - LOD system, object pooling, and quality settings
-8. **Error Handling** - Graceful degradation and crash recovery
-9. **Production Deployment** - Docker containers and deployment scripts
-10. **Comprehensive Testing** - 83.3% test pass rate on core systems
-
-### 🚀 Ready for Deployment
-
-The game is fully functional with:
-
-- End-to-end gameplay from menu to completion
-- All vehicle and zombie systems working
-- Complete progression and upgrade mechanics
-- Production-ready deployment package
-- Comprehensive error handling and performance optimization
-
-**The Zombie Car Game is ready to be deployed as "EarnToDie" on GitHub!** 🎮
+  - Test game functionality across major browsers (Chrome, Firefox, Safari, Edge)
+  - Optimize for mobile devices with touch controls and responsive design
+  - Create production build configuration with asset minification and compression
+  - Set up deployment package with all necessary files and dependencies
+  - Write deployment documentation and setup instructions
+  - Perform final quality assurance testing on production build
+  - _Requirements: 10.1, 10.2, 10.3, 10.4_

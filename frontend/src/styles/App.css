@@ -93,12 +93,45 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Game Container */
+.game-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
 /* Game Canvas */
 .game-canvas {
   display: block;
   width: 100%;
   height: 100vh;
   cursor: crosshair;
+}
+
+/* Game HUD */
+.game-hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.hud-stats {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 15px;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.4;
+  backdrop-filter: blur(5px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-stats div {
+  margin: 3px 0;
 }
 
 /* Game UI Overlay */
