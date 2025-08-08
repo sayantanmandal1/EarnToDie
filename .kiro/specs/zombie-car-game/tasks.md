@@ -2,7 +2,6 @@
 
 - [x] 1. Project Setup and Core 2D Game Infrastructure
 
-
   - Initialize project structure with HTML5 Canvas-based 2D game engine
   - Set up package.json with Matter.js physics engine and build tools dependencies
   - Create basic HTML structure with canvas element and game container
@@ -10,9 +9,7 @@
   - Initialize local storage save system and basic error handling
   - _Requirements: 10.1, 10.4_
 
-- [-] 2. Local Storage Save System and Game Data Models
-
-
+- [x] 2. Local Storage Save System and Game Data Models
 
   - Create SaveManager class for local storage persistence of game progress
   - Implement data models for vehicles, upgrades, player statistics, and stage progress
@@ -21,7 +18,8 @@
   - Write unit tests for save system reliability and data integrity
   - _Requirements: 5.3, 5.4, 2.4_
 
-- [ ] 3. 2D Canvas Rendering Engine and Camera System
+- [x] 3. 2D Canvas Rendering Engine and Camera System
+
 
   - Create GameEngine class with HTML5 Canvas rendering and game loop
   - Implement Camera class with smooth following, zoom controls, and screen-to-world coordinate conversion

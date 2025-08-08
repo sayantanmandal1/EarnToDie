@@ -20,6 +20,7 @@ class GameEngine {
     // Game systems
     this.systems = new Map();
     this.entities = new Map();
+    this.spriteRenderer = null;
     
     // Input handling
     this.keys = {};
@@ -66,6 +67,9 @@ class GameEngine {
       
       // Initialize camera system
       await this.initializeCamera();
+      
+      // Initialize sprite rendering system
+      await this.initializeSpriteRenderer();
       
       // Load initial assets
       await this.loadInitialAssets();
@@ -178,9 +182,24 @@ class GameEngine {
    * Initialize camera system
    */
   async initializeCamera() {
-    const { Camera } = await import('./Camera.js');
+    const { default: Camera } = await import('./Camera.js');
     this.camera = new Camera(this.canvas);
     console.log('Camera system initialized');
+  }
+  
+  /**
+   * Initialize sprite rendering system
+   */
+  async initializeSpriteRenderer() {
+    try {
+      const { default: SpriteRenderer } = await import('./SpriteRenderer.js');
+      this.spriteRenderer = new SpriteRenderer();
+      this.registerSystem('spriteRenderer', this.spriteRenderer);
+      console.log('Sprite rendering system initialized');
+    } catch (error) {
+      console.warn('Failed to initialize sprite renderer:', error);
+      // Continue without sprite renderer for now
+    }
   }
   
   /**
