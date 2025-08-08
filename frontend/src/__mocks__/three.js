@@ -1,248 +1,195 @@
-/**
- * Comprehensive Three.js Mock for Testing - 100% Coverage
- */
+// PERFECT THREE.JS MOCK - FIXES ALL CONSTRUCTOR ISSUES
+const THREE = {
+    // CORE CLASSES WITH PROPER CONSTRUCTORS
+    Color: function (r = 1, g = 1, b = 1) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.isColor = true;
 
-// Mock Vector3 class
-class MockVector3 {
-    constructor(x = 0, y = 0, z = 0) {
+        this.set = jest.fn().mockReturnThis();
+        this.setHex = jest.fn().mockReturnThis();
+        this.setRGB = jest.fn().mockReturnThis();
+        this.setHSL = jest.fn().mockReturnThis();
+        this.clone = jest.fn().mockReturnThis();
+        this.copy = jest.fn().mockReturnThis();
+        this.getHex = jest.fn(() => 0xffffff);
+        this.getHexString = jest.fn(() => 'ffffff');
+        this.getStyle = jest.fn(() => 'rgb(255,255,255)');
+
+        return this;
+    },
+
+    Vector3: function (x = 0, y = 0, z = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.isVector3 = true;
-    }
 
-    set(x, y, z) {
+        this.set = jest.fn().mockReturnThis();
+        this.add = jest.fn().mockReturnThis();
+        this.sub = jest.fn().mockReturnThis();
+        this.multiply = jest.fn().mockReturnThis();
+        this.normalize = jest.fn().mockReturnThis();
+        this.length = jest.fn(() => 1);
+        this.clone = jest.fn().mockReturnThis();
+        this.copy = jest.fn().mockReturnThis();
+
+        return this;
+    },
+
+    Vector2: function (x = 0, y = 0) {
         this.x = x;
         this.y = y;
-        this.z = z;
+        this.isVector2 = true;
+
+        this.set = jest.fn().mockReturnThis();
+        this.add = jest.fn().mockReturnThis();
+        this.sub = jest.fn().mockReturnThis();
+        this.normalize = jest.fn().mockReturnThis();
+        this.length = jest.fn(() => 1);
+        this.clone = jest.fn().mockReturnThis();
+
         return this;
-    }
+    },
 
-    copy(v) {
-        this.x = v.x;
-        this.y = v.y;
-        this.z = v.z;
-        return this;
-    }
-
-    clone() {
-        return new MockVector3(this.x, this.y, this.z);
-    }
-
-    add(v) {
-        this.x += v.x;
-        this.y += v.y;
-        this.z += v.z;
-        return this;
-    }
-
-    sub(v) {
-        this.x -= v.x;
-        this.y -= v.y;
-        this.z -= v.z;
-        return this;
-    }
-
-    normalize() {
-        const length = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-        if (length > 0) {
-            this.x /= length;
-            this.y /= length;
-            this.z /= length;
-        }
-        return this;
-    }
-
-    length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-    }
-
-    distanceTo(v) {
-        const dx = this.x - v.x;
-        const dy = this.y - v.y;
-        const dz = this.z - v.z;
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
-    }
-}
-// Mock WebGLRenderer
-class MockWebGLRenderer {
-    constructor(parameters = {}) {
-        this.domElement = {
-            style: {},
-            width: parameters.canvas?.width || 800,
-            height: parameters.canvas?.height || 600
-        };
-        this.shadowMap = {
-            enabled: false,
-            type: 'PCFShadowMap'
-        };
-    }
-
-    setSize(width, height) {
-        this.domElement.width = width;
-        this.domElement.height = height;
-    }
-
-    render(scene, camera) {
-        // Mock render
-    }
-
-    dispose() {
-        // Mock dispose
-    }
-}
-
-// Mock BufferGeometry
-class MockBufferGeometry {
-    constructor() {
-        this.attributes = {};
-        this.index = null;
-        this.isBufferGeometry = true;
-    }
-
-    setAttribute(name, attribute) {
-        this.attributes[name] = attribute;
-        return this;
-    }
-
-    setIndex(index) {
-        this.index = index;
-        return this;
-    }
-
-    dispose() {
-        // Mock dispose
-    }
-}
-
-// Mock Material classes
-class MockMaterial {
-    constructor() {
-        this.isMaterial = true;
-        this.transparent = false;
-        this.opacity = 1;
-    }
-}
-
-class MockMeshBasicMaterial extends MockMaterial {
-    constructor(parameters = {}) {
-        super();
-        Object.assign(this, parameters);
-    }
-}
-
-class MockSpriteMaterial extends MockMaterial {
-    constructor(parameters = {}) {
-        super();
-        Object.assign(this, parameters);
-    }
-}
-// Mock Scene, Camera, etc.
-class MockScene {
-    constructor() {
+    Scene: function () {
+        this.type = 'Scene';
         this.children = [];
-    }
-    
-    add(object) {
-        this.children.push(object);
-    }
-    
-    remove(object) {
-        const index = this.children.indexOf(object);
-        if (index > -1) this.children.splice(index, 1);
-    }
-}
+        this.background = null;
+        this.fog = null;
 
-class MockCamera {
-    constructor() {
-        this.position = new MockVector3();
-        this.rotation = new MockVector3();
-    }
-}
+        this.add = jest.fn();
+        this.remove = jest.fn();
+        this.traverse = jest.fn();
+        this.getObjectByName = jest.fn();
 
-class MockPerspectiveCamera extends MockCamera {
-    constructor(fov, aspect, near, far) {
-        super();
+        return this;
+    },
+
+    PerspectiveCamera: function (fov = 50, aspect = 1, near = 0.1, far = 2000) {
+        this.type = 'PerspectiveCamera';
         this.fov = fov;
         this.aspect = aspect;
         this.near = near;
         this.far = far;
-    }
-}
+        this.position = new THREE.Vector3();
+        this.rotation = { x: 0, y: 0, z: 0 };
 
-// Mock Object3D
-class MockObject3D {
-    constructor() {
-        this.position = new MockVector3();
-        this.rotation = new MockVector3();
-        this.scale = new MockVector3(1, 1, 1);
-        this.children = [];
-        this.parent = null;
-    }
+        this.lookAt = jest.fn();
+        this.updateProjectionMatrix = jest.fn();
 
-    add(object) {
-        this.children.push(object);
-        object.parent = this;
-    }
+        return this;
+    },
 
-    remove(object) {
-        const index = this.children.indexOf(object);
-        if (index > -1) {
-            this.children.splice(index, 1);
-            object.parent = null;
-        }
-    }
-}
+    WebGLRenderer: function (parameters = {}) {
+        this.domElement = document.createElement('canvas');
+        this.shadowMap = { enabled: false, type: THREE.PCFShadowMap };
 
-// Mock Mesh
-class MockMesh extends MockObject3D {
-    constructor(geometry, material) {
-        super();
+        this.setSize = jest.fn();
+        this.setPixelRatio = jest.fn();
+        this.setClearColor = jest.fn();
+        this.render = jest.fn();
+        this.dispose = jest.fn();
+
+        return this;
+    },
+
+    Mesh: function (geometry, material) {
+        this.type = 'Mesh';
         this.geometry = geometry;
         this.material = material;
-        this.isMesh = true;
-    }
-}
+        this.position = new THREE.Vector3();
+        this.rotation = { x: 0, y: 0, z: 0 };
+        this.scale = new THREE.Vector3(1, 1, 1);
 
-// Mock Sprite
-class MockSprite extends MockObject3D {
-    constructor(material) {
-        super();
-        this.material = material;
-        this.isSprite = true;
-    }
-}
+        this.add = jest.fn();
+        this.remove = jest.fn();
+        this.lookAt = jest.fn();
 
-// Export all mocks
-const THREE = {
-    Vector3: MockVector3,
-    WebGLRenderer: MockWebGLRenderer,
-    BufferGeometry: MockBufferGeometry,
-    Material: MockMaterial,
-    MeshBasicMaterial: MockMeshBasicMaterial,
-    SpriteMaterial: MockSpriteMaterial,
-    Scene: MockScene,
-    Camera: MockCamera,
-    PerspectiveCamera: MockPerspectiveCamera,
-    Object3D: MockObject3D,
-    Mesh: MockMesh,
-    Sprite: MockSprite,
-    
-    // Constants
-    PCFShadowMap: 'PCFShadowMap'
+        return this;
+    },
+
+    BoxGeometry: function (width = 1, height = 1, depth = 1) {
+        this.type = 'BoxGeometry';
+        this.parameters = { width, height, depth };
+
+        return this;
+    },
+
+    BufferGeometry: function () {
+        this.type = 'BufferGeometry';
+        this.attributes = {};
+        this.index = null;
+
+        this.setAttribute = jest.fn().mockReturnThis();
+        this.setIndex = jest.fn().mockReturnThis();
+        this.computeBoundingBox = jest.fn();
+        this.computeBoundingSphere = jest.fn();
+        this.dispose = jest.fn();
+
+        return this;
+    },
+
+    SphereGeometry: function (radius = 1, widthSegments = 32, heightSegments = 16) {
+        this.type = 'SphereGeometry';
+        this.parameters = { radius, widthSegments, heightSegments };
+
+        return this;
+    },
+
+    MeshBasicMaterial: function (parameters = {}) {
+        this.type = 'MeshBasicMaterial';
+        this.color = new THREE.Color();
+        this.transparent = parameters.transparent || false;
+        this.opacity = parameters.opacity || 1;
+
+        return this;
+    },
+
+    AmbientLight: function (color = 0xffffff, intensity = 1) {
+        this.type = 'AmbientLight';
+        this.color = new THREE.Color(color);
+        this.intensity = intensity;
+
+        return this;
+    },
+
+    DirectionalLight: function (color = 0xffffff, intensity = 1) {
+        this.type = 'DirectionalLight';
+        this.color = new THREE.Color(color);
+        this.intensity = intensity;
+        this.position = new THREE.Vector3();
+        this.target = { position: new THREE.Vector3() };
+
+        return this;
+    },
+
+    // CONSTANTS
+    PCFShadowMap: 1,
+    NoToneMapping: 0,
+    LinearToneMapping: 1,
+    ReinhardToneMapping: 2,
+    CineonToneMapping: 3,
+    ACESFilmicToneMapping: 4,
+
+    // MATH UTILITIES
+    MathUtils: {
+        degToRad: (degrees) => degrees * Math.PI / 180,
+        radToDeg: (radians) => radians * 180 / Math.PI,
+        clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+        lerp: (x, y, t) => (1 - t) * x + t * y,
+        generateUUID: () => 'mock-uuid-' + Math.random().toString(36).substr(2, 9)
+    }
 };
+
+// Make constructors work properly
+Object.keys(THREE).forEach(key => {
+    if (typeof THREE[key] === 'function' && key !== 'MathUtils') {
+        THREE[key].prototype = THREE[key].prototype || {};
+        THREE[key].prototype.constructor = THREE[key];
+    }
+});
 
 module.exports = THREE;
 export default THREE;
-export const Vector3 = MockVector3;
-export const WebGLRenderer = MockWebGLRenderer;
-export const BufferGeometry = MockBufferGeometry;
-export const Material = MockMaterial;
-export const MeshBasicMaterial = MockMeshBasicMaterial;
-export const SpriteMaterial = MockSpriteMaterial;
-export const Scene = MockScene;
-export const Camera = MockCamera;
-export const PerspectiveCamera = MockPerspectiveCamera;
-export const Object3D = MockObject3D;
-export const Mesh = MockMesh;
-export const Sprite = MockSprite;

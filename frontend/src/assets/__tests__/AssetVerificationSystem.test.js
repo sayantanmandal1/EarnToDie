@@ -21,10 +21,8 @@ describe('AssetVerificationSystem - FAANG Level Tests', () => {
 
     test('should verify assets successfully', async () => {
         const mockManifest = { assets: { 'test-asset': { path: 'test.js' } } };
-                assetVerificationSystem.manifest = mockManifest;
-                const mockManifest = { assets: { 'test-asset': { path: 'test.js' } } };
-                assetVerificationSystem.manifest = mockManifest;
-                const result = await assetVerificationSystem.verifyAsset('test-asset');
+        assetVerificationSystem.manifest = mockManifest;
+        const result = await assetVerificationSystem.verifyAsset('test-asset');
         expect(result).toBeDefined();
     });
 

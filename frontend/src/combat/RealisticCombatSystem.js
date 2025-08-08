@@ -161,7 +161,7 @@ export class RealisticCombatSystem extends EventEmitter {
         
         // Zombie vs Zombie collisions (for physics)
         if (zombies) {
-            this.// checkZombieZombieCollisions(zombies); // TODO: Implement zombie-zombie collisions
+            // this.checkZombieZombieCollisions(zombies); // TODO: Implement zombie-zombie collisions
         }
     }
 

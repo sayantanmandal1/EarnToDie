@@ -3,8 +3,7 @@
  * Tests complete user journeys from start to finish
  */
 
-// Import test fixes first
-import '../test-fixes';
+// Test fixes are handled by setupTests.js
 
 import { GameEngine } from '../engine/GameEngine';
 import { VehicleManager } from '../vehicles/VehicleManager';
