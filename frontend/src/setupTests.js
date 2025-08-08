@@ -1,210 +1,126 @@
+
+// Jest DOM matchers
 import '@testing-library/jest-dom';
 
-// Prevent infinite loops and timeouts
-jest.setTimeout(15000);
-
-// Mock problematic APIs
-global.requestAnimationFrame = jest.fn(cb => setTimeout(cb, 16));
-global.cancelAnimationFrame = jest.fn();
-
-// Ultimate AudioContext mock with ALL methods
-class UltimateAudioContext {
-    constructor() {
-        this.state = 'running';
-        this.sampleRate = 44100;
-        this.destination = { channelCount: 2 };
-        this.listener = {
-            positionX: { value: 0, setValueAtTime: jest.fn() },
-            positionY: { value: 0, setValueAtTime: jest.fn() },
-            positionZ: { value: 0, setValueAtTime: jest.fn() },
-            forwardX: { value: 0, setValueAtTime: jest.fn() },
-            forwardY: { value: 0, setValueAtTime: jest.fn() },
-            forwardZ: { value: -1, setValueAtTime: jest.fn() },
-            upX: { value: 0, setValueAtTime: jest.fn() },
-            upY: { value: 1, setValueAtTime: jest.fn() },
-            upZ: { value: 0, setValueAtTime: jest.fn() }
-        };
-        this.eventListeners = {};
-    }
-    
-    addEventListener(event, callback) {
-        if (!this.eventListeners[event]) {
-            this.eventListeners[event] = [];
-        }
-        this.eventListeners[event].push(callback);
-    }
-    
-    removeEventListener(event, callback) {
-        if (this.eventListeners[event]) {
-            const index = this.eventListeners[event].indexOf(callback);
-            if (index > -1) {
-                this.eventListeners[event].splice(index, 1);
-            }
-        }
-    }
-    
-    createBuffer(channels, length, sampleRate) {
-        return {
-            numberOfChannels: channels,
-            length: length,
-            sampleRate: sampleRate,
-            getChannelData: (channel) => new Float32Array(length).fill(0.1)
-        };
-    }
-    
-    createBufferSource() {
-        return {
-            buffer: null,
-            loop: false,
-            playbackRate: { value: 1, setValueAtTime: jest.fn(), setTargetAtTime: jest.fn() },
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn(),
-            start: jest.fn(),
-            stop: jest.fn()
-        };
-    }
-    
-    createGain() {
-        return {
-            gain: {
-                value: 1,
-                setValueAtTime: jest.fn(),
-                setTargetAtTime: jest.fn(),
-                linearRampToValueAtTime: jest.fn(),
-                exponentialRampToValueAtTime: jest.fn()
-            },
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn()
-        };
-    }
-    
-    createPanner() {
-        return {
-            panningModel: 'HRTF',
-            distanceModel: 'inverse',
-            positionX: { value: 0, setValueAtTime: jest.fn() },
-            positionY: { value: 0, setValueAtTime: jest.fn() },
-            positionZ: { value: 0, setValueAtTime: jest.fn() },
-            orientationX: { value: 1, setValueAtTime: jest.fn() },
-            orientationY: { value: 0, setValueAtTime: jest.fn() },
-            orientationZ: { value: 0, setValueAtTime: jest.fn() },
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn()
-        };
-    }
-    
-    createAnalyser() {
-        return {
-            fftSize: 2048,
-            frequencyBinCount: 1024,
-            getByteFrequencyData: jest.fn(),
-            getByteTimeDomainData: jest.fn(),
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn()
-        };
-    }
-    
-    createConvolver() {
-        return {
-            buffer: null,
-            normalize: true,
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn()
-        };
-    }
-    
-    createDelay() {
-        return {
-            delayTime: { value: 0, setValueAtTime: jest.fn() },
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn()
-        };
-    }
-    
-    createDynamicsCompressor() {
-        return {
-            threshold: { value: -24, setValueAtTime: jest.fn() },
-            knee: { value: 30, setValueAtTime: jest.fn() },
-            ratio: { value: 12, setValueAtTime: jest.fn() },
-            attack: { value: 0.003, setValueAtTime: jest.fn() },
-            release: { value: 0.25, setValueAtTime: jest.fn() },
-            connect: jest.fn().mockReturnThis(),
-            disconnect: jest.fn()
-        };
-    }
-    
-    decodeAudioData(arrayBuffer) {
-        return Promise.resolve(this.createBuffer(2, 44100, 44100));
-    }
-    
-    resume() {
-        this.state = 'running';
-        return Promise.resolve();
-    }
-    
-    suspend() {
-        this.state = 'suspended';
-        return Promise.resolve();
-    }
-    
-    close() {
-        this.state = 'closed';
-        return Promise.resolve();
-    }
-}
-
-global.AudioContext = UltimateAudioContext;
-global.webkitAudioContext = UltimateAudioContext;
-
-// Ultimate fetch mock
-global.fetch = jest.fn((url, options) => {
-    if (url.includes('audio-manifest.json')) {
-        return Promise.resolve({
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve({
-                version: '2.0.0',
-                files: {
-                    'engine/engine_1': { path: 'audio/engine/engine_1.wav', type: 'wav' },
-                    'engine/engine_2': { path: 'audio/engine/engine_2.wav', type: 'wav' },
-                    'impacts/impacts_1': { path: 'audio/impacts/impacts_1.wav', type: 'wav' },
-                    'zombies/zombies_1': { path: 'audio/zombies/zombies_1.wav', type: 'wav' },
-                    'music/music_1': { path: 'audio/music/music_1.mp3', type: 'mp3' },
-                    'ui/ui_1': { path: 'audio/ui/ui_1.wav', type: 'wav' }
-                }
-            })
-        });
-    }
-    if (url.includes('.wav') || url.includes('.mp3')) {
-        const audioData = new ArrayBuffer(1024);
-        const view = new Uint8Array(audioData);
-        for (let i = 0; i < view.length; i++) {
-            view[i] = Math.floor(Math.random() * 256);
-        }
-        return Promise.resolve({
-            ok: true,
-            status: 200,
-            arrayBuffer: () => Promise.resolve(audioData)
-        });
-    }
-    return Promise.resolve({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve({}),
-        text: () => Promise.resolve(''),
-        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0))
-    });
+// Ultimate AudioContext Mock
+const createMockAudioContext = () => ({
+    createBufferSource: jest.fn(() => ({
+        buffer: null,
+        connect: jest.fn(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        playbackRate: { setValueAtTime: jest.fn(), value: 1 },
+        onended: null,
+        loop: false
+    })),
+    createPanner: jest.fn(() => ({
+        panningModel: 'HRTF',
+        distanceModel: 'inverse',
+        refDistance: 1,
+        maxDistance: 100,
+        rolloffFactor: 1,
+        positionX: { setValueAtTime: jest.fn(), value: 0 },
+        positionY: { setValueAtTime: jest.fn(), value: 0 },
+        positionZ: { setValueAtTime: jest.fn(), value: 0 },
+        orientationX: { setValueAtTime: jest.fn(), value: 0 },
+        orientationY: { setValueAtTime: jest.fn(), value: 0 },
+        orientationZ: { setValueAtTime: jest.fn(), value: -1 },
+        connect: jest.fn()
+    })),
+    createGain: jest.fn(() => ({
+        gain: { setValueAtTime: jest.fn(), setTargetAtTime: jest.fn(), value: 1 },
+        connect: jest.fn()
+    })),
+    createAnalyser: jest.fn(() => ({
+        fftSize: 2048,
+        frequencyBinCount: 1024,
+        getByteFrequencyData: jest.fn(),
+        getByteTimeDomainData: jest.fn(),
+        connect: jest.fn()
+    })),
+    createCompressor: jest.fn(() => ({
+        threshold: { setValueAtTime: jest.fn(), value: -24 },
+        knee: { setValueAtTime: jest.fn(), value: 30 },
+        ratio: { setValueAtTime: jest.fn(), value: 12 },
+        attack: { setValueAtTime: jest.fn(), value: 0.003 },
+        release: { setValueAtTime: jest.fn(), value: 0.25 },
+        connect: jest.fn()
+    })),
+    createDynamicsCompressor: jest.fn(() => ({
+        threshold: { setValueAtTime: jest.fn(), value: -24 },
+        knee: { setValueAtTime: jest.fn(), value: 30 },
+        ratio: { setValueAtTime: jest.fn(), value: 12 },
+        attack: { setValueAtTime: jest.fn(), value: 0.003 },
+        release: { setValueAtTime: jest.fn(), value: 0.25 },
+        connect: jest.fn()
+    })),
+    createConvolver: jest.fn(() => ({
+        buffer: null,
+        normalize: true,
+        connect: jest.fn()
+    })),
+    createDelay: jest.fn(() => ({
+        delayTime: { setValueAtTime: jest.fn(), value: 0 },
+        connect: jest.fn()
+    })),
+    createBiquadFilter: jest.fn(() => ({
+        type: 'lowpass',
+        frequency: { setValueAtTime: jest.fn(), value: 350 },
+        Q: { setValueAtTime: jest.fn(), value: 1 },
+        gain: { setValueAtTime: jest.fn(), value: 0 },
+        connect: jest.fn()
+    })),
+    listener: {
+        positionX: { setValueAtTime: jest.fn(), value: 0 },
+        positionY: { setValueAtTime: jest.fn(), value: 0 },
+        positionZ: { setValueAtTime: jest.fn(), value: 0 },
+        forwardX: { setValueAtTime: jest.fn(), value: 0 },
+        forwardY: { setValueAtTime: jest.fn(), value: 0 },
+        forwardZ: { setValueAtTime: jest.fn(), value: -1 },
+        upX: { setValueAtTime: jest.fn(), value: 0 },
+        upY: { setValueAtTime: jest.fn(), value: 1 },
+        upZ: { setValueAtTime: jest.fn(), value: 0 }
+    },
+    destination: {},
+    sampleRate: 44100,
+    currentTime: 0,
+    state: 'running',
+    resume: jest.fn().mockResolvedValue(),
+    suspend: jest.fn().mockResolvedValue(),
+    close: jest.fn().mockResolvedValue(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    decodeAudioData: jest.fn().mockResolvedValue({
+        duration: 1,
+        sampleRate: 44100,
+        numberOfChannels: 2,
+        length: 44100,
+        getChannelData: jest.fn(() => new Float32Array(44100))
+    })
 });
 
-// Ultimate Canvas mock
+// Mock AudioContext constructor
+global.AudioContext = jest.fn(() => createMockAudioContext());
+global.webkitAudioContext = jest.fn(() => createMockAudioContext());
+
+// Mock MediaDevices
+global.navigator.mediaDevices = {
+    getUserMedia: jest.fn().mockResolvedValue({
+        getTracks: jest.fn(() => []),
+        getAudioTracks: jest.fn(() => []),
+        getVideoTracks: jest.fn(() => [])
+    })
+};
+
+// Mock Canvas API
 HTMLCanvasElement.prototype.getContext = jest.fn((type) => {
     if (type === '2d') {
         return {
             fillRect: jest.fn(),
             clearRect: jest.fn(),
-            getImageData: jest.fn(() => ({ data: new Array(4).fill(0) })),
+            getImageData: jest.fn(() => ({ data: new Array(4) })),
             putImageData: jest.fn(),
-            createImageData: jest.fn(() => ({ data: new Array(4).fill(0) })),
+            createImageData: jest.fn(() => ({ data: new Array(4) })),
             setTransform: jest.fn(),
             drawImage: jest.fn(),
             save: jest.fn(),
@@ -220,308 +136,39 @@ HTMLCanvasElement.prototype.getContext = jest.fn((type) => {
             rotate: jest.fn(),
             arc: jest.fn(),
             fill: jest.fn(),
-            measureText: jest.fn(() => ({ width: 100 })),
+            measureText: jest.fn(() => ({ width: 0 })),
             transform: jest.fn(),
             rect: jest.fn(),
-            clip: jest.fn(),
-            font: '10px sans-serif',
-            textAlign: 'start',
-            textBaseline: 'alphabetic',
-            fillStyle: '#000000',
-            strokeStyle: '#000000',
-            lineWidth: 1,
-            lineCap: 'butt',
-            lineJoin: 'miter',
-            globalAlpha: 1,
-            globalCompositeOperation: 'source-over'
+            clip: jest.fn()
         };
     }
     return null;
 });
 
-// Ultimate THREE.js mock with ALL classes and methods
-const ultimateTHREE = {
-    Vector3: class UltimateVector3 {
-        constructor(x = 0, y = 0, z = 0) {
-            this.x = x; this.y = y; this.z = z;
-        }
-        set(x, y, z) { this.x = x; this.y = y; this.z = z; return this; }
-        copy(v) { this.x = v.x; this.y = v.y; this.z = v.z; return this; }
-        clone() { return new ultimateTHREE.Vector3(this.x, this.y, this.z); }
-        add(v) { this.x += v.x; this.y += v.y; this.z += v.z; return this; }
-        sub(v) { this.x -= v.x; this.y -= v.y; this.z -= v.z; return this; }
-        multiplyScalar(s) { this.x *= s; this.y *= s; this.z *= s; return this; }
-        normalize() { return this; }
-        length() { return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); }
-        distanceTo(v) { return 1; }
-        dot(v) { return this.x * v.x + this.y * v.y + this.z * v.z; }
-        cross(v) { return new ultimateTHREE.Vector3(); }
-        setFromMatrixPosition(m) { return this; }
-    },
-    
-    Color: class UltimateColor {
-        constructor(color = 0xffffff) {
-            this.r = 1; this.g = 1; this.b = 1;
-            if (typeof color === 'number') {
-                this.setHex(color);
-            }
-        }
-        setHex(hex) {
-            this.r = ((hex >> 16) & 255) / 255;
-            this.g = ((hex >> 8) & 255) / 255;
-            this.b = (hex & 255) / 255;
-            return this;
-        }
-        set(color) { return this; }
-        copy(color) { return this; }
-        clone() { return new ultimateTHREE.Color(); }
-    },
-    
-    Fog: class UltimateFog {
-        constructor(color = 0xffffff, near = 1, far = 1000) {
-            this.color = new ultimateTHREE.Color(color);
-            this.near = near;
-            this.far = far;
-        }
-    },
-    
-    Material: class UltimateMaterial {
-        constructor() {
-            this.transparent = false;
-            this.opacity = 1;
-            this.color = new ultimateTHREE.Color();
-        }
-        dispose() {}
-    },
-    
-    MeshBasicMaterial: class UltimateMeshBasicMaterial {
-        constructor(params = {}) {
-            this.transparent = false;
-            this.opacity = 1;
-            this.color = params.color || new ultimateTHREE.Color();
-            Object.assign(this, params);
-        }
-        dispose() {}
-    },
-    
-    MeshLambertMaterial: class UltimateMeshLambertMaterial {
-        constructor(params = {}) {
-            this.transparent = false;
-            this.opacity = 1;
-            this.color = params.color || new ultimateTHREE.Color();
-            Object.assign(this, params);
-        }
-        dispose() {}
-    },
-    
-    BufferGeometry: class UltimateBufferGeometry {
-        constructor() {
-            this.attributes = {};
-            this.index = null;
-        }
-        setAttribute(name, attr) { this.attributes[name] = attr; return this; }
-        setIndex(idx) { this.index = idx; return this; }
-        dispose() {}
-        computeBoundingBox() {}
-        computeBoundingSphere() {}
-    },
-    
-    Object3D: class UltimateObject3D {
-        constructor() {
-            this.position = { x: 0, y: 0, z: 0 };
-            this.rotation = { x: 0, y: 0, z: 0 };
-            this.scale = { x: 1, y: 1, z: 1 };
-            this.children = [];
-            this.parent = null;
-            this.visible = true;
-            this.matrixWorld = { elements: new Array(16).fill(0) };
-        }
-        add(...objects) { objects.forEach(obj => { this.children.push(obj); obj.parent = this; }); }
-        remove(...objects) { objects.forEach(obj => {
-            const idx = this.children.indexOf(obj);
-            if (idx > -1) { this.children.splice(idx, 1); obj.parent = null; }
-        }); }
-        updateMatrixWorld() {}
-        traverse(callback) {
-            callback(this);
-            this.children.forEach(child => child.traverse(callback));
-        }
-        lookAt(x, y, z) { return this; }
-    },
-    
-    Mesh: class UltimateMesh {
-        constructor(geometry, material) {
-            this.position = { x: 0, y: 0, z: 0 };
-            this.rotation = { x: 0, y: 0, z: 0 };
-            this.scale = { x: 1, y: 1, z: 1 };
-            this.children = [];
-            this.parent = null;
-            this.visible = true;
-            this.matrixWorld = { elements: new Array(16).fill(0) };
-            this.geometry = geometry;
-            this.material = material;
-        }
-        add(...objects) { objects.forEach(obj => { this.children.push(obj); obj.parent = this; }); }
-        remove(...objects) { objects.forEach(obj => {
-            const idx = this.children.indexOf(obj);
-            if (idx > -1) { this.children.splice(idx, 1); obj.parent = null; }
-        }); }
-        updateMatrixWorld() {}
-        traverse(callback) {
-            callback(this);
-            this.children.forEach(child => child.traverse(callback));
-        }
-        lookAt(x, y, z) { return this; }
-    },
-    
-    Scene: class UltimateScene {
-        constructor() {
-            this.position = { x: 0, y: 0, z: 0 };
-            this.rotation = { x: 0, y: 0, z: 0 };
-            this.scale = { x: 1, y: 1, z: 1 };
-            this.children = [];
-            this.parent = null;
-            this.visible = true;
-            this.matrixWorld = { elements: new Array(16).fill(0) };
-            this.background = null;
-            this.fog = null;
-        }
-        add(...objects) { objects.forEach(obj => { this.children.push(obj); obj.parent = this; }); }
-        remove(...objects) { objects.forEach(obj => {
-            const idx = this.children.indexOf(obj);
-            if (idx > -1) { this.children.splice(idx, 1); obj.parent = null; }
-        }); }
-        updateMatrixWorld() {}
-        traverse(callback) {
-            callback(this);
-            this.children.forEach(child => child.traverse(callback));
-        }
-        lookAt(x, y, z) { return this; }
-    },
-    
-    Camera: class UltimateCamera {
-        constructor() {
-            this.position = { x: 0, y: 0, z: 0 };
-            this.rotation = { x: 0, y: 0, z: 0 };
-            this.scale = { x: 1, y: 1, z: 1 };
-            this.children = [];
-            this.parent = null;
-            this.visible = true;
-            this.matrixWorld = { elements: new Array(16).fill(0) };
-            this.up = { x: 0, y: 1, z: 0 };
-        }
-        add(...objects) { objects.forEach(obj => { this.children.push(obj); obj.parent = this; }); }
-        remove(...objects) { objects.forEach(obj => {
-            const idx = this.children.indexOf(obj);
-            if (idx > -1) { this.children.splice(idx, 1); obj.parent = null; }
-        }); }
-        updateMatrixWorld() {}
-        traverse(callback) {
-            callback(this);
-            this.children.forEach(child => child.traverse(callback));
-        }
-        updateProjectionMatrix() {}
-        lookAt(x, y, z) { return this; }
-    },
-    
-    PerspectiveCamera: class UltimatePerspectiveCamera {
-        constructor(fov = 50, aspect = 1, near = 0.1, far = 2000) {
-            this.position = { x: 0, y: 0, z: 0 };
-            this.rotation = { x: 0, y: 0, z: 0 };
-            this.scale = { x: 1, y: 1, z: 1 };
-            this.children = [];
-            this.parent = null;
-            this.visible = true;
-            this.matrixWorld = { elements: new Array(16).fill(0) };
-            this.up = { x: 0, y: 1, z: 0 };
-            this.fov = fov;
-            this.aspect = aspect;
-            this.near = near;
-            this.far = far;
-        }
-        add(...objects) { objects.forEach(obj => { this.children.push(obj); obj.parent = this; }); }
-        remove(...objects) { objects.forEach(obj => {
-            const idx = this.children.indexOf(obj);
-            if (idx > -1) { this.children.splice(idx, 1); obj.parent = null; }
-        }); }
-        updateMatrixWorld() {}
-        traverse(callback) {
-            callback(this);
-            this.children.forEach(child => child.traverse(callback));
-        }
-        updateProjectionMatrix() {}
-        lookAt(x, y, z) { return this; }
-    },
-    
-    WebGLRenderer: class UltimateWebGLRenderer {
-        constructor(params = {}) {
-            this.domElement = document.createElement('canvas');
-            this.shadowMap = { enabled: false, type: 'PCFSoftShadowMap' };
-            this.outputColorSpace = 'srgb';
-        }
-        setSize() {}
-        setPixelRatio() {}
-        render() {}
-        dispose() {}
-        setClearColor() {}
-        clear() {}
-    },
-    
-    AudioListener: class UltimateAudioListener {
-        constructor() {
-            this.context = { listener: this };
-        }
-        setMasterVolume() {}
-    },
-    
-    // Constants
-    PCFSoftShadowMap: 'PCFSoftShadowMap',
-    SRGBColorSpace: 'srgb'
-};
-
-// Mock the three module
-jest.doMock('three', () => ultimateTHREE);
-
-// Mock physics system
-const mockPhysics = {
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    step: jest.fn(),
-    addBody: jest.fn(),
-    removeBody: jest.fn()
-};
-
-// Mock AudioManager methods
-const mockAudioManager = {
-    initialize: jest.fn().mockResolvedValue(true),
-    muteAll: jest.fn(),
-    unmuteAll: jest.fn(),
-    isMuted: jest.fn().mockReturnValue(false),
-    setMasterVolume: jest.fn(),
-    playSound: jest.fn(),
-    stopSound: jest.fn(),
-    dispose: jest.fn()
-};
-
-// Mock other problematic globals
-global.ResizeObserver = jest.fn(() => ({
+// Mock ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
     observe: jest.fn(),
     unobserve: jest.fn(),
     disconnect: jest.fn()
 }));
 
-global.IntersectionObserver = jest.fn(() => ({
+// Mock IntersectionObserver
+global.IntersectionObserver = jest.fn().mockImplementation(() => ({
     observe: jest.fn(),
     unobserve: jest.fn(),
     disconnect: jest.fn()
 }));
 
-global.Worker = jest.fn(() => ({
-    postMessage: jest.fn(),
-    terminate: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn()
-}));
+// Mock fetch
+global.fetch = jest.fn(() =>
+    Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({}),
+        text: () => Promise.resolve(''),
+        blob: () => Promise.resolve(new Blob()),
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(8))
+    })
+);
 
 // Mock localStorage
 const localStorageMock = {
@@ -533,36 +180,48 @@ const localStorageMock = {
 global.localStorage = localStorageMock;
 global.sessionStorage = localStorageMock;
 
-// Mock window properties
-Object.defineProperty(window, 'devicePixelRatio', {
-    writable: true,
-    value: 1
-});
-
-Object.defineProperty(window, 'innerWidth', {
-    writable: true,
-    value: 1024
-});
-
-Object.defineProperty(window, 'innerHeight', {
-    writable: true,
-    value: 768
-});
-
-// Mock URL
+// Mock URL methods
 global.URL.createObjectURL = jest.fn(() => 'mocked-url');
 global.URL.revokeObjectURL = jest.fn();
 
-// Suppress console noise
-global.console = {
-    ...console,
-    warn: jest.fn(),
-    error: jest.fn(),
-    log: jest.fn()
+// Mock Worker
+global.Worker = jest.fn().mockImplementation(() => ({
+    postMessage: jest.fn(),
+    terminate: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+}));
+
+// Mock performance
+global.performance = {
+    now: jest.fn(() => Date.now()),
+    mark: jest.fn(),
+    measure: jest.fn(),
+    getEntriesByName: jest.fn(() => []),
+    getEntriesByType: jest.fn(() => [])
 };
 
-// Export mocks for tests that need them
-global.mockPhysics = mockPhysics;
-global.mockAudioManager = mockAudioManager;
+// Mock requestAnimationFrame
+global.requestAnimationFrame = jest.fn(cb => setTimeout(cb, 16));
+global.cancelAnimationFrame = jest.fn(id => clearTimeout(id));
 
-console.log('✅ Ultimate test environment loaded - 100% compatible with ALL features');
+// Mock window properties
+Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
+Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 768 });
+Object.defineProperty(window, 'devicePixelRatio', { writable: true, configurable: true, value: 1 });
+
+// Suppress console warnings in tests
+const originalWarn = console.warn;
+console.warn = (...args) => {
+    if (args[0] && typeof args[0] === 'string' && (
+        args[0].includes('THREE.') || 
+        args[0].includes('WebGL') ||
+        args[0].includes('AudioContext')
+    )) {
+        return;
+    }
+    originalWarn.apply(console, args);
+};
+
+// Set test timeout
+jest.setTimeout(30000);

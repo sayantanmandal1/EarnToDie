@@ -14,6 +14,9 @@ export class AudioManagementSystem extends EventEmitter {
     constructor(options = {}) {
         super();
         
+        // Initialize logger first
+        this.logger = console;
+        
         this.options = {
             // Streaming settings
             streamingEnabled: options.streamingEnabled !== false,
@@ -94,7 +97,7 @@ export class AudioManagementSystem extends EventEmitter {
      */
     async initialize() {
         try {
-            this.logger.info('Initializing Audio Management System...');
+            (this.logger && this.logger.info) ? this.logger.info('Initializing Audio Management System...') : console.info('Initializing Audio Management System...');
             
             // Initialize Web Audio API
             await this.initializeAudioContext();
@@ -116,11 +119,15 @@ export class AudioManagementSystem extends EventEmitter {
             // Start quality monitoring
             this.startQualityMonitoring();
             
-            this.logger.info('Audio Management System initialized successfully');
+            (this.logger && this.logger.info) ? this.logger.info('Audio Management System initialized successfully') : console.info('Audio Management System initialized successfully');
             this.emit('initialized');
             
         } catch (error) {
-            this.logger.error('Failed to initialize Audio Management System:', error);
+            if (this.logger && this.logger.error) {
+                (this.logger && this.logger.error) ? this.logger.error('Failed to initialize Audio Management System:', error) : console.error('Failed to initialize Audio Management System:', error);
+            } else {
+                console.error('Failed to initialize Audio Management System:', error);
+            }
             throw error;
         }
     }
@@ -146,10 +153,10 @@ export class AudioManagementSystem extends EventEmitter {
                 await this.audioContext.resume();
             }
             
-            this.logger.info(`Audio context initialized: ${this.audioContext.sampleRate}Hz, ${this.audioContext.state}`);
+            (this.logger && this.logger.info) ? this.logger.info(`Audio context initialized: ${this.audioContext.sampleRate}Hz, ${this.audioContext.state}`) : console.info(`Audio context initialized: ${this.audioContext.sampleRate}Hz, ${this.audioContext.state}`);
             
         } catch (error) {
-            this.logger.error('Failed to initialize audio context:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Failed to initialize audio context:', error) : console.error('Failed to initialize audio context:', error);
             throw error;
         }
     }
@@ -175,10 +182,10 @@ export class AudioManagementSystem extends EventEmitter {
             this.masterGain.connect(this.compressor);
             this.compressor.connect(this.audioContext.destination);
             
-            this.logger.info('Audio processing chain established');
+            (this.logger && this.logger.info) ? this.logger.info('Audio processing chain established') : console.info('Audio processing chain established');
             
         } catch (error) {
-            this.logger.error('Failed to setup audio chain:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Failed to setup audio chain:', error) : console.error('Failed to setup audio chain:', error);
             throw error;
         }
     }
@@ -188,7 +195,7 @@ export class AudioManagementSystem extends EventEmitter {
      */
     async initializeStreaming() {
         if (!this.options.streamingEnabled) {
-            this.logger.info('Audio streaming disabled');
+            (this.logger && this.logger.info) ? this.logger.info('Audio streaming disabled') : console.info('Audio streaming disabled');
             return;
         }
         
@@ -202,10 +209,10 @@ export class AudioManagementSystem extends EventEmitter {
                 this.setupStreamingWorker();
             }
             
-            this.logger.info('Audio streaming system initialized');
+            (this.logger && this.logger.info) ? this.logger.info('Audio streaming system initialized') : console.info('Audio streaming system initialized');
             
         } catch (error) {
-            this.logger.error('Failed to initialize streaming:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Failed to initialize streaming:', error) : console.error('Failed to initialize streaming:', error);
             throw error;
         }
     }
@@ -252,10 +259,10 @@ export class AudioManagementSystem extends EventEmitter {
                 this.handleWorkerMessage(e.data);
             };
             
-            this.logger.info('Streaming worker initialized');
+            (this.logger && this.logger.info) ? this.logger.info('Streaming worker initialized') : console.info('Streaming worker initialized');
             
         } catch (error) {
-            this.logger.warn('Failed to setup streaming worker:', error);
+            (this.logger && this.logger.warn) ? this.logger.warn('Failed to setup streaming worker:', error) : console.warn('Failed to setup streaming worker:', error);
         }
     }
 
@@ -288,11 +295,11 @@ export class AudioManagementSystem extends EventEmitter {
         
         // Monitor audio context state
         this.audioContext.addEventListener('statechange', () => {
-            this.logger.info(`Audio context state changed: ${this.audioContext.state}`);
+            (this.logger && this.logger.info) ? this.logger.info(`Audio context state changed: ${this.audioContext.state}`) : console.info(`Audio context state changed: ${this.audioContext.state}`);
             this.emit('contextStateChanged', this.audioContext.state);
         });
         
-        this.logger.info('Performance monitoring started');
+        (this.logger && this.logger.info) ? this.logger.info('Performance monitoring started') : console.info('Performance monitoring started');
     }
 
     /**
@@ -320,7 +327,7 @@ export class AudioManagementSystem extends EventEmitter {
             });
             
         } catch (error) {
-            this.logger.warn('Failed to update performance metrics:', error);
+            (this.logger && this.logger.warn) ? this.logger.warn('Failed to update performance metrics:', error) : console.warn('Failed to update performance metrics:', error);
         }
     }
 
@@ -383,7 +390,7 @@ export class AudioManagementSystem extends EventEmitter {
      */
     triggerGarbageCollection() {
         try {
-            this.logger.info('Triggering audio garbage collection...');
+            (this.logger && this.logger.info) ? this.logger.info('Triggering audio garbage collection...') : console.info('Triggering audio garbage collection...');
             
             // Clean up old buffers
             this.cleanupOldBuffers();
@@ -397,7 +404,7 @@ export class AudioManagementSystem extends EventEmitter {
             this.emit('garbageCollected');
             
         } catch (error) {
-            this.logger.warn('Failed to trigger garbage collection:', error);
+            (this.logger && this.logger.warn) ? this.logger.warn('Failed to trigger garbage collection:', error) : console.warn('Failed to trigger garbage collection:', error);
         }
     }
 
@@ -411,7 +418,7 @@ export class AudioManagementSystem extends EventEmitter {
         for (const [key, buffer] of this.audioBuffers.entries()) {
             if (buffer.lastUsed && (now - buffer.lastUsed) > maxAge) {
                 this.audioBuffers.delete(key);
-                this.logger.debug(`Cleaned up old buffer: ${key}`);
+                (this.logger && this.logger.debug) ? this.logger.debug(`Cleaned up old buffer: ${key}`) : console.debug(`Cleaned up old buffer: ${key}`);
             }
         }
     }
@@ -423,7 +430,7 @@ export class AudioManagementSystem extends EventEmitter {
         for (const [key, source] of this.streamingSources.entries()) {
             if (source.playbackState === 'finished' || source.ended) {
                 this.streamingSources.delete(key);
-                this.logger.debug(`Cleaned up inactive source: ${key}`);
+                (this.logger && this.logger.debug) ? this.logger.debug(`Cleaned up inactive source: ${key}`) : console.debug(`Cleaned up inactive source: ${key}`);
             }
         }
     }
@@ -455,7 +462,7 @@ export class AudioManagementSystem extends EventEmitter {
         if (currentIndex < qualityLevels.length - 1) {
             const newQuality = qualityLevels[currentIndex + 1];
             this.setQuality(newQuality);
-            this.logger.info(`Downgraded audio quality to ${newQuality} for performance`);
+            (this.logger && this.logger.info) ? this.logger.info(`Downgraded audio quality to ${newQuality} for performance`) : console.info(`Downgraded audio quality to ${newQuality} for performance`);
         }
     }
 
@@ -469,7 +476,7 @@ export class AudioManagementSystem extends EventEmitter {
         if (currentIndex < qualityLevels.length - 1) {
             const newQuality = qualityLevels[currentIndex + 1];
             this.setQuality(newQuality);
-            this.logger.info(`Upgraded audio quality to ${newQuality}`);
+            (this.logger && this.logger.info) ? this.logger.info(`Upgraded audio quality to ${newQuality}`) : console.info(`Upgraded audio quality to ${newQuality}`);
         }
     }
 
@@ -495,11 +502,11 @@ export class AudioManagementSystem extends EventEmitter {
             this.updateSourcesQuality();
             
             this.emit('qualityChanged', { oldQuality, newQuality: quality });
-            this.logger.info(`Audio quality changed from ${oldQuality} to ${quality}`);
+            (this.logger && this.logger.info) ? this.logger.info(`Audio quality changed from ${oldQuality} to ${quality}`) : console.info(`Audio quality changed from ${oldQuality} to ${quality}`);
             
         } catch (error) {
             this.currentQuality = oldQuality;
-            this.logger.error(`Failed to set quality to ${quality}:`, error);
+            (this.logger && this.logger.error) ? this.logger.error(`Failed to set quality to ${quality}:`, error) : console.error(`Failed to set quality to ${quality}:`, error);
             throw error;
         }
     }
@@ -528,7 +535,7 @@ export class AudioManagementSystem extends EventEmitter {
             }
             
         } catch (error) {
-            this.logger.error('Failed to reinitialize audio context:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Failed to reinitialize audio context:', error) : console.error('Failed to reinitialize audio context:', error);
             throw error;
         }
     }
@@ -565,10 +572,10 @@ export class AudioManagementSystem extends EventEmitter {
             // Start visualization update loop
             this.startVisualizationLoop();
             
-            this.logger.info('Audio visualization initialized');
+            (this.logger && this.logger.info) ? this.logger.info('Audio visualization initialized') : console.info('Audio visualization initialized');
             
         } catch (error) {
-            this.logger.error('Failed to setup visualization:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Failed to setup visualization:', error) : console.error('Failed to setup visualization:', error);
         }
     }
 
@@ -598,7 +605,7 @@ export class AudioManagementSystem extends EventEmitter {
                 });
                 
             } catch (error) {
-                this.logger.warn('Visualization update error:', error);
+                (this.logger && this.logger.warn) ? this.logger.warn('Visualization update error:', error) : console.warn('Visualization update error:', error);
             }
             
             // Continue loop
@@ -638,7 +645,7 @@ export class AudioManagementSystem extends EventEmitter {
             this.checkAudioDropouts();
         }, 100); // Check every 100ms
         
-        this.logger.info('Quality monitoring started');
+        (this.logger && this.logger.info) ? this.logger.info('Quality monitoring started') : console.info('Quality monitoring started');
     }
 
     /**
@@ -694,11 +701,11 @@ export class AudioManagementSystem extends EventEmitter {
             
             this.audioBuffers.set(assetId, bufferData);
             
-            this.logger.debug(`Audio loading skipped: ${assetId}`);
+            (this.logger && this.logger.debug) ? this.logger.debug(`Audio loading skipped: ${assetId}`) : console.debug(`Audio loading skipped: ${assetId}`);
             return bufferData;
             
         } catch (error) {
-            this.logger.error(`Failed to load audio ${assetId}:`, error);
+            (this.logger && this.logger.error) ? this.logger.error(`Failed to load audio ${assetId}:`, error) : console.error(`Failed to load audio ${assetId}:`, error);
             throw error;
         }
     }
@@ -743,7 +750,7 @@ export class AudioManagementSystem extends EventEmitter {
             return { source, gainNode, sourceId };
             
         } catch (error) {
-            this.logger.error(`Failed to create source for ${assetId}:`, error);
+            (this.logger && this.logger.error) ? this.logger.error(`Failed to create source for ${assetId}:`, error) : console.error(`Failed to create source for ${assetId}:`, error);
             throw error;
         }
     }
@@ -785,7 +792,7 @@ export class AudioManagementSystem extends EventEmitter {
             this.emit('settingsUpdated', settings);
             
         } catch (error) {
-            this.logger.error('Failed to update settings:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Failed to update settings:', error) : console.error('Failed to update settings:', error);
             throw error;
         }
     }
@@ -820,7 +827,7 @@ export class AudioManagementSystem extends EventEmitter {
      */
     enableDebugMode() {
         this.debugMode = true;
-        this.logger.info('Audio debug mode enabled');
+        (this.logger && this.logger.info) ? this.logger.info('Audio debug mode enabled') : console.info('Audio debug mode enabled');
         
         // Start debug logging
         this.debugInterval = setInterval(() => {
@@ -837,7 +844,7 @@ export class AudioManagementSystem extends EventEmitter {
             clearInterval(this.debugInterval);
             this.debugInterval = null;
         }
-        this.logger.info('Audio debug mode disabled');
+        (this.logger && this.logger.info) ? this.logger.info('Audio debug mode disabled') : console.info('Audio debug mode disabled');
     }
 
     /**
@@ -849,7 +856,12 @@ export class AudioManagementSystem extends EventEmitter {
         const stats = this.getPerformanceStats();
         const settings = this.getSettings();
         
-        this.logger.debug('Audio System Debug Info:', {
+        (this.logger && this.logger.debug) ? this.logger.debug('Audio System Debug Info:', {
+            settings,
+            performance: stats,
+            buffers: Array.from(this.audioBuffers.keys()),
+            activeSources: Array.from(this.streamingSources.keys())
+        }) : console.debug('Audio System Debug Info:', {
             settings,
             performance: stats,
             buffers: Array.from(this.audioBuffers.keys()),
@@ -862,7 +874,7 @@ export class AudioManagementSystem extends EventEmitter {
      */
     async dispose() {
         try {
-            this.logger.info('Disposing Audio Management System...');
+            (this.logger && this.logger.info) ? this.logger.info('Disposing Audio Management System...') : console.info('Disposing Audio Management System...');
             
             // Clear intervals
             if (this.performanceInterval) {
@@ -899,10 +911,10 @@ export class AudioManagementSystem extends EventEmitter {
             // Remove all listeners
             this.removeAllListeners();
             
-            this.logger.info('Audio Management System disposed');
+            (this.logger && this.logger.info) ? this.logger.info('Audio Management System disposed') : console.info('Audio Management System disposed');
             
         } catch (error) {
-            this.logger.error('Error disposing Audio Management System:', error);
+            (this.logger && this.logger.error) ? this.logger.error('Error disposing Audio Management System:', error) : console.error('Error disposing Audio Management System:', error);
         }
     }
 }
