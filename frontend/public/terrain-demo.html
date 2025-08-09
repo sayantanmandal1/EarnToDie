@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desert Terrain Demo - Zombie Car Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2a2a2a;
+            font-family: 'Courier New', monospace;
+            color: #d4a574;
+            overflow: hidden;
+        }
+        
+        #gameContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #8b4513;
+            background: #ff8c42;
+            box-shadow: 0 0 20px rgba(139, 69, 19, 0.5);
+        }
+        
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        #loadingText {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #loadingProgress {
+            width: 300px;
+            height: 20px;
+            border: 2px solid #8b4513;
+            background: #1a1a1a;
+            position: relative;
+        }
+        
+        #loadingBar {
+            height: 100%;
+            background: linear-gradient(90deg, #8b4513, #d4a574);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(42, 42, 42, 0.9);
+            padding: 15px;
+            border: 2px solid #8b4513;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .title {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="title">🏜️ DESERT TERRAIN DEMO 🚗</div>
+    
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1200" height="800"></canvas>
+    </div>
+    
+    <div id="loadingScreen">
+        <div id="loadingText">
+            Loading Desert Terrain System...<br>
+            <small>Generating procedural wasteland</small>
+        </div>
+        <div id="loadingProgress">
+            <div id="loadingBar"></div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <strong>TERRAIN DEMO CONTROLS:</strong><br>
+        ↑/↓ Arrow Keys - Adjust vehicle speed<br>
+        SPACE - Make vehicle jump<br>
+        F3 - Toggle debug information<br>
+        ESC - Pause/Resume demo<br><br>
+        
+        <strong>FEATURES DEMONSTRATED:</strong><br>
+        • Procedural desert terrain generation<br>
+        • Dynamic chunk loading/unloading<br>
+        • Physics-based obstacle collision<br>
+        • Terrain following camera system<br>
+        • Performance-optimized rendering
+    </div>
+    
+    <script type="module">
+        import TerrainIntegrationExample from '../src/terrain/TerrainIntegrationExample.js';
+        
+        // Initialize and start the terrain demo
+        async function startDemo() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingText = document.getElementById('loadingText');
+            
+            try {
+                // Simulate loading progress
+                const loadingSteps = [
+                    { text: 'Initializing game engine...', progress: 20 },
+                    { text: 'Loading terrain generator...', progress: 40 },
+                    { text: 'Setting up physics world...', progress: 60 },
+                    { text: 'Creating demo vehicle...', progress: 80 },
+                    { text: 'Starting terrain demo...', progress: 100 }
+                ];
+                
+                for (const step of loadingSteps) {
+                    loadingText.innerHTML = `${step.text}<br><small>Generating procedural wasteland</small>`;
+                    loadingBar.style.width = `${step.progress}%`;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // Initialize terrain demo
+                const demo = new TerrainIntegrationExample();
+                
+                if (await demo.initialize()) {
+                    // Hide loading screen
+                    loadingScreen.style.display = 'none';
+                    
+                    // Start demo
+                    demo.start();
+                    
+                    // Add cleanup on page unload
+                    window.addEventListener('beforeunload', () => {
+                        demo.dispose();
+                    });
+                    
+                    console.log('🏜️ Desert terrain demo started successfully!');
+                } else {
+                    throw new Error('Failed to initialize terrain demo');
+                }
+                
+            } catch (error) {
+                console.error('Failed to start terrain demo:', error);
+                loadingText.innerHTML = `
+                    <span style="color: #ff4444;">Failed to load terrain demo</span><br>
+                    <small>${error.message}</small><br><br>
+                    <small>Please check the console for more details</small>
+                `;
+            }
+        }
+        
+        // Start demo when page loads
+        document.addEventListener('DOMContentLoaded', startDemo);
+        
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'F11') {
+                event.preventDefault();
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

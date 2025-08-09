@@ -20,7 +20,6 @@
 
 - [x] 3. 2D Canvas Rendering Engine and Camera System
 
-
   - Create GameEngine class with HTML5 Canvas rendering and game loop
   - Implement Camera class with smooth following, zoom controls, and screen-to-world coordinate conversion
   - Create sprite rendering system with support for animated sprites and visual effects
@@ -29,7 +28,7 @@
   - Write unit tests for camera movement and rendering coordinate calculations
   - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 4. Matter.js Physics Integration and Vehicle Physics
+- [x] 4. Matter.js Physics Integration and Vehicle Physics
 
   - Integrate Matter.js 2D physics engine with the game engine
   - Create Vehicle class with physics body, semi-realistic movement, and momentum
@@ -39,7 +38,7 @@
   - Write unit tests for vehicle physics behavior and collision responses
   - _Requirements: 6.1, 6.2, 6.3, 1.2_
 
-- [ ] 5. Desert Terrain Generation and Obstacle System
+- [x] 5. Desert Terrain Generation and Obstacle System
 
   - Create TerrainGenerator class for procedural desert landscapes with hills, ramps, and dips
   - Implement uneven terrain generation using noise functions and mathematical curves
@@ -49,12 +48,14 @@
   - Write unit tests for terrain generation algorithms and collision detection
   - _Requirements: 6.4, 6.5, 8.2_
 
-- [ ] 6. Vehicle System and Progression Implementation
+- [-] 6. Vehicle System and Progression Implementation
+
 
   - Create Vehicle class with base stats, upgrade modifiers, and weathered visual appearance
   - Implement multiple vehicle types starting with basic run-down car and progressing to better vehicles
   - Create vehicle unlock system based on distance milestones and currency requirements
   - Add visual representation of vehicle wear, rust, and post-apocalyptic modifications
+
   - Implement fuel consumption system that ends runs when fuel is depleted
   - Write unit tests for vehicle stats calculations and unlock progression
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
