@@ -486,4 +486,89 @@ describe('VehicleInstance', () => {
             expect(appearance).toHaveProperty('modifications');
             
             expect(appearance.upgrades).toHaveProperty('hasEngineUpgrades');
-            expect(appearance.upgrades).toHaveProperty('has
+            expect(appearance.upgrades).toHaveProperty('hasArmorPlating');
+            expect(appearance.upgrades).toHaveProperty('hasWeapons');
+        });
+        
+        test('should show visual modifications based on upgrades', () => {
+            // Add various upgrades
+            mockSaveManager.getSaveData().vehicles.upgrades.STARTER_CAR.engine = 2;
+            mockSaveManager.getSaveData().vehicles.upgrades.STARTER_CAR.armor = 1;
+            mockSaveManager.getSaveData().vehicles.upgrades.STARTER_CAR.weapon = 1;
+            
+            const appearance = vehicleInstance.getVisualAppearance();
+            const modifications = appearance.modifications;
+            
+            expect(modifications.some(mod => mod.type === 'exhaust')).toBe(true);
+            expect(modifications.some(mod => mod.type === 'armor_plating')).toBe(true);
+            expect(modifications.some(mod => mod.type === 'weapons')).toBe(true);
+        });
+        
+        test('should get vehicle colors based on type', () => {
+            const appearance = vehicleInstance.getVisualAppearance();
+            const colors = appearance.colors;
+            
+            expect(colors).toHaveProperty('primary');
+            expect(colors).toHaveProperty('secondary');
+            expect(colors).toHaveProperty('rust');
+            expect(colors).toHaveProperty('damage');
+        });
+    });
+    
+    describe('Vehicle Summary', () => {
+        test('should provide comprehensive vehicle summary', () => {
+            const summary = vehicleInstance.getSummary();
+            
+            expect(summary).toHaveProperty('type');
+            expect(summary).toHaveProperty('name');
+            expect(summary).toHaveProperty('description');
+            expect(summary).toHaveProperty('baseStats');
+            expect(summary).toHaveProperty('effectiveStats');
+            expect(summary).toHaveProperty('upgrades');
+            expect(summary).toHaveProperty('performance');
+            expect(summary).toHaveProperty('appearance');
+            expect(summary).toHaveProperty('health');
+            expect(summary).toHaveProperty('fuel');
+            expect(summary).toHaveProperty('fuelCapacity');
+            expect(summary).toHaveProperty('fuelPercentage');
+            expect(summary).toHaveProperty('isDestroyed');
+            expect(summary).toHaveProperty('isOutOfFuel');
+            
+            expect(summary.type).toBe('STARTER_CAR');
+            expect(summary.name).toBe(VehicleTypes.STARTER_CAR.name);
+        });
+    });
+    
+    describe('Edge Cases', () => {
+        test('should handle missing upgrade data gracefully', () => {
+            // Remove upgrade data
+            delete mockSaveManager.getSaveData().vehicles.upgrades.STARTER_CAR;
+            
+            const upgrades = vehicleInstance.getCurrentUpgrades();
+            expect(upgrades).toEqual({
+                engine: 0, fuel: 0, armor: 0, weapon: 0, wheels: 0
+            });
+        });
+        
+        test('should handle negative damage gracefully', () => {
+            const initialHealth = vehicleInstance.health;
+            vehicleInstance.takeDamage(-10);
+            
+            expect(vehicleInstance.health).toBe(initialHealth);
+        });
+        
+        test('should handle negative repair gracefully', () => {
+            vehicleInstance.health = 50;
+            vehicleInstance.repair(-10);
+            
+            expect(vehicleInstance.health).toBe(50);
+        });
+        
+        test('should handle fuel consumption with zero delta time', () => {
+            const initialFuel = vehicleInstance.fuel;
+            vehicleInstance.consumeFuel(0, 1.0);
+            
+            expect(vehicleInstance.fuel).toBe(initialFuel);
+        });
+    });
+});
