@@ -381,7 +381,7 @@ export class VehicleInstance {
      * Take damage
      */
     takeDamage(amount) {
-        if (this.health <= 0) return 0;
+        if (this.health <= 0 || amount < 0) return 0;
         
         const stats = this.getEffectiveStats();
         const armorReduction = Math.min(0.8, stats.armor * 0.01); // Max 80% damage reduction
@@ -397,6 +397,7 @@ export class VehicleInstance {
      * Repair vehicle
      */
     repair(amount) {
+        if (amount < 0) return;
         this.health = Math.min(100, this.health + amount);
         this.damageLevel = 1 - (this.health / 100);
     }
@@ -598,7 +599,14 @@ export class VehicleInstance {
      * Calculate overall rating
      */
     calculateOverallRating(stats) {
-        const metrics = this.getPerformanceMetrics();
+        const acceleration = this.calculateAcceleration(stats);
+        const topSpeed = this.calculateTopSpeed(stats);
+        const handling = this.calculateHandling(stats);
+        const durability = this.calculateDurability(stats);
+        const upgrades = this.getCurrentUpgrades();
+        const fuelEfficiency = this.calculateFuelEfficiency(stats, upgrades);
+        const combatPower = stats.weapon;
+        
         const weights = {
             acceleration: 0.2,
             topSpeed: 0.2,
@@ -608,10 +616,13 @@ export class VehicleInstance {
             combatPower: 0.1
         };
         
-        let totalScore = 0;
-        Object.keys(weights).forEach(metric => {
-            totalScore += (metrics[metric] || 0) * weights[metric];
-        });
+        const totalScore = 
+            acceleration * weights.acceleration +
+            topSpeed * weights.topSpeed +
+            handling * weights.handling +
+            durability * weights.durability +
+            fuelEfficiency * weights.fuelEfficiency +
+            combatPower * weights.combatPower;
         
         return Math.round(totalScore);
     }

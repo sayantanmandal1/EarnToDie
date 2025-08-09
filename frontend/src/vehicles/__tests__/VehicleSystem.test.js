@@ -356,9 +356,11 @@ describe('VehicleInstance', () => {
         test('should take damage correctly', () => {
             const damage = vehicleInstance.takeDamage(30);
             
-            expect(damage).toBeCloseTo(30, 1); // Allow small floating point differences
-            expect(vehicleInstance.health).toBe(70);
-            expect(vehicleInstance.getHealthPercentage()).toBe(0.7);
+            // Starter car has 30 armor, so 30% damage reduction
+            const expectedDamage = 30 * (1 - 0.3); // 21 damage
+            expect(damage).toBeCloseTo(expectedDamage, 1);
+            expect(vehicleInstance.health).toBe(100 - expectedDamage);
+            expect(vehicleInstance.getHealthPercentage()).toBeCloseTo((100 - expectedDamage) / 100, 2);
         });
         
         test('should reduce damage with armor upgrades', () => {
@@ -399,7 +401,8 @@ describe('VehicleInstance', () => {
         test('should correctly identify destroyed state', () => {
             expect(vehicleInstance.isDestroyed()).toBe(false);
             
-            vehicleInstance.takeDamage(100);
+            // Need to deal enough damage to overcome armor
+            vehicleInstance.takeDamage(200); // 200 * 0.7 = 140 damage, more than 100 health
             expect(vehicleInstance.isDestroyed()).toBe(true);
         });
     });
