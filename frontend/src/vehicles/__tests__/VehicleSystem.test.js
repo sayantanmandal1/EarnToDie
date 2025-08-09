@@ -41,7 +41,8 @@ const createMockSaveManager = (initialData = {}) => {
         getSaveData: jest.fn(() => saveData),
         saveGame: jest.fn((data) => {
             Object.assign(saveData, data);
-        })
+        }),
+        saveToDisk: jest.fn(() => Promise.resolve())
     };
 };
 

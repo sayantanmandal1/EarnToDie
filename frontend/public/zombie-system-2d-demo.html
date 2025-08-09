@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Zombie System Demo - Desert Survival Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ff8c42, #d4a574);
+            font-family: 'Courier New', monospace;
+            color: #8b4513;
+            overflow: hidden;
+        }
+        
+        #gameContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #8b4513;
+            box-shadow: 0 0 20px rgba(139, 69, 19, 0.5);
+            background: linear-gradient(to bottom, #ff8c42, #d4a574);
+        }
+        
+        #loadingScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 69, 19, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        #loadingText {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #d4a574;
+        }
+        
+        #loadingProgress {
+            width: 300px;
+            height: 20px;
+            background: #2a2a2a;
+            border: 2px solid #8b4513;
+            overflow: hidden;
+        }
+        
+        #loadingBar {
+            height: 100%;
+            background: linear-gradient(to right, #ff8c42, #d4a574);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(42, 42, 42, 0.9);
+            border: 2px solid #8b4513;
+            padding: 15px;
+            border-radius: 5px;
+            color: #d4a574;
+            font-size: 12px;
+            max-width: 250px;
+        }
+        
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #ff8c42;
+        }
+        
+        .info-panel ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .info-panel li {
+            margin-bottom: 5px;
+        }
+        
+        #errorMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(139, 69, 19, 0.95);
+            color: #d4a574;
+            padding: 20px;
+            border: 2px solid #d4a574;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1200" height="800"></canvas>
+        
+        <div id="loadingScreen">
+            <div id="loadingText">Loading 2D Zombie System Demo...</div>
+            <div id="loadingProgress">
+                <div id="loadingBar"></div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h3>2D Zombie System Demo</h3>
+            <ul>
+                <li><strong>Green/Grey Zombies:</strong> Different types with unique behaviors</li>
+                <li><strong>Flailing Animations:</strong> Zombies react when hit</li>
+                <li><strong>Vehicle Combat:</strong> Collision-based damage system</li>
+                <li><strong>Visual Feedback:</strong> Blood effects, damage numbers</li>
+                <li><strong>Audio Feedback:</strong> Impact sounds and zombie growls</li>
+                <li><strong>Stage Scaling:</strong> Difficulty increases over time</li>
+            </ul>
+            <br>
+            <strong>Controls:</strong>
+            <ul>
+                <li>SPACE - Spawn zombie horde</li>
+                <li>R - Reset demo</li>
+                <li>ESC - Pause/Resume</li>
+            </ul>
+        </div>
+        
+        <div id="errorMessage">
+            <h3>Demo Error</h3>
+            <p id="errorText"></p>
+            <button onclick="location.reload()">Reload Page</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import GameEngine from '../src/engine/GameEngine.js';
+        import { ZombieSystem2DDemo } from '../src/zombies/ZombieSystem2DDemo.js';
+
+        class ZombieDemoApp {
+            constructor() {
+                this.gameEngine = null;
+                this.zombieDemo = null;
+                this.isInitialized = false;
+                
+                this.loadingScreen = document.getElementById('loadingScreen');
+                this.loadingBar = document.getElementById('loadingBar');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.errorText = document.getElementById('errorText');
+            }
+
+            async initialize() {
+                try {
+                    this.updateLoadingProgress(10, 'Initializing game engine...');
+                    
+                    // Initialize game engine
+                    this.gameEngine = new GameEngine();
+                    const engineInitialized = await this.gameEngine.initialize();
+                    
+                    if (!engineInitialized) {
+                        throw new Error('Failed to initialize game engine');
+                    }
+                    
+                    this.updateLoadingProgress(40, 'Setting up zombie system...');
+                    
+                    // Initialize zombie demo
+                    this.zombieDemo = new ZombieSystem2DDemo(this.gameEngine);
+                    const demoInitialized = await this.zombieDemo.initialize();
+                    
+                    if (!demoInitialized) {
+                        throw new Error('Failed to initialize zombie demo');
+                    }
+                    
+                    this.updateLoadingProgress(70, 'Starting demo...');
+                    
+                    // Start the demo
+                    this.zombieDemo.start();
+                    
+                    this.updateLoadingProgress(90, 'Finalizing...');
+                    
+                    // Setup input handling
+                    this.setupInputHandling();
+                    
+                    this.updateLoadingProgress(100, 'Ready!');
+                    
+                    // Hide loading screen
+                    setTimeout(() => {
+                        this.loadingScreen.style.display = 'none';
+                        this.isInitialized = true;
+                        this.gameEngine.start();
+                    }, 500);
+                    
+                    console.log('2D Zombie System Demo initialized successfully');
+                    
+                } catch (error) {
+                    console.error('Failed to initialize demo:', error);
+                    this.showError(error.message);
+                }
+            }
+
+            setupInputHandling() {
+                // Override game engine input handling to include demo controls
+                const originalHandleInput = this.gameEngine.handleInput.bind(this.gameEngine);
+                
+                this.gameEngine.handleInput = () => {
+                    originalHandleInput();
+                    
+                    if (this.zombieDemo && this.isInitialized) {
+                        this.zombieDemo.handleInput(this.gameEngine.keys);
+                    }
+                };
+                
+                // Override game engine render to include demo rendering
+                const originalRender = this.gameEngine.render.bind(this.gameEngine);
+                
+                this.gameEngine.render = () => {
+                    originalRender();
+                    
+                    if (this.zombieDemo && this.isInitialized) {
+                        this.zombieDemo.render(this.gameEngine.ctx);
+                    }
+                };
+                
+                // Override game engine update to include demo updates
+                const originalUpdate = this.gameEngine.update.bind(this.gameEngine);
+                
+                this.gameEngine.update = (deltaTime) => {
+                    originalUpdate(deltaTime);
+                    
+                    if (this.zombieDemo && this.isInitialized) {
+                        this.zombieDemo.update(deltaTime);
+                    }
+                };
+            }
+
+            updateLoadingProgress(percent, message) {
+                this.loadingBar.style.width = `${percent}%`;
+                document.getElementById('loadingText').textContent = message;
+            }
+
+            showError(message) {
+                this.errorText.textContent = message;
+                this.errorMessage.style.display = 'block';
+                this.loadingScreen.style.display = 'none';
+            }
+
+            dispose() {
+                if (this.zombieDemo) {
+                    this.zombieDemo.dispose();
+                }
+                
+                if (this.gameEngine) {
+                    this.gameEngine.dispose();
+                }
+            }
+        }
+
+        // Initialize the demo when page loads
+        window.addEventListener('load', async () => {
+            const app = new ZombieDemoApp();
+            
+            // Handle page unload
+            window.addEventListener('beforeunload', () => {
+                app.dispose();
+            });
+            
+            // Handle errors
+            window.addEventListener('error', (event) => {
+                console.error('Demo error:', event.error);
+                app.showError(`Demo error: ${event.error.message}`);
+            });
+            
+            // Start the demo
+            await app.initialize();
+        });
+    </script>
+</body>
+</html>

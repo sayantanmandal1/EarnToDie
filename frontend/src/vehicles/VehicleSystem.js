@@ -151,7 +151,7 @@ export class VehicleSystem {
         };
         
         // Save the changes
-        this.saveManager.saveGame(saveData);
+        this.saveManager.saveToDisk();
         
         return {
             success: true,
@@ -181,7 +181,7 @@ export class VehicleSystem {
         saveData.vehicles.selected = vehicleType;
         
         // Save the change
-        this.saveManager.saveGame(saveData);
+        this.saveManager.saveToDisk();
         
         return this.currentVehicle;
     }
@@ -679,7 +679,7 @@ export class VehicleInstance {
         saveData.vehicles.upgrades[this.type][category]++;
         
         // Save changes
-        this.saveManager.saveGame(saveData);
+        this.saveManager.saveToDisk();
         
         return {
             success: true,

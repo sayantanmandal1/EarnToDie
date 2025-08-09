@@ -48,8 +48,7 @@
   - Write unit tests for terrain generation algorithms and collision detection
   - _Requirements: 6.4, 6.5, 8.2_
 
-- [-] 6. Vehicle System and Progression Implementation
-
+- [x] 6. Vehicle System and Progression Implementation
 
   - Create Vehicle class with base stats, upgrade modifiers, and weathered visual appearance
   - Implement multiple vehicle types starting with basic run-down car and progressing to better vehicles
@@ -59,6 +58,9 @@
   - Implement fuel consumption system that ends runs when fuel is depleted
   - Write unit tests for vehicle stats calculations and unlock progression
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+- [x] 7. Zombie Obstacle System and Combat Mechanics
+
 
 - [ ] 7. Zombie Obstacle System and Combat Mechanics
 
