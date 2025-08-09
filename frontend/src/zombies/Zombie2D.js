@@ -711,14 +711,7 @@ export class Zombie2D {
         console.log(`Zombie ${this.type} died, worth ${this.config.pointValue} points`);
     }
 
-    /**
-     * Find nearby vehicle to chase
-     */
-    _findNearbyVehicle() {
-        // This would integrate with the vehicle system
-        // For now, return null (no vehicles found)
-        return null;
-    }
+
 
     /**
      * Get distance to target position
@@ -728,6 +721,34 @@ export class Zombie2D {
         const dx = targetPos.x - myPos.x;
         const dy = targetPos.y - myPos.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
+     * Find nearby vehicle to chase
+     */
+    _findNearbyVehicle() {
+        // Check if vehicle manager is available and has vehicles
+        if (this.vehicleManager && this.vehicleManager.getVehiclesInRadius) {
+            const nearbyVehicles = this.vehicleManager.getVehiclesInRadius(
+                this.position.x,
+                this.position.y,
+                this.detectionRadius
+            );
+            
+            if (nearbyVehicles.length > 0) {
+                return nearbyVehicles[0]; // Return closest vehicle
+            }
+        }
+        
+        // Check if target vehicle is set directly (for demo purposes)
+        if (this.targetVehicle) {
+            const distance = this._getDistanceTo(this.targetVehicle.getPosition());
+            if (distance <= this.detectionRadius) {
+                return this.targetVehicle;
+            }
+        }
+        
+        return null;
     }
 
     /**
@@ -820,7 +841,7 @@ export class Zombie2D {
      */
     _createBloodEffect() {
         const spriteRenderer = this.gameEngine.getSystem('spriteRenderer');
-        if (spriteRenderer) {
+        if (spriteRenderer && spriteRenderer.createParticleEffect) {
             spriteRenderer.createParticleEffect(
                 this.position.x,
                 this.position.y,

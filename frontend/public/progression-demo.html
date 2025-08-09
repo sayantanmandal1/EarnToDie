@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance-Based Progression and Currency System Demo</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #2a2a2a, #1a1a1a);
+            color: #d4a574;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(42, 42, 42, 0.8);
+            border: 2px solid #8b4513;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff8c42;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 30px;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #696969, #4a4a4a);
+            border: 2px solid #8b4513;
+            color: #d4a574;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #8b4513, #696969);
+            box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-panel {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid #8b4513;
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        .stat-panel h3 {
+            color: #ff8c42;
+            margin-top: 0;
+            border-bottom: 1px solid #8b4513;
+            padding-bottom: 5px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 2px 0;
+        }
+
+        .stat-value {
+            color: #90EE90;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #2a2a2a;
+            border: 1px solid #8b4513;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8c42, #ff681a);
+            transition: width 0.3s ease;
+        }
+
+        .log-panel {
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid #8b4513;
+            border-radius: 5px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .log-milestone { color: #FFD700; }
+        .log-money { color: #90EE90; }
+        .log-damage { color: #FF6B6B; }
+        .log-info { color: #87CEEB; }
+
+        .upgrade-shop {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .upgrade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background: rgba(42, 42, 42, 0.5);
+            border: 1px solid #8b4513;
+            border-radius: 3px;
+        }
+
+        .vehicle-display {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid #8b4513;
+            border-radius: 5px;
+        }
+
+        .vehicle-ascii {
+            font-size: 24px;
+            color: #ff8c42;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧟‍♂️ Distance-Based Progression & Currency System Demo 🚗</h1>
+        
+        <div class="demo-controls">
+            <button id="startBtn">🚗 Start Run</button>
+            <button id="endBtn" disabled>🛑 End Run</button>
+            <button id="resetBtn">🔄 Reset All Data</button>
+            <button id="autoRunBtn">🤖 Auto Run</button>
+        </div>
+
+        <div class="vehicle-display">
+            <div class="vehicle-ascii" id="vehicleDisplay">🚗💨</div>
+            <div id="vehicleStatus">Ready to start</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-panel">
+                <h3>💰 Currency Stats</h3>
+                <div class="stat-item">
+                    <span>Current Money:</span>
+                    <span class="stat-value" id="currentMoney">$0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Total Earned:</span>
+                    <span class="stat-value" id="totalEarned">$0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Total Spent:</span>
+                    <span class="stat-value" id="totalSpent">$0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Net Earnings:</span>
+                    <span class="stat-value" id="netEarnings">$0</span>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <h3>📊 Distance Stats</h3>
+                <div class="stat-item">
+                    <span>Current Distance:</span>
+                    <span class="stat-value" id="currentDistance">0m</span>
+                </div>
+                <div class="stat-item">
+                    <span>Best Distance:</span>
+                    <span class="stat-value" id="bestDistance">0m</span>
+                </div>
+                <div class="stat-item">
+                    <span>Total Distance:</span>
+                    <span class="stat-value" id="totalDistance">0m</span>
+                </div>
+                <div class="stat-item">
+                    <span>Average Distance:</span>
+                    <span class="stat-value" id="averageDistance">0m</span>
+                </div>
+                <div class="stat-item">
+                    <span>Total Runs:</span>
+                    <span class="stat-value" id="totalRuns">0</span>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <h3>🚗 Vehicle Status</h3>
+                <div class="stat-item">
+                    <span>Fuel:</span>
+                    <span class="stat-value" id="fuelStatus">100/100</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="fuelBar" style="width: 100%"></div>
+                </div>
+                <div class="stat-item">
+                    <span>Health:</span>
+                    <span class="stat-value" id="healthStatus">100/100</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="healthBar" style="width: 100%"></div>
+                </div>
+                <div class="stat-item">
+                    <span>Milestones:</span>
+                    <span class="stat-value" id="milestones">0</span>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <h3>⬆️ Upgrade Shop</h3>
+                <div class="upgrade-shop">
+                    <div class="upgrade-item">
+                        <span>Engine (Lv.<span id="engineLevel">1</span>)</span>
+                        <button onclick="buyUpgrade('engine', 100)">$100</button>
+                    </div>
+                    <div class="upgrade-item">
+                        <span>Fuel (Lv.<span id="fuelLevel">0</span>)</span>
+                        <button onclick="buyUpgrade('fuel', 80)">$80</button>
+                    </div>
+                    <div class="upgrade-item">
+                        <span>Armor (Lv.<span id="armorLevel">0</span>)</span>
+                        <button onclick="buyUpgrade('armor', 120)">$120</button>
+                    </div>
+                    <div class="upgrade-item">
+                        <span>Weapon (Lv.<span id="weaponLevel">0</span>)</span>
+                        <button onclick="buyUpgrade('weapon', 150)">$150</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-panel">
+            <h3>📝 Activity Log</h3>
+            <div class="log-panel" id="logPanel">
+                <div class="log-entry log-info">🎮 Demo loaded. Click "Start Run" to begin!</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import ProgressionDemo from '../src/progression/ProgressionDemo.js';
+
+        // Initialize demo
+        let demo;
+        let autoRunInterval;
+
+        // Initialize when page loads
+        window.addEventListener('load', async () => {
+            try {
+                demo = new ProgressionDemo();
+                updateDisplay();
+                log('🎮 Demo initialized successfully!', 'info');
+            } catch (error) {
+                log(`❌ Error initializing demo: ${error.message}`, 'damage');
+                console.error(error);
+            }
+        });
+
+        // Button event listeners
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (demo) {
+                demo.startRun();
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('endBtn').disabled = false;
+            }
+        });
+
+        document.getElementById('endBtn').addEventListener('click', () => {
+            if (demo) {
+                demo.endRun('manual_end');
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('endBtn').disabled = true;
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (demo) {
+                demo.reset();
+                log('🔄 All progression data reset!', 'info');
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('autoRunBtn').addEventListener('click', () => {
+            if (autoRunInterval) {
+                clearInterval(autoRunInterval);
+                autoRunInterval = null;
+                document.getElementById('autoRunBtn').textContent = '🤖 Auto Run';
+                log('⏹️ Auto run stopped', 'info');
+            } else {
+                autoRunInterval = setInterval(() => {
+                    if (demo && !demo.isRunning) {
+                        demo.startRun();
+                        setTimeout(() => {
+                            if (demo && demo.isRunning) {
+                                demo.endRun('auto_end');
+                            }
+                        }, Math.random() * 5000 + 2000); // 2-7 seconds
+                    }
+                }, 8000); // Start new run every 8 seconds
+                document.getElementById('autoRunBtn').textContent = '⏹️ Stop Auto';
+                log('🤖 Auto run started', 'info');
+            }
+        });
+
+        // Global function for upgrade purchases
+        window.buyUpgrade = (type, cost) => {
+            if (demo) {
+                const success = demo.buyUpgrade(type, cost);
+                if (success) {
+                    log(`⬆️ Upgraded ${type} for $${cost}`, 'money');
+                } else {
+                    log(`❌ Cannot afford ${type} upgrade ($${cost})`, 'damage');
+                }
+                updateDisplay();
+            }
+        };
+
+        // Update display function
+        function updateDisplay() {
+            if (!demo) return;
+
+            const stats = demo.getProgressionManager().getProgressionStats();
+            const currentRun = demo.getProgressionManager().getCurrentRunStats();
+            const vehicle = demo.getVehicle();
+            const position = demo.getPosition();
+
+            // Currency stats
+            document.getElementById('currentMoney').textContent = `$${stats.currentMoney}`;
+            document.getElementById('totalEarned').textContent = `$${stats.totalEarned}`;
+            document.getElementById('totalSpent').textContent = `$${stats.totalSpent}`;
+            document.getElementById('netEarnings').textContent = `$${stats.netEarnings}`;
+
+            // Distance stats
+            document.getElementById('currentDistance').textContent = `${Math.floor(position.x)}m`;
+            document.getElementById('bestDistance').textContent = `${stats.bestDistance}m`;
+            document.getElementById('totalDistance').textContent = `${stats.totalDistance}m`;
+            document.getElementById('averageDistance').textContent = `${Math.floor(stats.averageDistance)}m`;
+            document.getElementById('totalRuns').textContent = stats.totalRuns;
+
+            // Vehicle status
+            const fuelPercent = Math.max(0, (vehicle.fuel / vehicle.maxFuel) * 100);
+            const healthPercent = Math.max(0, (vehicle.health / vehicle.maxHealth) * 100);
+            
+            document.getElementById('fuelStatus').textContent = `${Math.floor(vehicle.fuel)}/${vehicle.maxFuel}`;
+            document.getElementById('healthStatus').textContent = `${Math.floor(vehicle.health)}/${vehicle.maxHealth}`;
+            document.getElementById('fuelBar').style.width = `${fuelPercent}%`;
+            document.getElementById('healthBar').style.width = `${healthPercent}%`;
+            
+            if (currentRun) {
+                document.getElementById('milestones').textContent = currentRun.milestones.length;
+                document.getElementById('vehicleStatus').textContent = `Running - ${Math.floor(position.x)}m`;
+                document.getElementById('vehicleDisplay').textContent = demo.isRunning ? '🚗💨💨' : '🚗';
+            } else {
+                document.getElementById('milestones').textContent = '0';
+                document.getElementById('vehicleStatus').textContent = 'Ready to start';
+                document.getElementById('vehicleDisplay').textContent = '🚗';
+            }
+
+            // Upgrade levels
+            document.getElementById('engineLevel').textContent = vehicle.upgrades.engine || 0;
+            document.getElementById('fuelLevel').textContent = vehicle.upgrades.fuel || 0;
+            document.getElementById('armorLevel').textContent = vehicle.upgrades.armor || 0;
+            document.getElementById('weaponLevel').textContent = vehicle.upgrades.weapon || 0;
+        }
+
+        // Log function
+        function log(message, type = 'info') {
+            const logPanel = document.getElementById('logPanel');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            logPanel.appendChild(entry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+
+            // Keep only last 100 entries
+            while (logPanel.children.length > 100) {
+                logPanel.removeChild(logPanel.firstChild);
+            }
+        }
+
+        // Update display every 100ms when running
+        setInterval(() => {
+            if (demo && demo.isRunning) {
+                updateDisplay();
+            }
+        }, 100);
+
+        // Override console.log to show in our log panel
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.join(' ');
+            
+            let type = 'info';
+            if (message.includes('🎯') || message.includes('Milestone')) type = 'milestone';
+            else if (message.includes('💰') || message.includes('Money') || message.includes('$')) type = 'money';
+            else if (message.includes('💥') || message.includes('damage') || message.includes('❌')) type = 'damage';
+            
+            log(message, type);
+        };
+    </script>
+</body>
+</html>

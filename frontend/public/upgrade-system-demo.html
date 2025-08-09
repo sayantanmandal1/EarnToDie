@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Upgrade System Demo</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #2a2a2a, #1a1a1a);
+            color: #d4a574;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ff8c42;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 30px;
+        }
+        
+        .demo-section {
+            background: linear-gradient(45deg, #3a3a3a, #2a2a2a);
+            border: 2px solid #8b4513;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .vehicle-display {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .vehicle-canvas {
+            border: 2px solid #654321;
+            background: #1a1a1a;
+            border-radius: 5px;
+        }
+        
+        .upgrade-controls {
+            flex: 1;
+        }
+        
+        .upgrade-category {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 5px;
+        }
+        
+        .upgrade-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .upgrade-level {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .level-indicator {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .level-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #444;
+            border: 1px solid #666;
+        }
+        
+        .level-dot.active {
+            background: #ff8c42;
+            box-shadow: 0 0 5px #ff8c42;
+        }
+        
+        .upgrade-button {
+            background: linear-gradient(45deg, #8b4513, #654321);
+            border: 2px solid #8b4513;
+            color: #d4a574;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .upgrade-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #a0522d, #8b4513);
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
+        }
+        
+        .upgrade-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #654321;
+        }
+        
+        .stat-title {
+            color: #ff8c42;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .money-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .visual-changes {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #aaa;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .control-button {
+            background: linear-gradient(45deg, #696969, #4a4a4a);
+            border: 2px solid #8b4513;
+            color: #d4a574;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .control-button:hover {
+            background: linear-gradient(45deg, #8b4513, #696969);
+            box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Vehicle Upgrade System Demo 🔧</h1>
+        
+        <div class="demo-section">
+            <div class="money-display">
+                Money: $<span id="money">5000</span>
+            </div>
+            
+            <div class="controls">
+                <button class="control-button" onclick="addMoney()">Add $1000</button>
+                <button class="control-button" onclick="resetUpgrades()">Reset All Upgrades</button>
+                <button class="control-button" onclick="maxAllUpgrades()">Max All Upgrades</button>
+            </div>
+            
+            <div class="vehicle-display">
+                <canvas id="vehicleCanvas" class="vehicle-canvas" width="400" height="200"></canvas>
+                
+                <div class="upgrade-controls">
+                    <div id="upgradeCategories"></div>
+                </div>
+            </div>
+            
+            <div class="stats-display" id="statsDisplay"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import UpgradeShop from '../src/upgrades/UpgradeShop.js';
+        import VehicleVisualEnhancer from '../src/upgrades/VehicleVisualEnhancer.js';
+        import { VehicleSystem } from '../src/vehicles/VehicleSystem.js';
+        import { ZombieCarSaveManager } from '../src/save/ZombieCarSaveManager.js';
+
+        // Initialize systems
+        const saveManager = new ZombieCarSaveManager();
+        const vehicleSystem = new VehicleSystem(saveManager);
+        const upgradeShop = new UpgradeShop(saveManager);
+        const visualEnhancer = new VehicleVisualEnhancer();
+
+        // Set up initial game state
+        const saveData = saveManager.getSaveData();
+        saveData.player.money = 5000;
+        saveData.player.bestDistance = 10000;
+        saveManager.saveToDisk();
+
+        const canvas = document.getElementById('vehicleCanvas');
+        const ctx = canvas.getContext('2d');
+        const vehicleType = 'STARTER_CAR';
+
+        // Global functions for buttons
+        window.addMoney = function() {
+            const saveData = saveManager.getSaveData();
+            saveData.player.money += 1000;
+            saveManager.saveToDisk();
+            updateDisplay();
+        };
+
+        window.resetUpgrades = function() {
+            try {
+                upgradeShop.resetVehicleUpgrades(vehicleType);
+                updateDisplay();
+            } catch (error) {
+                console.error('Reset failed:', error);
+            }
+        };
+
+        window.maxAllUpgrades = function() {
+            const categories = ['engine', 'fuel', 'armor', 'weapon', 'wheels'];
+            categories.forEach(category => {
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        upgradeShop.purchaseUpgrade(vehicleType, category);
+                    } catch (error) {
+                        // Expected when max level reached or insufficient funds
+                        break;
+                    }
+                }
+            });
+            updateDisplay();
+        };
+
+        function purchaseUpgrade(category) {
+            try {
+                const result = upgradeShop.purchaseUpgrade(vehicleType, category);
+                console.log('Upgrade purchased:', result);
+                updateDisplay();
+            } catch (error) {
+                alert(`Cannot purchase upgrade: ${error.message}`);
+            }
+        }
+
+        function renderVehicle() {
+            // Clear canvas
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Get vehicle and upgrades
+            const vehicle = vehicleSystem.getVehicle(vehicleType);
+            const upgrades = vehicle.getCurrentUpgrades();
+
+            // Create mock vehicle for rendering
+            const mockVehicle = {
+                width: 80,
+                height: 40,
+                controls: { throttle: 0.3 } // Show some engine effects
+            };
+
+            // Render vehicle body
+            ctx.save();
+            ctx.translate(200, 100);
+            
+            // Basic vehicle body
+            ctx.fillStyle = '#8b4513';
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 2;
+            ctx.fillRect(-40, -20, 80, 40);
+            ctx.strokeRect(-40, -20, 80, 40);
+
+            // Windshield
+            ctx.fillStyle = '#87ceeb';
+            ctx.fillRect(-35, -15, 70, 8);
+
+            // Wheels
+            ctx.fillStyle = '#333333';
+            ctx.beginPath();
+            ctx.arc(-25, 25, 8, 0, Math.PI * 2);
+            ctx.arc(25, 25, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // Apply visual enhancements
+            visualEnhancer.applyEnhancements(ctx, mockVehicle, upgrades, { x: 200, y: 100 }, 0);
+
+            // Add upgrade glow effects
+            visualEnhancer.renderUpgradeGlowEffects(ctx, mockVehicle, upgrades, { x: 200, y: 100 }, 0);
+        }
+
+        function updateUpgradeControls() {
+            const container = document.getElementById('upgradeCategories');
+            const categories = upgradeShop.getUpgradeCategories();
+            
+            container.innerHTML = '';
+
+            categories.forEach(category => {
+                const info = upgradeShop.getUpgradeInfo(vehicleType, category.id);
+                
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'upgrade-category';
+                
+                const visualChanges = upgradeShop.getVisualChanges(vehicleType, category.id, info.currentLevel);
+                const visualText = visualChanges.length > 0 ? 
+                    `Visual: ${visualChanges.map(c => c.description).join(', ')}` : 
+                    'No visual changes yet';
+
+                categoryDiv.innerHTML = `
+                    <div class="upgrade-header">
+                        <strong>${category.icon} ${category.name}</strong>
+                        <span>Level ${info.currentLevel}/${info.maxLevel}</span>
+                    </div>
+                    <div class="upgrade-level">
+                        <div class="level-indicator">
+                            ${Array.from({length: info.maxLevel}, (_, i) => 
+                                `<div class="level-dot ${i < info.currentLevel ? 'active' : ''}"></div>`
+                            ).join('')}
+                        </div>
+                        <button class="upgrade-button" 
+                                onclick="purchaseUpgrade('${category.id}')"
+                                ${!info.canAfford.canUpgrade ? 'disabled' : ''}>
+                            ${info.isMaxLevel ? 'MAX' : `$${info.cost}`}
+                        </button>
+                    </div>
+                    <div style="font-size: 11px; margin-top: 5px;">
+                        ${category.description}
+                    </div>
+                    <div class="visual-changes">
+                        ${visualText}
+                    </div>
+                `;
+                
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function updateStats() {
+            const container = document.getElementById('statsDisplay');
+            const vehicle = vehicleSystem.getVehicle(vehicleType);
+            const baseStats = vehicle.getBaseStats();
+            const effectiveStats = vehicle.getEffectiveStats();
+            const performance = vehicle.getPerformanceMetrics();
+            const upgrades = vehicle.getCurrentUpgrades();
+
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-title">Base Stats</div>
+                    <div>Engine: ${baseStats.engine}</div>
+                    <div>Fuel: ${baseStats.fuel}</div>
+                    <div>Armor: ${baseStats.armor}</div>
+                    <div>Weapon: ${baseStats.weapon}</div>
+                    <div>Wheels: ${baseStats.wheels}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Effective Stats</div>
+                    <div>Engine: ${effectiveStats.engine} (+${effectiveStats.engine - baseStats.engine})</div>
+                    <div>Fuel: ${effectiveStats.fuel} (+${effectiveStats.fuel - baseStats.fuel})</div>
+                    <div>Armor: ${effectiveStats.armor} (+${effectiveStats.armor - baseStats.armor})</div>
+                    <div>Weapon: ${effectiveStats.weapon} (+${effectiveStats.weapon - baseStats.weapon})</div>
+                    <div>Wheels: ${effectiveStats.wheels} (+${effectiveStats.wheels - baseStats.wheels})</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Performance</div>
+                    <div>Acceleration: ${performance.acceleration}</div>
+                    <div>Top Speed: ${performance.topSpeed}</div>
+                    <div>Handling: ${performance.handling}</div>
+                    <div>Durability: ${performance.durability}</div>
+                    <div>Overall Rating: ${performance.overallRating}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Upgrade Levels</div>
+                    <div>Engine: ${upgrades.engine}/5</div>
+                    <div>Fuel: ${upgrades.fuel}/5</div>
+                    <div>Armor: ${upgrades.armor}/5</div>
+                    <div>Weapon: ${upgrades.weapon}/5</div>
+                    <div>Wheels: ${upgrades.wheels}/5</div>
+                </div>
+            `;
+        }
+
+        function updateDisplay() {
+            // Update money display
+            const saveData = saveManager.getSaveData();
+            document.getElementById('money').textContent = saveData.player.money.toLocaleString();
+
+            // Update all components
+            renderVehicle();
+            updateUpgradeControls();
+            updateStats();
+        }
+
+        // Make purchaseUpgrade global
+        window.purchaseUpgrade = purchaseUpgrade;
+
+        // Initial render
+        updateDisplay();
+
+        // Add some animation
+        setInterval(() => {
+            renderVehicle();
+        }, 100);
+    </script>
+</body>
+</html>

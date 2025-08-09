@@ -61,7 +61,6 @@
 
 - [x] 7. Zombie Obstacle System and Combat Mechanics
 
-
 - [ ] 7. Zombie Obstacle System and Combat Mechanics
 
   - Create Zombie class with green/grey coloring, ragged clothing, and flailing animations
@@ -72,17 +71,20 @@
   - Write unit tests for zombie collision detection and destruction mechanics
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 8. Vehicle Upgrade Shop and Enhancement System
+- [x] 8. Vehicle Upgrade Shop and Enhancement System
 
   - Create UpgradeShop class with categories for engine power, fuel tank, wheels, weaponry, and armor
   - Implement upgrade cost calculation with exponential pricing based on current level
   - Add visual representation of upgrades on vehicles (roof-mounted guns, armor plating, etc.)
+
   - Create upgrade effects that improve vehicle performance (speed, fuel capacity, weapon damage)
   - Implement upgrade persistence tied to individual vehicle types
   - Write unit tests for upgrade calculations and visual enhancement systems
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 9. Distance-Based Progression and Currency System
+-
+
+- [x] 9. Distance-Based Progression and Currency System
 
   - Create DistanceTracker class to measure how far the vehicle travels in each run
   - Implement money earning system that converts distance traveled into currency
@@ -92,7 +94,8 @@
   - Write unit tests for distance calculation and currency conversion systems
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 10. Post-Apocalyptic Visual Style and Desert Environment
+- [x] 10. Post-Apocalyptic Visual Style and Desert Environment
+
 
   - Create VisualStyleManager for post-apocalyptic aesthetic with dusty desert backgrounds
   - Implement orange-hued sky gradients and weathered vehicle textures

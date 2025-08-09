@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Apocalyptic Visual Style Demo</title>
+    <link rel="stylesheet" href="../src/visual/PostApocalypticUI.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2a2a2a;
+            font-family: 'Courier New', monospace;
+            color: #d4a574;
+        }
+        
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .canvas-container {
+            position: relative;
+            flex: 1;
+            background: #1a1a1a;
+            border: 2px solid #8b4513;
+        }
+        
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(to bottom, #ff8c42, #d4a574);
+        }
+        
+        .controls-panel {
+            background: linear-gradient(135deg, #4a4a4a, #696969);
+            border-top: 3px solid #8b4513;
+            padding: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group h3 {
+            color: #ff8c42;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .info-panel {
+            background: rgba(74, 74, 74, 0.9);
+            border: 2px solid #8b4513;
+            padding: 15px;
+            margin: 10px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            min-width: 200px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .stage-info {
+            margin-bottom: 10px;
+        }
+        
+        .stage-name {
+            font-weight: bold;
+            color: #ff8c42;
+        }
+        
+        .effect-status {
+            font-size: 12px;
+            color: #a0855b;
+        }
+        
+        .demo-ui-showcase {
+            background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+            border: 3px solid #8b4513;
+            padding: 20px;
+            margin: 20px;
+        }
+        
+        .ui-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .sample-hud {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .hud-gauges {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .hud-info {
+            text-align: right;
+        }
+        
+        .distance-counter {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff8c42;
+        }
+        
+        .money-counter {
+            font-size: 18px;
+            color: #d4a574;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+            
+            <!-- Info Panel -->
+            <div class="info-panel apocalypse-ui">
+                <div class="stage-info">
+                    <div class="stage-name" id="stageName">Desert Outskirts</div>
+                    <div class="effect-status" id="stageDescription">The edge of civilization</div>
+                </div>
+                <div class="effect-status">
+                    <div>Dust Density: <span id="dustDensity">30%</span></div>
+                    <div>Heat Shimmer: <span id="heatShimmer">10%</span></div>
+                    <div>Visibility: <span id="visibility">90%</span></div>
+                    <div>Particles: <span id="particleCount">0</span></div>
+                </div>
+            </div>
+            
+            <!-- Sample HUD -->
+            <div class="sample-hud apocalypse-hud">
+                <div class="hud-gauges">
+                    <div class="apocalypse-gauge">
+                        <div class="apocalypse-gauge-label">FUEL</div>
+                        <div class="apocalypse-gauge-bar">
+                            <div class="apocalypse-gauge-fill fuel" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="apocalypse-gauge">
+                        <div class="apocalypse-gauge-label">HEALTH</div>
+                        <div class="apocalypse-gauge-bar">
+                            <div class="apocalypse-gauge-fill health" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    <div class="apocalypse-gauge">
+                        <div class="apocalypse-gauge-label">SPEED</div>
+                        <div class="apocalypse-gauge-bar">
+                            <div class="apocalypse-gauge-fill speed" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hud-info">
+                    <div class="distance-counter">1,247m</div>
+                    <div class="money-counter">$324</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls Panel -->
+        <div class="controls-panel apocalypse-ui">
+            <div class="control-group">
+                <h3>Stage Selection</h3>
+                <div class="button-group">
+                    <button class="apocalypse-button" onclick="setStage(0)">Outskirts</button>
+                    <button class="apocalypse-button" onclick="setStage(1)">Deep Wasteland</button>
+                    <button class="apocalypse-button" onclick="setStage(2)">Death Valley</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Atmospheric Effects</h3>
+                <div class="button-group">
+                    <button class="apocalypse-button" onclick="toggleDustStorm()">Dust Storm</button>
+                    <button class="apocalypse-button" onclick="toggleHeatShimmer()">Heat Shimmer</button>
+                    <button class="apocalypse-button" onclick="increaseWind()">Increase Wind</button>
+                    <button class="apocalypse-button" onclick="resetEffects()">Reset Effects</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Audio Controls</h3>
+                <div class="button-group">
+                    <button class="apocalypse-button" onclick="playSound('buttonClick')">Button Click</button>
+                    <button class="apocalypse-button" onclick="playSound('upgradePurchase')">Upgrade Purchase</button>
+                    <button class="apocalypse-button" onclick="playSound('menuOpen')">Menu Open</button>
+                    <button class="apocalypse-button" onclick="playSound('errorSound')">Error Sound</button>
+                    <button class="apocalypse-button" onclick="toggleAudio()">Toggle Audio</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- UI Showcase -->
+        <div class="demo-ui-showcase apocalypse-ui">
+            <h2 class="apocalypse-header">Post-Apocalyptic UI Showcase</h2>
+            
+            <div class="ui-grid">
+                <!-- Upgrade Shop Sample -->
+                <div class="apocalypse-panel">
+                    <h3>Upgrade Shop</h3>
+                    <div class="apocalypse-shop">
+                        <div class="apocalypse-upgrade-card">
+                            <div class="apocalypse-upgrade-icon">⚙️</div>
+                            <div class="apocalypse-upgrade-name">Engine</div>
+                            <div class="apocalypse-upgrade-cost">$150</div>
+                            <button class="apocalypse-button">Upgrade</button>
+                        </div>
+                        <div class="apocalypse-upgrade-card">
+                            <div class="apocalypse-upgrade-icon">🛡️</div>
+                            <div class="apocalypse-upgrade-name">Armor</div>
+                            <div class="apocalypse-upgrade-cost">$200</div>
+                            <button class="apocalypse-button">Upgrade</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bars -->
+                <div class="apocalypse-panel">
+                    <h3>Progress Indicators</h3>
+                    <div style="margin-bottom: 15px;">
+                        <label>Vehicle Health</label>
+                        <div class="apocalypse-progress">
+                            <div class="apocalypse-progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label>Fuel Level</label>
+                        <div class="apocalypse-progress">
+                            <div class="apocalypse-progress-fill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Stage Progress</label>
+                        <div class="apocalypse-progress">
+                            <div class="apocalypse-progress-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input Fields -->
+                <div class="apocalypse-panel">
+                    <h3>Input Controls</h3>
+                    <input type="text" class="apocalypse-input" placeholder="Player Name" value="Wasteland Survivor">
+                    <input type="range" class="apocalypse-input" min="0" max="100" value="75">
+                    <button class="apocalypse-button apocalypse-glow">Save Settings</button>
+                </div>
+                
+                <!-- Menu Sample -->
+                <div class="apocalypse-panel">
+                    <h3>Menu Options</h3>
+                    <div class="apocalypse-menu-buttons">
+                        <button class="apocalypse-button">Continue Game</button>
+                        <button class="apocalypse-button">New Game</button>
+                        <button class="apocalypse-button">Settings</button>
+                        <button class="apocalypse-button" disabled>Achievements</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { VisualStyleManager } from '../src/visual/VisualStyleManager.js';
+        import { DesertStageBackdrops } from '../src/visual/DesertStageBackdrops.js';
+        import { AtmosphericEffects } from '../src/visual/AtmosphericEffects.js';
+        import { MechanicalSoundEffects } from '../src/visual/MechanicalSoundEffects.js';
+
+        // Initialize canvas and context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = 800;
+        canvas.height = 400;
+        
+        // Initialize visual systems
+        const visualStyleManager = new VisualStyleManager(canvas, ctx);
+        const desertBackdrops = new DesertStageBackdrops(canvas, ctx);
+        const atmosphericEffects = new AtmosphericEffects(canvas, ctx);
+        const mechanicalSounds = new MechanicalSoundEffects();
+        
+        // Attach sound effects to UI
+        mechanicalSounds.attachToUIElements();
+        
+        // Animation variables
+        let animationId;
+        let lastTime = 0;
+        let cameraX = 0;
+        let windSpeed = 1;
+        let currentStage = 0;
+        
+        // Update info panel
+        function updateInfoPanel() {
+            const stageConfig = visualStyleManager.getCurrentStageConfig();
+            const backdropConfig = desertBackdrops.getCurrentStageConfig();
+            const effectStatus = atmosphericEffects.getEffectStatus();
+            
+            document.getElementById('stageName').textContent = stageConfig.name;
+            document.getElementById('stageDescription').textContent = backdropConfig.description;
+            document.getElementById('dustDensity').textContent = Math.round(stageConfig.dustDensity * 100) + '%';
+            document.getElementById('heatShimmer').textContent = Math.round(stageConfig.atmosphericHaze * 100) + '%';
+            document.getElementById('visibility').textContent = Math.round(backdropConfig.atmosphere.visibility * 100) + '%';
+            document.getElementById('particleCount').textContent = effectStatus.particleCount;
+        }
+        
+        // Animation loop
+        function animate(currentTime) {
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
+            // Update camera position
+            cameraX += 30 * deltaTime;
+            
+            // Update wind speed with variation
+            windSpeed = 1 + Math.sin(currentTime * 0.001) * 0.5;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update all systems
+            const stageConfig = visualStyleManager.getCurrentStageConfig();
+            visualStyleManager.update(deltaTime, cameraX, windSpeed);
+            desertBackdrops.update(deltaTime);
+            atmosphericEffects.update(deltaTime, windSpeed, stageConfig);
+            
+            // Render complete scene
+            desertBackdrops.render(cameraX);
+            visualStyleManager.render(cameraX, windSpeed);
+            atmosphericEffects.render();
+            
+            // Update info panel
+            updateInfoPanel();
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Global functions for controls
+        window.setStage = function(stageIndex) {
+            currentStage = stageIndex;
+            visualStyleManager.setStage(stageIndex);
+            desertBackdrops.setStage(stageIndex);
+            mechanicalSounds.playSound('tabSwitch');
+        };
+        
+        window.toggleDustStorm = function() {
+            if (atmosphericEffects.effects.dustStorm.active) {
+                atmosphericEffects.effects.dustStorm.active = false;
+                atmosphericEffects.effects.dustStorm.particles = [];
+            } else {
+                atmosphericEffects.activateDustStorm(0.8, 10000);
+            }
+            mechanicalSounds.playSound('buttonClick');
+        };
+        
+        window.toggleHeatShimmer = function() {
+            const current = atmosphericEffects.effects.heatShimmer.active;
+            atmosphericEffects.effects.heatShimmer.active = !current;
+            mechanicalSounds.playSound('buttonClick');
+        };
+        
+        window.increaseWind = function() {
+            windSpeed = Math.min(windSpeed + 0.5, 3);
+            atmosphericEffects.setWindEffect(windSpeed);
+            mechanicalSounds.playSound('buttonClick');
+        };
+        
+        window.resetEffects = function() {
+            windSpeed = 1;
+            atmosphericEffects.effects.dustStorm.active = false;
+            atmosphericEffects.effects.dustStorm.particles = [];
+            atmosphericEffects.effects.heatShimmer.active = true;
+            atmosphericEffects.setWindEffect(1);
+            mechanicalSounds.playSound('successSound');
+        };
+        
+        window.playSound = function(soundName) {
+            mechanicalSounds.playSound(soundName);
+        };
+        
+        window.toggleAudio = function() {
+            const currentState = mechanicalSounds.enabled;
+            mechanicalSounds.setEnabled(!currentState);
+            mechanicalSounds.playSound(currentState ? 'errorSound' : 'successSound');
+        };
+        
+        // Start animation
+        updateInfoPanel();
+        animate(0);
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+    </script>
+</body>
+</html>
